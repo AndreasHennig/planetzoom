@@ -45,14 +45,14 @@ public class FirstPersonCamera
 	 
 	public void strafeLeft(float distance)
 	{
-	    position.x -= distance * (float) Math.sin(yaw - (Math.PI / 4.0));
-	    position.z += distance * (float) Math.cos(yaw - (Math.PI / 4.0));
+	    position.x -= distance * (float) Math.sin(yaw - (Math.PI / 2.0));
+	    position.z += distance * (float) Math.cos(yaw - (Math.PI / 2.0));
 	}
 	 
 	public void strafeRight(float distance)
 	{
-	    position.x -= distance * (float) Math.sin(yaw + (Math.PI / 4.0));
-	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 4.0));
+	    position.x -= distance * (float) Math.sin(yaw + (Math.PI / 2.0));
+	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 2.0));
 	}
 	
 	public void setPosition(Vector3f position)
@@ -92,7 +92,7 @@ public class FirstPersonCamera
 	
 	public void addPitch(float amount)
 	{
-		yaw += amount;
+		pitch += amount;
 	}
 	
 	public Matrix4f getViewMatrix()
@@ -109,7 +109,7 @@ public class FirstPersonCamera
         viewMatrix.rotate(pitch, new Vector3f(1.0f, 0.0f, 0.0f));
         
         //yaw - y-axis
-        viewMatrix.rotate(yaw,new Vector3f(0.0f, 1.0f, 0.0f));
+        viewMatrix.rotate(yaw, new Vector3f(0.0f, 1.0f, 0.0f));
         
         viewMatrix.translate(position);
 	}
