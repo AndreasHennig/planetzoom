@@ -8,5 +8,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PlanetZoom/libs/lwjgl_3/native"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/lwjgl_util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
