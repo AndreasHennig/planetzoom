@@ -2,12 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="libs/lwjgl_3/jar/lwjgl.jar">
+	<classpathentry kind="lib" path="libs/lwjgl_util.jar"/>
+	<classpathentry kind="lib" path="libs/lwjgl_3.0.0a/jar/lwjgl.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/PlanetZoom/libs/lwjgl_3/doc/javadoc.zip!/"/>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PlanetZoom/libs/lwjgl_3/native"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/PlanetZoom/libs/lwjgl_3.0.0a/doc/javadoc.zip!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PlanetZoom/libs/lwjgl_3.0.0a/native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/lwjgl_util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
