@@ -9,6 +9,7 @@ public class FirstPersonCamera
 	
 	private float yaw = 0.0f;
 	private float pitch = 0.0f;
+	private boolean invertYAxis;
 	
 	public FirstPersonCamera()
 	{
@@ -77,28 +78,41 @@ public class FirstPersonCamera
 	
 	public void setYaw(float yaw)
 	{
-		this.yaw = yaw;
+		this.yaw = (float) (yaw % (2 * Math.PI));
 	}
 	
 	public void setPitch(float pitch)
 	{
-		this.pitch = pitch;
+		this.pitch = (float) (pitch % (2 * Math.PI));
 	}
 	
 	public void addYaw(float amount)
 	{
-		yaw += amount;
+		yaw = (float) ((yaw + amount) % (2 * Math.PI));
 	}
 	
 	public void addPitch(float amount)
 	{
-		pitch += amount;
+		pitch = (float) ((pitch + amount) % (2 * Math.PI));
 	}
 	
 	public Matrix4f getViewMatrix()
 	{
 		updateViewMatrix();
 		return viewMatrix;
+	}
+	
+	public void invertYAxis()
+	{
+		invertYAxis = true;
+	}
+	public void setInvertYAxis(boolean b)
+	{
+		invertYAxis = b;
+	}
+	public boolean getYAxisInverted()
+	{
+		return invertYAxis;
 	}
 	
 	private void updateViewMatrix()
@@ -109,7 +123,10 @@ public class FirstPersonCamera
         viewMatrix.rotate(pitch, new Vector3f(1.0f, 0.0f, 0.0f));
         
         //yaw - y-axis
-        viewMatrix.rotate(yaw, new Vector3f(0.0f, 1.0f, 0.0f));
+        if(invertYAxis)
+        	viewMatrix.rotate(yaw, new Vector3f(0.0f, 1.0f, 0.0f));
+        else
+        	viewMatrix.rotate(-yaw, new Vector3f(0.0f, 1.0f, 0.0f));
         
         viewMatrix.translate(position);
 	}
