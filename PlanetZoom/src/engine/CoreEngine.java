@@ -17,6 +17,7 @@ public class CoreEngine
     private final IGame game;
     public boolean running;
     public long windowHandle;
+    
     private GLFWKeyCallback keyCallback;
 
     public CoreEngine(IGame game)
@@ -58,7 +59,7 @@ public class CoreEngine
 //    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 //    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
   
-        windowHandle = glfwCreateWindow(800,600, "Stare into it device", NULL, NULL);
+        windowHandle = glfwCreateWindow(800,600, "Stare into it device: " + windowHandle, NULL, NULL);
 
         if(windowHandle == NULL)
         {
@@ -75,7 +76,7 @@ public class CoreEngine
 
         GLContext.createFromCurrent();
 
-        game.init();
+        game.init(windowHandle);
     }
 
     public void update()
@@ -91,5 +92,5 @@ public class CoreEngine
 
         glfwSwapBuffers(windowHandle);
     }
-
+    
 }
