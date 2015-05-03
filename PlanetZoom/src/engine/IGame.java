@@ -2,7 +2,7 @@ package engine;
 
 public interface IGame 
 {
-    void init();
+    void init(long windowHandle);
     void update();
     void render();
 }

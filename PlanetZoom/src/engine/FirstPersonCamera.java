@@ -1,35 +1,51 @@
 package engine;
 
+import input.FirstPersonCameraControl;
+import input.ICameraControl;
+
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
-public class FirstPersonCamera
+public class FirstPersonCamera implements ICamera
 {
 	private Matrix4f viewMatrix;
 	private Vector3f position;
 	
+	private final long windowHandle;
 	private float yaw = 0.0f;
 	private float pitch = 0.0f;
 	private boolean invertYAxis;
 	
-	public FirstPersonCamera()
+	public FirstPersonCamera(long windowHandle)
 	{
+		this.windowHandle = windowHandle;
+		
 		position = new Vector3f(0.0f, 0.0f, 0.0f);
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
 	}
 	
-	public FirstPersonCamera(float x, float y, float z)
+	public FirstPersonCamera(long windowHandle, float x, float y, float z)
 	{
+		this.windowHandle = windowHandle;
+		
 		position = new Vector3f(x, y , z);
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
 	}
 	
-	public FirstPersonCamera(Vector3f position)
+	public FirstPersonCamera(long windowHandle, Vector3f position)
 	{
+		this.windowHandle = windowHandle;
+		
 		this.position = position;
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
+	}
+	
+	@Override
+	public ICameraControl getCameraControl()
+	{
+		return new FirstPersonCameraControl(this, windowHandle);	
 	}
 	
 	public void moveForwards(float distance)
@@ -56,6 +72,10 @@ public class FirstPersonCamera
 	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 2.0));
 	}
 	
+	public Vector3f getPosition()
+	{
+		return position;
+	}
 	public void setPosition(Vector3f position)
 	{
 		this.position = position;
@@ -130,5 +150,4 @@ public class FirstPersonCamera
         
         viewMatrix.translate(position);
 	}
-	
 }

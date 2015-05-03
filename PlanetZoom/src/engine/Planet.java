@@ -1,5 +1,6 @@
 package engine;
 
-public class Planet {
+public class Planet 
+{
 	// TODO: to implement
 }
