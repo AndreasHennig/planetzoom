@@ -71,12 +71,6 @@ public class FirstPersonCamera implements ICamera
 	 
 	public void strafeLeft(float distance)
 	{
-		float x = distance * (float) Math.sin(yaw);
-		float z = distance * (float) Math.cos(yaw);
-		
-		System.out.println("z: " + z);
-		System.out.println("x: " + x);
-		
 	    position.x += distance * (float) Math.sin(yaw + (Math.PI / 2.0));
 	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 2.0));
 	}

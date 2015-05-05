@@ -1,14 +1,26 @@
 package engine;
 
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
+import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import input.Keyboard;
+import input.Cursor;
 
 import java.nio.ByteBuffer;
 
-import input.Input;
-
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GLContext;
 
@@ -19,6 +31,7 @@ public class CoreEngine
     public long windowHandle;
     
     private GLFWKeyCallback keyCallback;
+    private GLFWCursorPosCallback cursorCallback;
 
     public CoreEngine(IGame game)
     {
@@ -43,6 +56,8 @@ public class CoreEngine
         }
 
         keyCallback.release();
+        cursorCallback.release();
+
     }
 
     public void init()
@@ -72,9 +87,12 @@ public class CoreEngine
         glfwMakeContextCurrent(windowHandle);
 
         glfwShowWindow(windowHandle);
-        glfwSetKeyCallback(windowHandle, keyCallback = new Input());
 
         GLContext.createFromCurrent();
+
+        glfwSetKeyCallback(windowHandle, keyCallback = new Keyboard());
+        glfwSetCursorPosCallback(windowHandle, cursorCallback = new Cursor());
+      
 
         game.init(windowHandle);
     }
@@ -82,8 +100,9 @@ public class CoreEngine
     public void update()
     {
         glfwPollEvents();
-
         game.update();
+        
+        
     }
 
     public void render()
