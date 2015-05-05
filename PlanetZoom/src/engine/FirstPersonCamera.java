@@ -42,13 +42,7 @@ public class FirstPersonCamera implements ICamera
 	}
 	
 	public void moveForwards(float distance)
-	{
-		float x = distance * (float) Math.sin(yaw);
-		float z = distance * (float) Math.cos(yaw);
-		
-		System.out.println("z: " + z);
-		System.out.println("x: " + x);
-		
+	{		
 	    position.x += distance * (float) Math.sin(yaw);
 	    position.z += distance * (float) Math.cos(yaw);
 	}
