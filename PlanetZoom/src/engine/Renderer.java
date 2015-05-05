@@ -1,21 +1,10 @@
 package engine;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glNormal3f;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
 import lenz.utils.ShaderProgram;
+
+import static engine.utils.SimplexNoise.*;
 
 import org.lwjgl.util.vector.Matrix4f;
 
@@ -34,7 +23,7 @@ public class Renderer
 	public void render(Planet planet, Matrix4f viewMatrix) 
 	{
 		renderTest();
-		
+
 		Matrix4f modelMatrix = new Matrix4f();
 		modelMatrix.setIdentity();
 		
@@ -71,7 +60,26 @@ public class Renderer
                
         
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        drawCube(1.0f, 1.0f, 1.0f, 1.0f);
+//        drawCube(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        drawNoise();
+    }
+    
+    private void drawNoise() {
+    	double size = 1000;
+    	
+    	glBegin(GL_POINTS);
+    	
+    	for(double i = -size/2; i < size/2 ; i++) {
+    		for(double j = -size/2; j < size/2; j++) {
+    			double noise = (noise(i, j) + 1) / 2;
+    			glColor3d(noise, 0, 0);
+    			
+        		glVertex3d(i * 0.01,j*0.01,noise * 5);
+    		}
+    	}
+    	
+    	glEnd();
     }
     
     private void drawCube(float sizeX, float sizeY, float sizeZ, float texTiling)
@@ -149,6 +157,4 @@ public class Renderer
   			glVertex3f( -halfWidth, -halfHeight, halfDepth);	
   		glEnd();
   	}
-	
-	
 }
