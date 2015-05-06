@@ -57,29 +57,9 @@ public class Renderer
     {
         glUseProgram(testShader.getId());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-               
         
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-//        drawCube(1.0f, 1.0f, 1.0f, 1.0f);
-        
-        drawNoise();
-    }
-    
-    private void drawNoise() {
-    	double size = 1000;
-    	
-    	glBegin(GL_POINTS);
-    	
-    	for(double i = -size/2; i < size/2 ; i++) {
-    		for(double j = -size/2; j < size/2; j++) {
-    			double noise = (noise(i, j) + 1) / 2;
-    			glColor3d(noise, 0, 0);
-    			
-        		glVertex3d(i * 0.01,j*0.01,noise * 5);
-    		}
-    	}
-    	
-    	glEnd();
+        drawCube(1.0f, 1.0f, 1.0f, 1.0f);
     }
     
     private void drawCube(float sizeX, float sizeY, float sizeZ, float texTiling)
