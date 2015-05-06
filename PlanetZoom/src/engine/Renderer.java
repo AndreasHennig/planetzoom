@@ -4,6 +4,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import lenz.utils.ShaderProgram;
 
+import static engine.utils.SimplexNoise.*;
+
 import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
@@ -21,7 +23,7 @@ public class Renderer
 	public void render(Planet planet, Matrix4f viewMatrix) 
 	{
 		renderTest();
-		
+
 		Matrix4f modelMatrix = new Matrix4f();
 		modelMatrix.setIdentity();
 		
@@ -55,7 +57,6 @@ public class Renderer
     {
         glUseProgram(testShader.getId());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-               
         
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         drawCube(1.0f, 1.0f, 1.0f, 1.0f);
@@ -143,6 +144,4 @@ public class Renderer
   			glVertex3f( -halfWidth, -halfHeight, halfDepth);	
   		glEnd();
   	}
-	
-	
 }
