@@ -10,33 +10,26 @@ public class FirstPersonCamera implements ICamera
 	private Matrix4f viewMatrix;
 	private Vector3f position;
 	
-	private final long windowHandle;
 	private float yaw = 0.0f;
 	private float pitch = 0.0f;
 	private boolean invertYAxis;
 	
-	public FirstPersonCamera(long windowHandle)
+	public FirstPersonCamera()
 	{
-		this.windowHandle = windowHandle;
-		
 		position = new Vector3f(0.0f, 0.0f, 0.0f);
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
 	}
 	
 	public FirstPersonCamera(long windowHandle, float x, float y, float z)
-	{
-		this.windowHandle = windowHandle;
-		
+	{	
 		position = new Vector3f(x, y , z);
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
 	}
 	
-	public FirstPersonCamera(long windowHandle, Vector3f position)
-	{
-		this.windowHandle = windowHandle;
-		
+	public FirstPersonCamera(Vector3f position)
+	{	
 		this.position = position;
 		viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
@@ -45,31 +38,41 @@ public class FirstPersonCamera implements ICamera
 	@Override
 	public ICameraControl getCameraControl()
 	{
-		return new FirstPersonCameraControl(this, windowHandle);	
+		return new FirstPersonCameraControl(this);	
 	}
 	
 	public void moveForwards(float distance)
-	{
-	    position.x -= distance * (float) Math.sin(yaw);
+	{		
+	    position.x += distance * (float) Math.sin(yaw);
 	    position.z += distance * (float) Math.cos(yaw);
 	}
 	 
 	public void moveBackwards(float distance)
 	{
-	    position.x += distance * (float) Math.sin(yaw);
+	    position.x -= distance * (float) Math.sin(yaw);
 	    position.z -= distance * (float) Math.cos(yaw);
+	}
+	
+	public void moveUp(float distance)
+	{
+		position.y -= distance;
+	}
+	
+	public void moveDown(float distance)
+	{
+		position.y += distance;
 	}
 	 
 	public void strafeLeft(float distance)
 	{
-	    position.x -= distance * (float) Math.sin(yaw - (Math.PI / 2.0));
-	    position.z += distance * (float) Math.cos(yaw - (Math.PI / 2.0));
+	    position.x += distance * (float) Math.sin(yaw + (Math.PI / 2.0));
+	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 2.0));
 	}
 	 
 	public void strafeRight(float distance)
 	{
 	    position.x -= distance * (float) Math.sin(yaw + (Math.PI / 2.0));
-	    position.z += distance * (float) Math.cos(yaw + (Math.PI / 2.0));
+	    position.z -= distance * (float) Math.cos(yaw + (Math.PI / 2.0));
 	}
 	
 	public Vector3f getPosition()

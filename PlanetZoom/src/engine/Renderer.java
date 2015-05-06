@@ -83,6 +83,7 @@ public class Renderer
   		
   		glBegin(GL_QUADS);
   			//TOP
+  			glColor4f(1, 0, 0, 1);
   			glNormal3f(0,1,0);
   			glTexCoord2f(0.0f,0.0f);
   			glVertex3f(-halfWidth, halfHeight, -halfDepth);         
@@ -94,6 +95,7 @@ public class Renderer
   			glVertex3f(halfWidth, halfHeight, -halfDepth);         
   				
   			//FRONT
+  			glColor4f(1, 1, 1, 1);
   			glNormal3f(0,0,1);
   			glTexCoord2f(0.0f,0.0f);
   			glVertex3f( -halfWidth, halfHeight, halfDepth);   
@@ -105,6 +107,7 @@ public class Renderer
   			glVertex3f( halfWidth, halfHeight, halfDepth);      
   				
   			//BACK
+
   			glNormal3f(0,0,-1);
   			glTexCoord2f(sizeX*texMul,0.0f);
   			glVertex3f( -halfWidth, halfHeight, -halfDepth);   
@@ -116,6 +119,7 @@ public class Renderer
   			glVertex3f( -halfWidth, -halfHeight, -halfDepth);      
 
   			//LEFT
+  			glColor4f(0, 1, 0, 1);
   			glNormal3f(-1,0,0);
   			glTexCoord2f(sizeZ*texMul,0.0f);
   			glVertex3f(-halfWidth, halfHeight, halfDepth);   
@@ -127,6 +131,7 @@ public class Renderer
   			glVertex3f(-halfWidth, -halfHeight, halfDepth);      
 
   			//RIGHT  
+  			glColor4f(0, 1, 0, 1);
   			glNormal3f(1,0,0);
   			glTexCoord2f(sizeZ*texMul,0.0f);
   			glVertex3f( halfWidth, halfHeight, -halfDepth);
@@ -137,7 +142,9 @@ public class Renderer
   		    glTexCoord2f(sizeZ*texMul,sizeY*texMul);
   		    glVertex3f( halfWidth, -halfHeight, -halfDepth);     
   			    
+  		    
   			//BOTTOM
+  			glColor4f(1, 0, 0, 1);
   		    glNormal3f(0,-1,0);
   		    glTexCoord2f(0.0f,0.0f);
   			glVertex3f( -halfWidth, -halfHeight, -halfDepth);  
