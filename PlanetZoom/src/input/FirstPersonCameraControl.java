@@ -1,7 +1,4 @@
-
 package input;
-
-
 
 import static org.lwjgl.glfw.GLFW.*;
 

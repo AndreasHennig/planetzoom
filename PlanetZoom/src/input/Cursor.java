@@ -2,8 +2,6 @@ package input;
 
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 
-
-
 public class Cursor extends GLFWCursorPosCallback
 {
 	private static double lastXPos;
