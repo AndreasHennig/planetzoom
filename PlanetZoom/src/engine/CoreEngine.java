@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GLContext;
+import org.lwjgl.util.Display;
 
 public class CoreEngine
 {
@@ -21,6 +22,8 @@ public class CoreEngine
     private GLFWKeyCallback keyCallback;
     private GLFWCursorPosCallback cursorCallback;
 
+    public Timer timer;
+    
     public CoreEngine(IGame game)
     {
         this.game = game;
@@ -45,7 +48,6 @@ public class CoreEngine
 
         keyCallback.release();
         cursorCallback.release();
-
     }
 
     public void init()
@@ -82,20 +84,22 @@ public class CoreEngine
         glfwSetCursorPosCallback(windowHandle, cursorCallback = new Cursor());
 
         game.init(windowHandle);
+        
+        timer = new Timer(); //not sure if best here
     }
 
     public void update()
     {
         glfwPollEvents();
-        game.update();
-        
-        
+        game.update();        
     }
 
     public void render()
     {
+    	int deltaTime = timer.getDeltaTime();
+    	System.out.println(deltaTime);
         game.render();
-
+                
         glfwSwapBuffers(windowHandle);
     }
     
