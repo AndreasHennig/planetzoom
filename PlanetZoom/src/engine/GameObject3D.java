@@ -12,7 +12,12 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class GameObject3D extends GameObject
 {
-	private ArrayList<Vertex3D> vertices;
+	protected ArrayList<Vertex3D> vertices;
+	
+	public GameObject3D()
+	{
+		this.vertices= new ArrayList<Vertex3D>();
+	}
 	
 	public GameObject3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{
@@ -86,7 +91,7 @@ public class GameObject3D extends GameObject
 		
 
         GameObject3D object = new GameObject3D(vertices, indices);
-        object.shader = new ShaderProgram("testShader");
+        //object.shader = new ShaderProgram("testShader");
         object.setTexture(new Texture("woodenBox.jpg"));
         return object;
 	}

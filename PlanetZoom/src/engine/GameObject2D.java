@@ -59,7 +59,6 @@ public class GameObject2D extends GameObject
         };
         
         GameObject2D object = new GameObject2D(vertices, indices);
-        object.shader = new ShaderProgram("HUDShader");
         object.setTexture(new Texture("crypt_wall.png"));
         return object;
 	}
