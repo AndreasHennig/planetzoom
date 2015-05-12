@@ -2,6 +2,7 @@ package geometry;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 public class Vertex3D extends Vertex
 {
@@ -14,6 +15,13 @@ public class Vertex3D extends Vertex
 	{
 		super(uv, normal);
 		this.position = position;
+	}
+	
+	public Vertex3D(Vector3f position, Vector2f uv, Vector3f normal, Vector4f color)
+	{
+		super(uv, normal);
+		this.position = position;
+		this.colorRGBA = color;
 	}
 	
 	public Vector3f getPosition()
