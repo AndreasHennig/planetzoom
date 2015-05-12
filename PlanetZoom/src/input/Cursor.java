@@ -10,6 +10,7 @@ public class Cursor extends GLFWCursorPosCallback
 	private static double xPos;
 	private static double yPos;
 	
+	private boolean initialized = false;
 	
 	public static double getDx()
 	{
@@ -34,10 +35,17 @@ public class Cursor extends GLFWCursorPosCallback
 	{
 		return yPos;
 	}
-
+	
 	@Override
 	public void invoke(long window, double xpos, double ypos)
 	{
+		if(!initialized)
+		{
+			lastXPos = xpos;
+			lastYPos = ypos;
+			initialized = true;
+		}
+			
 		Cursor.xPos = xpos;
 		Cursor.yPos = ypos;
 	}
