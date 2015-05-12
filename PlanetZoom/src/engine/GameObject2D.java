@@ -25,13 +25,13 @@ public class GameObject2D extends GameObject
 		this.vertices = vertices;
 		this.indices = indices;
 	}
-	public static GameObject2D getTestObject2D()
+	public static GameObject2D getTestObject2D(float x, float y)
 	{
 		ArrayList<Vector2f> positions = new ArrayList<Vector2f>();
-		positions.add(new Vector2f(0.6f, 0.8f));
-		positions.add(new Vector2f(0.6f, 0.6f));
-		positions.add(new Vector2f(0.8f, 0.6f));
-		positions.add(new Vector2f(0.8f, 0.8f));
+		positions.add(new Vector2f(x, y + 0.2f));
+		positions.add(new Vector2f(x, y));
+		positions.add(new Vector2f(x + 0.2f, y));
+		positions.add(new Vector2f(x + 0.2f, y + 0.2f));
         
         ArrayList<Vector2f> uvs = new ArrayList<>();      
         uvs.add(new Vector2f(0.0f, 1.0f));
