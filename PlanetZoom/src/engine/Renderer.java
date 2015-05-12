@@ -46,12 +46,12 @@ public class Renderer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         //renderObject2D(TextRenderer2D.textToObject2D("My Text yo", "arial_noMetrices.png", 10, 10, 32));
-        renderObject3D(Object3D.getTestObject3D(), viewMatrix);
-        renderObject2D(Object2D.getTestObject2D());
+        renderGameObject3D(GameObject3D.getTestObject3D(), viewMatrix);
+        renderGameObject2D(GameObject2D.getTestObject2D());
     }
     
    
-    public void renderObject2D(Object2D object2D)
+    public void renderGameObject2D(GameObject2D object2D)
 	{		
 		VertexArrayObject vao = new VertexArrayObject(object2D);
 		
@@ -81,7 +81,7 @@ public class Renderer
         GL30.glBindVertexArray(0);
 	}
     
-    public void renderObject3D(Object3D object3D, Matrix4f viewMatrix)
+    public void renderGameObject3D(GameObject3D object3D, Matrix4f viewMatrix)
 	{		
 		VertexArrayObject vao = new VertexArrayObject(object3D);
 		

@@ -10,22 +10,22 @@ import lenz.utils.Texture;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class Object2D extends Object
+public class GameObject2D extends GameObject
 {
 	private ArrayList<Vertex2D> vertices;
 
-	public Object2D()
+	public GameObject2D()
 	{
 		super();
 		vertices = new ArrayList<>();
 	}
 	
-	public Object2D(ArrayList<Vertex2D> vertices, byte[] indices)
+	public GameObject2D(ArrayList<Vertex2D> vertices, int[] indices)
 	{
 		this.vertices = vertices;
 		this.indices = indices;
 	}
-	public static Object2D getTestObject2D()
+	public static GameObject2D getTestObject2D()
 	{
 		ArrayList<Vector2f> positions = new ArrayList<Vector2f>();
 		positions.add(new Vector2f(0.6f, 0.8f));
@@ -49,7 +49,7 @@ public class Object2D extends Object
         
         
         // OpenGL expects to draw vertices in counter clockwise order by default
-        byte[] indices = 
+        int[] indices = 
         	{
                 // Left bottom triangle
                 0, 1, 2,
@@ -58,7 +58,7 @@ public class Object2D extends Object
                 2, 3, 0
         };
         
-        Object2D object = new Object2D(vertices, indices);
+        GameObject2D object = new GameObject2D(vertices, indices);
         object.shader = new ShaderProgram("HUDShader");
         object.setTexture(new Texture("crypt_wall.png"));
         return object;

@@ -3,10 +3,10 @@ package engine;
 import lenz.utils.ShaderProgram;
 import lenz.utils.Texture;
 
-public abstract class Object
+public abstract class GameObject
 {
 	protected Texture texture;
-	protected byte[] indices;
+	protected int[] indices;
 	
 	protected ShaderProgram shader; 
 
@@ -31,12 +31,12 @@ public abstract class Object
 		this.shader = shader;
 	}
 	
-	public byte[] getIndices()
+	public int[] getIndices()
 	{
 		return indices;
 	}
 
-	public void setIndices(byte[] indices)
+	public void setIndices(int[] indices)
 	{
 		this.indices = indices;
 	}

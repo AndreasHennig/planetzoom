@@ -10,18 +10,18 @@ import lenz.utils.Texture;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class Object3D extends Object
+public class GameObject3D extends GameObject
 {
 	private ArrayList<Vertex3D> vertices;
 	
-	public Object3D(ArrayList<Vertex3D> vertices, byte[] indices)
+	public GameObject3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{
 		this.vertices= vertices;
 		this.indices = indices;
 	}
 
 	
-	public static Object3D getTestObject3D()
+	public static GameObject3D getTestObject3D()
 	{
 		
 		ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
@@ -70,7 +70,7 @@ public class Object3D extends Object
 		vertices.add(new Vertex3D(positions.get(4), uvs.get(3), normals.get(1)));	//6
 		vertices.add(new Vertex3D(positions.get(7), uvs.get(2), normals.get(1)));	//7
 		
-		byte[] indices = new byte[]
+		int[] indices = new int[]
 				{
 					//Top
 					0, 1, 2,
@@ -85,7 +85,7 @@ public class Object3D extends Object
 				};
 		
 
-        Object3D object = new Object3D(vertices, indices);
+        GameObject3D object = new GameObject3D(vertices, indices);
         object.shader = new ShaderProgram("testShader");
         object.setTexture(new Texture("woodenBox.jpg"));
         return object;
