@@ -6,13 +6,28 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 import lenz.utils.ShaderProgram;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+
+import static org.lwjgl.opengl.GL11.*;
+
+import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL21.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL40.*;
+
 import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
@@ -20,6 +35,8 @@ public class Renderer
 	private Matrix4f perspectiveProjectionMatrix;
 	private Matrix4f orthographicProjectionMatrix;
 	
+	private ShaderProgram testShader = new ShaderProgram("testShader");
+	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	
 	public Renderer(Matrix4f projectionMatrix)
 	{
@@ -30,7 +47,18 @@ public class Renderer
 	
 	public void render(Planet planet, Matrix4f viewMatrix) 
 	{
-		renderTest(viewMatrix);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glUseProgram(testShader.getId());
+		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
+		renderGameObject3D(planet.getSphere(), viewMatrix);
+		
+		glUseProgram(hudShader.getId());
+		ShaderProgram.loadMatrix4f(hudShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadMatrix4f(hudShader.getId(), viewMatrix, "modelViewMatrix");
+        renderGameObject2D(GameObject2D.getTestObject2D(0.6f, 0.6f));
+		
 	}
 	
 	private void init()
@@ -43,11 +71,11 @@ public class Renderer
     private void renderTest(Matrix4f viewMatrix)
     {
        // glUseProgram(testShader.getId());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        //renderObject2D(TextRenderer2D.textToObject2D("My Text yo", "arial_noMetrices.png", 10, 10, 32));
-        renderGameObject3D(GameObject3D.getTestObject3D(), viewMatrix);
-        renderGameObject2D(GameObject2D.getTestObject2D());
+        //renderGameObject2D(TextRenderer2D.textToObject2D("Hello aaa bbb", "arial_noMetrices.png", 0, 0, 32));
+        //renderGameObject3D(GameObject3D.getTestObject3D(), viewMatrix);
+        //renderGameObject2D(GameObject2D.getTestObject2D(0.6f, 0.6f));
     }
     
    
@@ -57,12 +85,7 @@ public class Renderer
 		
 		Matrix4f modelViewMatrix = new Matrix4f();
 		Matrix4f.setIdentity(modelViewMatrix);
-		
-		GL20.glUseProgram(object2D.getShader().getId());
-		
-		ShaderProgram.loadMatrix4f(object2D.getShader().getId(), orthographicProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(object2D.getShader().getId(), modelViewMatrix, "modelViewMatrix");
-		
+						
     	vao.bindBuffers();
         GL30.glBindVertexArray(vao.getId());
         GL20.glEnableVertexAttribArray(0);
@@ -72,7 +95,7 @@ public class Renderer
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
          
         // Draw the vertices
-        GL11.glDrawElements(GL11.GL_TRIANGLES, vao.getIndexCount() , GL11.GL_UNSIGNED_BYTE, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
          
         // Put everything back to default (deselect)
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -85,41 +108,32 @@ public class Renderer
 	{		
 		VertexArrayObject vao = new VertexArrayObject(object3D);
 		
-		Matrix4f modelMatrix = new Matrix4f();
-		modelMatrix.setIdentity();
 		
-		Matrix4f modelViewMatrix = new Matrix4f();
-		Matrix4f.mul(viewMatrix, modelMatrix, modelViewMatrix);
-		
-		Matrix4f normalMatrix = new Matrix4f();
-		Matrix4f.transpose(modelViewMatrix, normalMatrix);
-		Matrix4f.invert(normalMatrix, normalMatrix);
-		
-
-		
-		GL20.glUseProgram(object3D.getShader().getId());
+		//GL20.glUseProgram(object3D.getShader().getId());
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix = perspectiveProjectionMatrix;
 		
-		ShaderProgram.loadMatrix4f(object3D.getShader().getId(), projectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(object3D.getShader().getId(), modelViewMatrix, "modelViewMatrix");
+		//ShaderProgram.loadMatrix4f(object3D.getShader().getId(), projectionMatrix, "projectionMatrix");
+		//ShaderProgram.loadMatrix4f(object3D.getShader().getId(), modelViewMatrix, "modelViewMatrix");
 		
     	vao.bindBuffers();
         GL30.glBindVertexArray(vao.getId());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
          
         // Bind to the index VBO that has all the information about the order of the vertices
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
          
         // Draw the vertices
-        GL11.glDrawElements(GL11.GL_TRIANGLES, vao.getIndexCount() , GL11.GL_UNSIGNED_BYTE, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
          
         // Put everything back to default (deselect)
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
         GL30.glBindVertexArray(0);
 	}
     

@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.GL_VENDOR;
 import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
+import geometry.Sphere;
 import input.ICameraControl;
 
 import org.lwjgl.util.vector.Matrix4f;
@@ -12,6 +13,7 @@ import engine.CoreEngine;
 import engine.FirstPersonCamera;
 import engine.ICamera;
 import engine.IGame;
+import engine.Planet;
 import engine.Renderer;
 
 
@@ -52,7 +54,7 @@ public class Game implements IGame
     public void render()
     {
         //initRenderer();
-    	renderer.render(null, camera.getViewMatrix());
+    	renderer.render(new Planet(new Sphere(6)), camera.getViewMatrix());
     }
 
     private void initCamera()

@@ -93,7 +93,6 @@ public class TextRenderer2D
 
 		GameObject2D obj =  new GameObject2D(vertices, indices);
 		obj.setTexture(textTexture);
-		obj.setShader(new ShaderProgram("HUDShader"));
 		return obj;
 	}
 	
