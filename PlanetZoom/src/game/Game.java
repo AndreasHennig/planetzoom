@@ -79,7 +79,7 @@ public class Game implements IGame
 	}   
     private void initRenderer()
     {
-    	renderer = new Renderer(projectionMatrix, camera.getViewMatrix());
+    	renderer = new Renderer(projectionMatrix);
     }
     
     private void printVersionInfo()
