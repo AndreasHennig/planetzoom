@@ -11,7 +11,8 @@ public class Timer {
 	long lastFrame;
 	long lastFPStimestamp;
 	int currentFPS;
-	int fps = 0;
+	int fps = 0; // counts frames every second
+	int expectedFPS = 0; // calculates frames based on time difference between two following(?) frames
 	
 	public Timer(){
 		 lastFrame = getTimeInMs();
@@ -34,9 +35,9 @@ public class Timer {
 	public int getDeltaTime() {
 	    long currentTime = getTimeInMs();
 	    int delta = (int) (currentTime - lastFrame);
-	    lastFrame = currentTime;
-	         
 	    updateFPS();
+	    updateExpectedFPS();
+	    lastFrame = currentTime;
 	    
 	    return delta;
 	}
@@ -55,4 +56,12 @@ public class Timer {
 		return currentFPS;
 	}
 	
+	private void updateExpectedFPS(){
+		long timeSinceLastFrame = getTimeInMs()- lastFrame;
+		expectedFPS = (int) (1_000.0f / timeSinceLastFrame);
+	}
+	
+	public int getExpectedFPS() {
+		return expectedFPS;
+	}
 }
