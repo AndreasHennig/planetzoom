@@ -162,7 +162,7 @@ public class VertexArrayObject
 	
 	private float[] asFloats(Vector4f v) 
 	{
-		return new float[]{v.w, v.x, v.y, v.z};
+		return new float[]{v.x, v.y, v.z, v.w};
 	}	
 	
 	private void bindArrayBuffer(int location, int dataSize, int handle, FloatBuffer buffer) 
