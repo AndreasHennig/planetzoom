@@ -101,7 +101,7 @@ public class CoreEngine
     {
     	int deltaTime = timer.getDeltaTime();
     	//System.out.println(deltaTime);
-    	System.out.println(timer.getFPS());
+    	//System.out.println(timer.getFPS());
     	game.render();
                 
         glfwSwapBuffers(windowHandle);
