@@ -6,11 +6,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import input.Keyboard;
 import input.Cursor;
 
-import java.nio.ByteBuffer;
-
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GLContext;
 
 public class CoreEngine
@@ -75,9 +72,6 @@ public class CoreEngine
         {
             System.err.println("Window creation failed");
         }
-
-        ByteBuffer vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        //System.out.println(GLFWvidmode.REFRESHRATE);
         
         glfwSetWindowPos(windowHandle, 100, 100);
 
@@ -105,9 +99,6 @@ public class CoreEngine
 
     public void render()
     {
-    	int deltaTime = timer.getDeltaTime();
-    	//System.out.println(deltaTime);
-    	//System.out.println(timer.getFPS());
     	game.render();
                 
         glfwSwapBuffers(windowHandle);

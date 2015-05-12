@@ -4,8 +4,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import lenz.utils.ShaderProgram;
 
-import static engine.utils.SimplexNoise.*;
-
 import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
