@@ -18,11 +18,15 @@ public class CoreEngine
     private final IGame game;
     public boolean running;
     public long windowHandle;
+  
+    int windowWidth = 800; 
+    int windowHeight = 600;
     
     private GLFWKeyCallback keyCallback;
     private GLFWCursorPosCallback cursorCallback;
 
     public Timer timer;
+	
     
     public CoreEngine(IGame game)
     {
@@ -64,7 +68,8 @@ public class CoreEngine
 //    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 //    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
   
-        windowHandle = glfwCreateWindow(800,600, "Stare into it device: " + windowHandle, NULL, NULL);
+        
+        windowHandle = glfwCreateWindow(800, 600, "Stare into it device: " + windowHandle, NULL, NULL);
 
         if(windowHandle == NULL)
         {
@@ -83,6 +88,7 @@ public class CoreEngine
 
         GLContext.createFromCurrent();
 
+        glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetKeyCallback(windowHandle, keyCallback = new Keyboard());
         glfwSetCursorPosCallback(windowHandle, cursorCallback = new Cursor());
 
