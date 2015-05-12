@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.Display;
 
 public class CoreEngine
 {
@@ -72,9 +72,12 @@ public class CoreEngine
         }
 
         ByteBuffer vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        //System.out.println(GLFWvidmode.REFRESHRATE);
+        
         glfwSetWindowPos(windowHandle, 100, 100);
 
         glfwMakeContextCurrent(windowHandle);
+        glfwSwapInterval(1); //vSync
 
         glfwShowWindow(windowHandle);
 
@@ -97,8 +100,9 @@ public class CoreEngine
     public void render()
     {
     	int deltaTime = timer.getDeltaTime();
-    	System.out.println(deltaTime);
-        game.render();
+    	//System.out.println(deltaTime);
+    	System.out.println(timer.getFPS());
+    	game.render();
                 
         glfwSwapBuffers(windowHandle);
     }

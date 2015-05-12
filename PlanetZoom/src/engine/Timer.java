@@ -9,9 +9,13 @@ import org.lwjgl.glfw.GLFW;
 public class Timer {
 
 	long lastFrame;
+	long lastFPStimestamp;
+	int currentFPS;
+	int fps = 0;
 	
 	public Timer(){
 		 lastFrame = getTimeInMs();
+		 lastFPStimestamp = getTimeInMs();
 	}
 	
 	public long getTimeInMs(){
@@ -32,6 +36,23 @@ public class Timer {
 	    int delta = (int) (currentTime - lastFrame);
 	    lastFrame = currentTime;
 	         
+	    updateFPS();
+	    
 	    return delta;
 	}
+	
+	private void updateFPS() {
+		if(getTimeInMs() - lastFPStimestamp > 1_000)
+		{
+			currentFPS = fps;
+			fps = 0;
+			lastFPStimestamp += 1000;
+		}
+		fps++;
+	}
+	
+	public int getFPS() {
+		return currentFPS;
+	}
+	
 }
