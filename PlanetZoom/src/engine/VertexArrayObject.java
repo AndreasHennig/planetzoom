@@ -3,8 +3,8 @@ package engine;
 import geometry.Vertex2D;
 import geometry.Vertex3D;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
+
 import org.lwjgl.util.vector.Vector3f;
 
 public class VertexArrayObject
@@ -24,11 +25,10 @@ public class VertexArrayObject
 	private int vboUVHandle;
 	private int vboIndexHandle;
 	
-	
 	private FloatBuffer normalBuffer;
 	private FloatBuffer vertexBuffer;
 	private FloatBuffer uvBuffer;
-	private ByteBuffer indexBuffer;
+	private IntBuffer indexBuffer;
 	
 	private int indexCount;
 	private boolean is3D;
@@ -37,7 +37,7 @@ public class VertexArrayObject
 	private final int uvAttributeLocation = 1;
 	private final int normalAttributeLocation = 2;
 	
-	public VertexArrayObject(Object2D object2D)
+	public VertexArrayObject(GameObject2D object2D)
 	{
 		is3D = false;
 		id = GL30.glGenVertexArrays();	
@@ -45,7 +45,7 @@ public class VertexArrayObject
 		indexCount = object2D.getIndices().length;
 	}
 	
-	public VertexArrayObject(Object3D object3D)
+	public VertexArrayObject(GameObject3D object3D)
 	{
 		is3D = true;
 		id = GL30.glGenVertexArrays();	
@@ -88,7 +88,7 @@ public class VertexArrayObject
         GL30.glDeleteVertexArrays(id);
 	}
 
-	private void initBuffers3D(ArrayList<Vertex3D> vertices, byte[] indices)
+	private void initBuffers3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{		
 		vboVertexHandle = GL15.glGenBuffers();
 		vboUVHandle = GL15.glGenBuffers();
@@ -98,7 +98,7 @@ public class VertexArrayObject
 		vertexBuffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
 		uvBuffer = BufferUtils.createFloatBuffer(vertices.size() * 2);
 		normalBuffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
-		indexBuffer = BufferUtils.createByteBuffer(indices.length);
+		indexBuffer = BufferUtils.createIntBuffer(indices.length);
 		
 		indexBuffer.put(indices);
 
@@ -114,7 +114,7 @@ public class VertexArrayObject
 		indexBuffer.flip();		
 	}
 	
-	private void initBuffers2D(ArrayList<Vertex2D> vertices, byte[] indices)
+	private void initBuffers2D(ArrayList<Vertex2D> vertices, int[] indices)
 	{		
 		vboVertexHandle = GL15.glGenBuffers();
 		vboUVHandle = GL15.glGenBuffers();
@@ -124,7 +124,7 @@ public class VertexArrayObject
 		vertexBuffer = BufferUtils.createFloatBuffer(vertices.size() * 2);
 		uvBuffer = BufferUtils.createFloatBuffer(vertices.size() * 2);
 		normalBuffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
-		indexBuffer = BufferUtils.createByteBuffer(indices.length);
+		indexBuffer = BufferUtils.createIntBuffer(indices.length);
 		
 		indexBuffer.put(indices);
 
@@ -158,7 +158,7 @@ public class VertexArrayObject
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 	
-	private void bindIndexBuffer(int handle, ByteBuffer buffer) 
+	private void bindIndexBuffer(int handle, IntBuffer buffer) 
 	{ 
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, handle);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
