@@ -16,6 +16,8 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
+
+import static org.lwjgl.glfw.GLFW.*;
 import input.Cursor;
 import input.Keyboard;
 
@@ -92,6 +94,7 @@ public class CoreEngine
 
         GLContext.createFromCurrent();
 
+        glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetKeyCallback(windowHandle, keyCallback = new Keyboard());
         glfwSetCursorPosCallback(windowHandle, cursorCallback = new Cursor());
 
@@ -102,6 +105,8 @@ public class CoreEngine
     {
         glfwPollEvents();
         game.update();
+        if(Keyboard.isKeyPressed(GLFW_KEY_ESCAPE))
+        	glfwSetWindowShouldClose(windowHandle, GL_TRUE);
         
         
     }
