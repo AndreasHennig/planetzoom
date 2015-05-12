@@ -1,11 +1,11 @@
-#version 120		//Texture FragmentShader
+#version 330 
 
-varying vec3 position;
-varying vec3 normal;
-varying vec4 color;
-varying vec2 uv;
+out vec4 out_Color; 
 
-void main()
+in vec2 pass_uv;
+uniform sampler2D sampler; 
+
+void main(void)
 {
-    gl_FragColor = color;   
+	out_Color = texture(sampler, pass_uv); 
 }
