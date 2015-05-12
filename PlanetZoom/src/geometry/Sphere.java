@@ -4,6 +4,7 @@ package geometry;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
 
@@ -14,6 +15,7 @@ public class Sphere extends GameObject3D
 	final static int MAX_SUBDIVISIONS = 11;
 		
 	private int subdivisions = 1;
+	private Vector4f color;
 	
 	private Vector3f[] positions;
 	
@@ -25,7 +27,7 @@ public class Sphere extends GameObject3D
 		Vertex3D.forward
 	};
 	
-	public Sphere(int subdivisions)
+	public Sphere(int subdivisions, Vector4f color)
 	{
 		if(subdivisions > MAX_SUBDIVISIONS)
 		{
@@ -37,6 +39,7 @@ public class Sphere extends GameObject3D
 			this.subdivisions = subdivisions;
 		}
 		
+		this.color = color;
 		int resolution = 1 << this.subdivisions;
 		positions =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
@@ -44,7 +47,7 @@ public class Sphere extends GameObject3D
 		createOctahedron(resolution);
 		
 		for(int i = 0; i < positions.length; i++)
-			vertices.add(new Vertex3D(positions[i], new Vector2f(0.0f, 0.0f), positions[i]));	
+			vertices.add(new Vertex3D(positions[i], new Vector2f(0.0f, 0.0f), positions[i], color));	
 	}
 	
 	
