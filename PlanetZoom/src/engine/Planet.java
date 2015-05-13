@@ -4,7 +4,8 @@ import geometry.Sphere;
 
 public class Planet 
 {
-	Sphere sphere;
+	private Sphere sphere;
+	
 	public Planet(Sphere sphere)
 	{
 		this.sphere = sphere;
