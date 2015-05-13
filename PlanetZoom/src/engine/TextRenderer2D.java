@@ -13,8 +13,8 @@ import org.lwjgl.util.vector.Vector3f;
 public class TextRenderer2D
 {
 	
-	private static final int rowCountStandard = 16;
-	private static final int colCountStandard = 16;
+	private static final int ROWCOUNT_STANDARD = 16;
+	private static final int COLUMNCOUNT_STANDARD = 16;
 	/**
 	 * 
 	 * @param text text to be rendered
@@ -25,7 +25,7 @@ public class TextRenderer2D
 	 */
 	public static GameObject2D textToObject2D(String text, String font, int x, int y, int size)
 	{
-		return textToObject2D(text, font, x, y, size, rowCountStandard, colCountStandard);
+		return textToObject2D(text, font, x, y, size, ROWCOUNT_STANDARD, COLUMNCOUNT_STANDARD);
 	}
 	
 	/**
@@ -43,8 +43,11 @@ public class TextRenderer2D
 		int index = 0;
 		char currentChar;
 		float uv_x, uv_y;
-		float r = 1.0f / (float) rowCount;
-		float c = 1.0f / (float) colCount;
+		
+		float cellHeight = 1.0f / colCount;
+		float cellWidth = 1.0f / rowCount;
+		
+		int row, column;
 		
 		int[] indices = new int[text.length() * 6];
 		ArrayList<Vector2f> positions = new ArrayList<>();;
@@ -54,41 +57,51 @@ public class TextRenderer2D
         
 		for(int i = 0; i < text.length(); i++)
 		{
-			positions.add(new Vector2f(x + (i * size) / 80.0f, (y + size) / 60.0f)); 		 	// top left			index
-			positions.add(new Vector2f(x + ((i + 1) * size) / 800.0f, (y + size) / 60.0f)); 	// top right		index + 1
-			positions.add(new Vector2f(x + (i * size) / 80.0f, y / 600.0f)); 			 		// bottom left		index + 2
-			positions.add(new Vector2f(x + ((i + 1) * size) / 800.0f, y / 60.0f)); 		 		// bottom right		index + 3
+			positions.add(new Vector2f(x + (i * size), (y + size))); 		 	// top left			index
+			positions.add(new Vector2f(x + ((i + 1) * size), (y + size))); 		// top right		index + 1
+			positions.add(new Vector2f(x + (i * size), y)); 			 		// bottom left		index + 2
+			positions.add(new Vector2f(x + ((i + 1) * size), y)); 		 		// bottom right		index + 3
+			
 			
 			currentChar = text.charAt(i);
-			uv_x = (currentChar % rowCount) / (float) rowCount;
-			uv_y = (currentChar / colCount) / (float) colCount;
-
-			uvs.add(new Vector2f(uv_x, 1 - uv_y));			  // top left			index
-			uvs.add(new Vector2f(uv_x + r, 1 - uv_y));		  // top right			index + 1
-			uvs.add(new Vector2f(uv_x + r, (1 - uv_y) + c));  // bottom left		index + 2
-			uvs.add(new Vector2f(uv_x, (1 - uv_y) + c)); 	  // bottom right		index + 3
+			int ascii = (int) text.charAt(i);
 			
-			vertices.add(new Vertex2D(positions.get(index), uvs.get(i), normal));
-			vertices.add(new Vertex2D(positions.get(index + 1), uvs.get(index + 1), normal));
-			vertices.add(new Vertex2D(positions.get(index + 2), uvs.get(index + 2), normal));
-			vertices.add(new Vertex2D(positions.get(index + 3), uvs.get(index + 3), normal));
+			row = (currentChar % rowCount);
+			column = (currentChar / colCount);
+			
+			uv_x =  row / (float) rowCount;
+			uv_y =  column / (float) colCount;
+
+//			uvs.add(new Vector2f(uv_x, 1 - uv_y));			  // top left			index
+//			uvs.add(new Vector2f(uv_x + cellWidth, 1 - uv_y));		  // top right			index + 1
+//			uvs.add(new Vector2f(uv_x + cellWidth, (1 - uv_y) + cellHeight));  // bottom left		index + 2
+//			uvs.add(new Vector2f(uv_x, (1 - uv_y) + cellHeight)); 	  // bottom right		index + 3
+			
+			uvs.add(new Vector2f(uv_x, uv_y));			  					// bottom left		index
+			uvs.add(new Vector2f(uv_x + cellWidth, uv_y));		  			// bottom right		index + 1
+			uvs.add(new Vector2f(uv_x + cellWidth, uv_y + cellHeight));  	// top right		index + 2
+			uvs.add(new Vector2f(uv_x, uv_y + cellHeight)); 	  			// top left			index + 3
+			
+			
+			vertices.add(new Vertex2D(positions.get(index), uvs.get(index + 3), normal));
+			vertices.add(new Vertex2D(positions.get(index + 1), uvs.get(index + 2), normal));
+			vertices.add(new Vertex2D(positions.get(index + 2), uvs.get(index), normal));
+			vertices.add(new Vertex2D(positions.get(index + 3), uvs.get(index + 1), normal));
 			
 			//First triangle
-			indices[(i * 6)] = index;
-			indices[(i * 6) + 1] = index + 3;
-			indices[(i * 6) + 2] = index + 1;
+			indices[(i * 6)] = index + 3;
+			indices[(i * 6) + 1] = index;
+			indices[(i * 6) + 2] = index + 2;
+			
 			//Second triangle
-			indices[(i * 6) + 3] = index + 2;
+			indices[(i * 6) + 3] = index + 3;
 			indices[(i * 6) + 4] = index + 1;
-			indices[(i * 6) + 5] = index + 3;
+			indices[(i * 6) + 5] = index;
 			
 						
 			index += 4;
 		}
 		
-		for(int i = 0; i < vertices.size(); i++)
-		{
-		}
 		Texture textTexture = new Texture("fonts/" + font);
 
 		GameObject2D obj =  new GameObject2D(vertices, indices);
