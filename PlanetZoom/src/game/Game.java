@@ -8,6 +8,7 @@ import geometry.Sphere;
 import input.ICameraControl;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 
 import engine.CoreEngine;
 import engine.FirstPersonCamera;
@@ -54,12 +55,12 @@ public class Game implements IGame
     public void render()
     {
         //initRenderer();
-    	renderer.render(new Planet(new Sphere(6)), camera.getViewMatrix());
+    	renderer.render(new Planet(new Sphere(4, new Vector4f(0, 0, 1, 1))), camera.getViewMatrix());
     }
 
     private void initCamera()
     {
-        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -15f);
+        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -2f);
     }   
     private void initProjectionMatrix(float fovParam)
 	{
