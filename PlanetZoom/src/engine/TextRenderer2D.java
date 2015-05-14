@@ -61,42 +61,37 @@ public class TextRenderer2D
 			positions.add(new Vector2f(x + ((i + 1) * size), (y + size))); 		// top right		index + 1
 			positions.add(new Vector2f(x + (i * size), y)); 			 		// bottom left		index + 2
 			positions.add(new Vector2f(x + ((i + 1) * size), y)); 		 		// bottom right		index + 3
-			
-			
+				
 			currentChar = text.charAt(i);
-			int ascii = (int) text.charAt(i);
-			
+
 			row = (currentChar % rowCount);
 			column = (currentChar / colCount);
 			
 			uv_x =  row / (float) rowCount;
 			uv_y =  column / (float) colCount;
+			
+			uvs.add(new Vector2f(uv_x, uv_y + cellHeight)); 	  			// top left			index 
+			uvs.add(new Vector2f(uv_x + cellWidth, uv_y + cellHeight));  	// top right		index + 1
+			uvs.add(new Vector2f(uv_x, uv_y));			  					// bottom left		index + 2
+			uvs.add(new Vector2f(uv_x + cellWidth, uv_y));		  			// bottom right		index + 3
 
-//			uvs.add(new Vector2f(uv_x, 1 - uv_y));			  // top left			index
-//			uvs.add(new Vector2f(uv_x + cellWidth, 1 - uv_y));		  // top right			index + 1
-//			uvs.add(new Vector2f(uv_x + cellWidth, (1 - uv_y) + cellHeight));  // bottom left		index + 2
-//			uvs.add(new Vector2f(uv_x, (1 - uv_y) + cellHeight)); 	  // bottom right		index + 3
-			
-			uvs.add(new Vector2f(uv_x, uv_y));			  					// bottom left		index
-			uvs.add(new Vector2f(uv_x + cellWidth, uv_y));		  			// bottom right		index + 1
-			uvs.add(new Vector2f(uv_x + cellWidth, uv_y + cellHeight));  	// top right		index + 2
-			uvs.add(new Vector2f(uv_x, uv_y + cellHeight)); 	  			// top left			index + 3
-			
-			
-			vertices.add(new Vertex2D(positions.get(index), uvs.get(index + 3), normal));
-			vertices.add(new Vertex2D(positions.get(index + 1), uvs.get(index + 2), normal));
-			vertices.add(new Vertex2D(positions.get(index + 2), uvs.get(index), normal));
-			vertices.add(new Vertex2D(positions.get(index + 3), uvs.get(index + 1), normal));
+	
+			vertices.add(new Vertex2D(positions.get(index), uvs.get(index), normal));
+			vertices.add(new Vertex2D(positions.get(index + 1), uvs.get(index + 1), normal));
+			vertices.add(new Vertex2D(positions.get(index + 2), uvs.get(index + 2), normal));
+			vertices.add(new Vertex2D(positions.get(index + 3), uvs.get(index + 3), normal));
 			
 			//First triangle
-			indices[(i * 6)] = index + 3;
+			indices[(i * 6) + 0] = index + 2;
 			indices[(i * 6) + 1] = index;
-			indices[(i * 6) + 2] = index + 2;
+			indices[(i * 6) + 2] = index + 3;
 			
 			//Second triangle
-			indices[(i * 6) + 3] = index + 3;
+			indices[(i * 6) + 3] = index;
 			indices[(i * 6) + 4] = index + 1;
-			indices[(i * 6) + 5] = index;
+			indices[(i * 6) + 5] = index + 3;
+
+
 			
 						
 			index += 4;
