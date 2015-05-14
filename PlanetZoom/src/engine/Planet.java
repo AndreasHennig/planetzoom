@@ -10,7 +10,6 @@ public class Planet
 	{
 		this.sphere = sphere;
 	}
-	// TODO: to implement
 	public Sphere getSphere()
 	{
 		return sphere;
