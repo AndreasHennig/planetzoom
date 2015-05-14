@@ -1,12 +1,5 @@
 package engine;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.*;
 import lenz.utils.ShaderProgram;
 
 import org.lwjgl.opengl.GL11;
@@ -15,7 +8,6 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import static org.lwjgl.opengl.GL11.*;
-
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL14.*;
@@ -42,8 +34,7 @@ public class Renderer
 	public Renderer(Matrix4f projectionMatrix)
 	{
 		this.perspectiveProjectionMatrix = projectionMatrix;
-		//this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(4.0f/3.0f, -4.0f/3.0f, 1.0f, -1.0f, -1.0f, 1.0f);
-		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(800, 0, 0.0f, 600, -1.0f, 1.0f);
+		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
 	
@@ -54,42 +45,38 @@ public class Renderer
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
-
 		
 		glUseProgram(testShader.getId());
 		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
-		renderVAO(new VertexArrayObject(planet.getSphere()));	
+		renderVAO(new VertexArrayObject(planet.getSphere()), GL_LINE_STRIP);	
+		
+		Matrix4f modelViewMatrix = new Matrix4f();
+		modelViewMatrix.setIdentity();
+		
+		
+		glClear(GL_DEPTH_BUFFER_BIT);
 		
 		glUseProgram(hudShader.getId());
-		ShaderProgram.loadMatrix4f(hudShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
-		//ShaderProgram.loadMatrix4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(hudShader.getId(), viewMatrix, "modelViewMatrix");
-		GameObject2D t = TextRenderer2D.textToObject2D("a", "arial_noMetrices_1.png", 0, 0, 32);
+		ShaderProgram.loadMatrix4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadMatrix4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
+		GameObject2D t = TextRenderer2D.textToObject2D("Sample text", "arial_nm.png", 0, 0, 16);
 		VertexArrayObject text = new VertexArrayObject(t);
-		renderVAO(text);
+		renderVAO(text, GL_TRIANGLES);
+		
 	}
 	
 	private void init()
     {
-		glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-    }
-    
-    private void renderTest(Matrix4f viewMatrix)
-    {
-       // glUseProgram(testShader.getId());
-       // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        //renderGameObject2D(TextRenderer2D.textToObject2D("Hello aaa bbb", "arial_noMetrices.png", 0, 0, 32));
-        //renderGameObject3D(GameObject3D.getTestObject3D(), viewMatrix);
-        //renderGameObject2D(GameObject2D.getTestObject2D(0.6f, 0.6f));
-    }
-    
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }    
    
-    public void renderVAO(VertexArrayObject vao)
+    public void renderVAO(VertexArrayObject vao, int mode)
 	{						
     	vao.bindBuffers();
         GL30.glBindVertexArray(vao.getId());
@@ -98,13 +85,12 @@ public class Renderer
         GL20.glEnableVertexAttribArray(2); //normals
         GL20.glEnableVertexAttribArray(3); //color
          
-        // Bind to the index VBO that has all the information about the order of the vertices
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
          
-        // Draw the vertices
-        GL11.glDrawElements(GL11.GL_LINE_STRIP, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
+        // Draw vertices
+        GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
          
-        // Put everything back to default (deselect)
+        // Put everything back to default 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
