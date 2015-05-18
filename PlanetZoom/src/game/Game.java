@@ -38,7 +38,7 @@ public class Game implements IGame
     {
         this.windowHandle = windowHandle;
         printVersionInfo();
-        initProjectionMatrix(90.0f);
+        initProjectionMatrix(45.0f);
         initCamera();
         initRenderer();
     }
