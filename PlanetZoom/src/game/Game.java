@@ -4,14 +4,17 @@ import static org.lwjgl.opengl.GL11.GL_VENDOR;
 import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
+import geometry.Sphere;
 import input.ICameraControl;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 
 import engine.CoreEngine;
 import engine.FirstPersonCamera;
 import engine.ICamera;
 import engine.IGame;
+import engine.Planet;
 import engine.Renderer;
 
 
@@ -52,12 +55,12 @@ public class Game implements IGame
     public void render()
     {
         //initRenderer();
-    	renderer.render(null, camera.getViewMatrix());
+    	renderer.render(new Planet(new Sphere(4, new Vector4f(1, 1, 1, 1))), camera.getViewMatrix());
     }
 
     private void initCamera()
     {
-        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -15f);
+        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -2f);
     }   
     private void initProjectionMatrix(float fovParam)
 	{
@@ -79,7 +82,7 @@ public class Game implements IGame
 	}   
     private void initRenderer()
     {
-    	renderer = new Renderer(projectionMatrix, camera.getViewMatrix());
+    	renderer = new Renderer(projectionMatrix);
     }
     
     private void printVersionInfo()

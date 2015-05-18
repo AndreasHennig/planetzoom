@@ -1,145 +1,107 @@
 package engine;
 
+import lenz.utils.ShaderProgram;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-import lenz.utils.ShaderProgram;
 
 import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
 {
-	private ShaderProgram testShader;
-	private Matrix4f projectionMatrix;
+	private Matrix4f perspectiveProjectionMatrix;
+	private Matrix4f orthographicProjectionMatrix;
 	
+	private ShaderProgram testShader = new ShaderProgram("testShader");
+	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
+	private ShaderProgram toonShader = new ShaderProgram("toonShader");
 	
-	public Renderer(Matrix4f projectionMatrix, Matrix4f viewMatrix)
+	public Renderer(Matrix4f projectionMatrix)
 	{
-		this.projectionMatrix = projectionMatrix;
+		this.perspectiveProjectionMatrix = projectionMatrix;
+		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
 	
 	public void render(Planet planet, Matrix4f viewMatrix) 
 	{
-		renderTest();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Matrix4f modelMatrix = new Matrix4f();
-		modelMatrix.setIdentity();
-		
-		Matrix4f modelViewMatrix = new Matrix4f();
-		Matrix4f.mul(viewMatrix, modelMatrix, modelViewMatrix);
-		
 		Matrix4f normalMatrix = new Matrix4f();
-		Matrix4f.transpose(modelViewMatrix, normalMatrix);
+		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
-		loadMatricesToShader(modelViewMatrix, normalMatrix);
+		glUseProgram(testShader.getId());
+		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
+		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
+		renderVAO(new VertexArrayObject(planet.getSphere()), GL_LINE_STRIP);	
+		
+		// TO FIX: uncommented because of issues under OS X
+//		Matrix4f modelViewMatrix = new Matrix4f();
+//		modelViewMatrix.setIdentity();
+//		
+//		glClear(GL_DEPTH_BUFFER_BIT);
+//		
+//		glUseProgram(hudShader.getId());
+//		ShaderProgram.loadMatrix4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
+//		ShaderProgram.loadMatrix4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
+//		GameObject2D t = TextRenderer2D.textToObject2D("Sample text", "arial_nm.png", 0, 0, 16);
+//		VertexArrayObject text = new VertexArrayObject(t);
+//		renderVAO(text, GL_TRIANGLES);
 	}
 	
 	private void init()
     {
-        testShader = new ShaderProgram("testShader");
-        
-		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-    }
-	
-    private void loadMatricesToShader(Matrix4f modelViewMatrix, Matrix4f normalMatrix)
-    {
-    	ShaderProgram.loadMatrix4f(testShader.getId(), projectionMatrix, "projectionMatrix");
-    	ShaderProgram.loadMatrix4f(testShader.getId(), modelViewMatrix, "modelViewMatrix");
-    	ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
-    }
-    
-    private void renderTest()
-    {
-        glUseProgram(testShader.getId());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }    
+   
+    public void renderVAO(VertexArrayObject vao, int mode)
+	{						
+    	vao.bindBuffers();
+        GL30.glBindVertexArray(vao.getId());
+        GL20.glEnableVertexAttribArray(0); //positions
+        GL20.glEnableVertexAttribArray(1); //uvs
+        GL20.glEnableVertexAttribArray(2); //normals
+        GL20.glEnableVertexAttribArray(3); //color
+         
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
+         
+        // Draw vertices
+        GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
+         
+        // Put everything back to default 
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
+        GL30.glBindVertexArray(0);
+	}
         
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        drawCube(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-    
-    private void drawCube(float sizeX, float sizeY, float sizeZ, float texTiling)
-  	{		
-  		float halfHeight = sizeY / 2.0f; 
-  		float halfWidth  = sizeX / 2.0f;
-  		float halfDepth  = sizeZ / 2.0f;
-  		float texMul = texTiling;
-  		
-  		glBegin(GL_QUADS);
-  			//TOP
-  			glColor4f(1, 0, 0, 1);
-  			glNormal3f(0,1,0);
-  			glTexCoord2f(0.0f,0.0f);
-  			glVertex3f(-halfWidth, halfHeight, -halfDepth);         
-  			glTexCoord2f(0.0f,sizeZ*texMul);
-  			glVertex3f(-halfWidth, halfHeight, halfDepth);         
-  			glTexCoord2f(sizeX*texMul,sizeZ*texMul);
-  			glVertex3f(halfWidth, halfHeight, halfDepth);         
-  			glTexCoord2f(sizeX*texMul,0.0f);
-  			glVertex3f(halfWidth, halfHeight, -halfDepth);         
-  				
-  			//FRONT
-  			glColor4f(1, 1, 1, 1);
-  			glNormal3f(0,0,1);
-  			glTexCoord2f(0.0f,0.0f);
-  			glVertex3f( -halfWidth, halfHeight, halfDepth);   
-  			glTexCoord2f(0.0f,sizeY*texMul);
-  			glVertex3f(-halfWidth, -halfHeight, halfDepth);   
-  			glTexCoord2f(sizeX*texMul,sizeY*texMul);
-  			glVertex3f(halfWidth, -halfHeight, halfDepth);    
-  			glTexCoord2f(sizeX*texMul,0.0f);
-  			glVertex3f( halfWidth, halfHeight, halfDepth);      
-  				
-  			//BACK
-
-  			glNormal3f(0,0,-1);
-  			glTexCoord2f(sizeX*texMul,0.0f);
-  			glVertex3f( -halfWidth, halfHeight, -halfDepth);   
-  			glTexCoord2f(0.0f,0.0f);
-  			glVertex3f( halfWidth, halfHeight, -halfDepth);     
-  			glTexCoord2f(0.0f,sizeY*texMul);
-  			glVertex3f( halfWidth, -halfHeight, -halfDepth);    
-  			glTexCoord2f(sizeX*texMul,sizeY*texMul);
-  			glVertex3f( -halfWidth, -halfHeight, -halfDepth);      
-
-  			//LEFT
-  			glColor4f(0, 1, 0, 1);
-  			glNormal3f(-1,0,0);
-  			glTexCoord2f(sizeZ*texMul,0.0f);
-  			glVertex3f(-halfWidth, halfHeight, halfDepth);   
-  			glTexCoord2f(0.0f,0.0f);
-  			glVertex3f(-halfWidth, halfHeight, -halfDepth);   
-  			glTexCoord2f(0.0f,sizeY*texMul);
-  			glVertex3f(-halfWidth, -halfHeight, -halfDepth);   
-  			glTexCoord2f(sizeZ*texMul,sizeY*texMul);
-  			glVertex3f(-halfWidth, -halfHeight, halfDepth);      
-
-  			//RIGHT  
-  			glColor4f(0, 1, 0, 1);
-  			glNormal3f(1,0,0);
-  			glTexCoord2f(sizeZ*texMul,0.0f);
-  			glVertex3f( halfWidth, halfHeight, -halfDepth);
-  			glTexCoord2f(0.0f,0.0f);
-  		    glVertex3f( halfWidth, halfHeight, halfDepth);  
-  		    glTexCoord2f(0.0f,sizeY*texMul);
-  		    glVertex3f( halfWidth, -halfHeight, halfDepth);         
-  		    glTexCoord2f(sizeZ*texMul,sizeY*texMul);
-  		    glVertex3f( halfWidth, -halfHeight, -halfDepth);     
-  			    
-  		    
-  			//BOTTOM
-  			glColor4f(1, 0, 0, 1);
-  		    glNormal3f(0,-1,0);
-  		    glTexCoord2f(0.0f,0.0f);
-  			glVertex3f( -halfWidth, -halfHeight, -halfDepth);  
-  			glTexCoord2f(0.0f,sizeZ*texMul);
-  			glVertex3f( halfWidth, -halfHeight, -halfDepth);     
-  			glTexCoord2f(sizeX*texMul,sizeZ*texMul);
-  			glVertex3f( halfWidth, -halfHeight, halfDepth);  
-  			glTexCoord2f(sizeX*texMul,0.0f);
-  			glVertex3f( -halfWidth, -halfHeight, halfDepth);	
-  		glEnd();
-  	}
+	
+	public static Matrix4f createOrthographicProjectionMatric(float right, float left, float top, float bottom, float near, float far)
+	{
+		Matrix4f projectionMatrix = new Matrix4f();
+		projectionMatrix.setZero();
+		
+		projectionMatrix.m00 = (2.0f / (right - left));
+		projectionMatrix.m11 = (2.0f / (top - bottom));
+		projectionMatrix.m22 = -(2.0f / (far - near));
+		projectionMatrix.m33 = 1;
+		projectionMatrix.m30 = (right + left) / (right - left);
+		projectionMatrix.m31 = (top + bottom) / (top - bottom);
+		projectionMatrix.m32 = (far + near) / (far - near);
+		
+		return projectionMatrix;
+	}
 }
