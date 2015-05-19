@@ -32,11 +32,13 @@ public class Planet
 		sphere.update(subdivisions);
 	}
 	
-	public void update(ICamera cam) {
+	public void update(ICamera cam) 
+	{
 		update(cam, false);
 	}
 	
-	public void update(ICamera cam, boolean adjustCamSpeed) {
+	public void update(ICamera cam, boolean adjustCamSpeed) 
+	{
 		float planetCamDistance = cam.getDistanceToPlanetSurface(this);
 
 		float subdivisionCoefficient = sphere.getSubdivisionCoefficient(planetCamDistance);
