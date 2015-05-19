@@ -37,9 +37,9 @@ public class Renderer
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
 		glUseProgram(shaderTestPete.getId());
-		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
-		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
+		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), viewMatrix, "modelViewMatrix");
+		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), normalMatrix, "normalMatrix");
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
 		
 		// TO FIX: uncommented because of issues under OS X
