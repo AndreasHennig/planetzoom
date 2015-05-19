@@ -63,17 +63,13 @@ public class Sphere extends GameObject3D
 		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		normals = new Vector3f[vertices.length];
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
-		
-		createOctahedron(resolution);
-		
+
 		// very slow!! TO FIX
 		vertexData.clear();
 		
-		for(int i = 0; i < vertices.length; i++)
-		{
-			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
-			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), normals[i], vertexColor));
-		}
+		createOctahedron(resolution);
+		applyMeshModifications();
+		uploadVertexData();
 	}
 	
 	/**
@@ -96,6 +92,16 @@ public class Sphere extends GameObject3D
 		subdivisionCoefficient = (float) (Math.pow(maxDistance - distanceToSphere, curveSlope) / Math.pow(maxDistance, curveSlope));
 		
 		return subdivisionCoefficient;
+	}
+	
+	public void applyMeshModifications()
+	{
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertices[i].normalise();
+			vertices[i].scale((float)Math.random()*2 + radius);
+			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+		}
 	}
 	
 	private void createOctahedron(int resolution)
@@ -155,12 +161,6 @@ public class Sphere extends GameObject3D
 			
 			vertices[v++] = Vertex3D.up();
 		}
-		
-		for(int i = 0; i < vertices.length; i++)
-		{
-			vertices[i].normalise();
-			vertices[i].scale((float)Math.sin(i) + radius);
-		}
 	}
 	
 	private int createVertexLine(Vector3f from, Vector3f to, int steps, int v)
@@ -211,5 +211,13 @@ public class Sphere extends GameObject3D
 		indices[t++] = vTop;
 		
 		return t;
+	}
+	
+	private void uploadVertexData()
+	{
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), normals[i], vertexColor));
+		}
 	}
 }
