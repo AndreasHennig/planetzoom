@@ -36,7 +36,7 @@ public class Renderer
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
-		glUseProgram(testShader.getId());
+		glUseProgram(toonShader.getId());
 		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");

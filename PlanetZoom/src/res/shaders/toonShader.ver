@@ -14,7 +14,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 normalMatrix;
 
-vec4 lightPosition = vec4(-5.0, 3.0, 5.0, 1.0);
+vec4 lightPosition = vec4(-15.0, 20.0, 5.0, 1.0);
 
 void main()
 {
