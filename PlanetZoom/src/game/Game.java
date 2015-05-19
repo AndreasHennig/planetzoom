@@ -48,7 +48,39 @@ public class Game implements IGame
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();
         
-        planet.update(1);
+        FirstPersonCamera cam = (FirstPersonCamera)camera;
+        
+        float distance = cam.getDistanceToPlanetSurface(planet);
+        int subdivisions;
+        
+        System.out.println(distance);
+        
+        if(distance < 1) {
+        	subdivisions = 9;
+        } else if(distance < 10) {
+        	subdivisions = 8;
+        } else if(distance < 20) {
+        	subdivisions = 7;
+        } else if(distance < 30) {
+        	subdivisions = 6;
+        } else if(distance < 40) {
+        	subdivisions = 5;
+        } else if(distance < 50) {
+        	subdivisions = 4;
+        } else if(distance < 60) {
+        	subdivisions = 3;
+        } else if(distance < 70) {
+        	subdivisions = 2;
+        } else if(distance < 80) {
+        	subdivisions = 1;
+        } else {
+        	subdivisions = 1;
+        } 
+        // distance 1 -> 7
+        // distance 10 -> 2
+//        subdivisions = 1;
+        
+        planet.update(subdivisions);
     }
 
     @Override

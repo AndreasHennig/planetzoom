@@ -31,4 +31,8 @@ public class Planet
 	public void update(int subdivisions) {
 		sphere.update(subdivisions);
 	}
+	
+	public void update(Planet planet) {
+		;
+	}
 }
