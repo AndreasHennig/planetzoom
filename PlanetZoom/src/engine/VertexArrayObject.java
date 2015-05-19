@@ -61,12 +61,16 @@ public class VertexArrayObject
 		GL30.glBindVertexArray(id); 
 		
 		if(is3D)
+		{
 			bindArrayBuffer(POSITION_ATTRIBUTE_LOCATION, 3, positionHandle, positionBuffer);
+		}
 		else
+		{
 			bindArrayBuffer(POSITION_ATTRIBUTE_LOCATION, 2, positionHandle, positionBuffer);
+		}
 		
 		bindArrayBuffer(UV_ATTRIBUTE_LOCATION, 2, uvHandle, uvBuffer);
-		bindArrayBuffer(NORMAL_ATTRIBUTE_LOCATION, 2, normalHandle, normalBuffer);
+		bindArrayBuffer(NORMAL_ATTRIBUTE_LOCATION, 3, normalHandle, normalBuffer);
 		bindArrayBuffer(COLOR_ATTRIBUTE_LOCATION, 4, colorHandle, colorBuffer);
 		bindIndexBuffer(indexHandle, indexBuffer);
 		
@@ -121,16 +125,16 @@ public class VertexArrayObject
 		for (int i = 0; i < vertices.size(); i++)
 		{
 			positionBuffer.put(asFloats(vertices.get(i).getPosition()));
-			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
 			uvBuffer.put(asFloats(vertices.get(i).getUv()));
+			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
 			colorBuffer.put(asFloats(vertices.get(i).getColorRGBA()));
 		}
 		
 		positionBuffer.flip();
 		uvBuffer.flip();
-		indexBuffer.flip();		
+		normalBuffer.flip();	
 		colorBuffer.flip();
-		normalBuffer.flip();
+		indexBuffer.flip();			
 	}
 	
 	private void initBuffers2D(ArrayList<Vertex2D> vertices, int[] indices)
@@ -141,12 +145,13 @@ public class VertexArrayObject
 		for (int i = 0; i < vertices.size(); i++)
 		{
 			positionBuffer.put(asFloats(vertices.get(i).getPosition()));
-			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
 			uvBuffer.put(asFloats(vertices.get(i).getUv()));
+			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
 		}
 		
 		positionBuffer.flip();
 		uvBuffer.flip();
+		normalBuffer.flip();
 		indexBuffer.flip();			
 	}
 	
