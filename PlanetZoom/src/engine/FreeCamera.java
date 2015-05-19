@@ -35,10 +35,18 @@ public class FreeCamera implements ICamera
 	{
 		position = new Vector3f(x, y ,z);
 		target = new Vector3f(0, 0, 0);
-		direction = (Vector3f) Vector3f.add(position, target, direction).normalise();
+		direction = new Vector3f();
+		Vector3f.add(position, target, direction);
+		direction.normalise();
 		
-		right = (Vector3f) Vector3f.cross(new Vector3f(0, 1, 0), direction, right).normalise();
-		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();
+		right = new Vector3f();
+		Vector3f.cross(new Vector3f(0, 1, 0), direction, right);
+		right.normalise();
+		
+		up = new Vector3f();
+		Vector3f.cross(direction, right, up);
+		up.normalise();
+		
 		view = new Matrix4f();
 	}
 	
@@ -59,7 +67,7 @@ public class FreeCamera implements ICamera
 		view.m12 = direction.y;
 		view.m22 = direction.z;
 		
-		view.translate((Vector3f) position.negate());
+		view.translate(new Vector3f(-position.x, -position.y, -position.z));
 
 		return view;
 	}
@@ -91,36 +99,86 @@ public class FreeCamera implements ICamera
 	public void setYaw(float yaw)
 	{
 		this.yaw = (float) (yaw % (2 * Math.PI));
-		updateDASHIAT();
+		updateOrientation();
 	}
 	
 	public void setPitch(float pitch)
 	{
 		this.pitch = (float) (pitch % (2 * Math.PI));
-		updateDASHIAT();
+		updateOrientation();
 	}
 	
 	public void addYaw(float amount)
 	{
 		yaw = (float) ((yaw + amount) % (2 * Math.PI));
-		updateDASHIAT();
+		updateOrientation();
 	}
 	
 	public void addPitch(float amount)
 	{
 		pitch = (float) ((pitch + amount) % (2 * Math.PI));
-		updateDASHIAT();
+		updateOrientation();
 	}
 	
-	private void updateDASHIAT()
+	private void updateOrientation()
 	{
 		direction.x = (float) (Math.cos(pitch) * Math.cos(yaw));
 		direction.y = (float) Math.sin(pitch);
 		direction.z = (float) (Math.cos(pitch) * Math.sin(yaw));
 		
-		right = (Vector3f) Vector3f.cross(new Vector3f(0, 1, 0), direction, right).normalise();
-		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();
+
+		Vector3f.cross(new Vector3f(0, 1, 0), direction, right);
+		right.normalise();
+		
+		if(pitch > Math.PI / 2.0 || pitch < - (Math.PI / 2.0))
+			right.negate();
+		
+		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();	
+		
+		System.out.println("direction: " + (direction));
+		System.out.println("up: " + up);
+		System.out.println("right: " + right);
 	}
 	
+	public void moveForwards(float amount)
+	{
+		this.position.x -= direction.x * amount;
+		this.position.y -= direction.y * amount;
+		this.position.z -= direction.z * amount;
+	}
 	
+	public void moveBackwards(float amount)
+	{
+		this.position.x += direction.x * amount;
+		this.position.y += direction.y * amount;
+		this.position.z += direction.z * amount;
+	}
+	
+	public void strafeLeft(float amount)
+	{
+		this.position.x -= right.x * amount;
+		this.position.y -= right.y * amount;
+		this.position.z -= right.z * amount;
+	}
+	
+	public void strafeRight(float amount)
+	{
+		this.position.x += right.x * amount;
+		this.position.y += right.y * amount;
+		this.position.z += right.z * amount;
+	}
+	
+	public void moveUp(float amount)
+	{
+		this.position.x += up.x * amount;
+		this.position.y += up.y * amount;
+		this.position.z += up.z * amount;
+	}
+	
+	public void moveDown(float amount)
+	{
+		this.position.x -= up.x * amount;
+		this.position.y -= up.y * amount;
+		this.position.z -= up.z * amount;
+	}
 }
