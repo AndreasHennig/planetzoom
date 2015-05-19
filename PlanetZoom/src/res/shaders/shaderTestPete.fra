@@ -1,14 +1,18 @@
 #version 410 
 
 in float intensity;
-in float positionY;
+in vec3 normalDir;
+in vec3 lightDir;
 
-out vec4 out_Color; 
-
+out vec4 out_Color;
+ 
 void main(void)
 {
 	vec4 color;
-
+	float intensity;
+	
+	intensity = dot(normalize(lightDir), normalize(normalDir));
+	
 	if(intensity > 0.95)
 	{
 		color = vec4(0.5, 0.5, 0.5, 1.0);

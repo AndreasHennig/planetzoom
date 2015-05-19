@@ -2,6 +2,7 @@
 
 package geometry;
 
+import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -21,7 +22,8 @@ public class Sphere extends GameObject3D
 	private Vector3f[] normals; 
 	private Vector4f vertexColor;
 	
-	public float getRadius() {
+	public float getRadius() 
+	{
 		return radius;
 	}
 	
@@ -57,17 +59,17 @@ public class Sphere extends GameObject3D
 		
 		int resolution = 1 << this.subdivisions;
 		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
+		normals = new Vector3f[vertices.length];
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 		
 		createOctahedron(resolution);
-		normals = vertices.clone();
-				
+		
 		// very slow!! TO FIX
 		vertexData.clear();
 		
 		for(int i = 0; i < vertices.length; i++)
 		{
-			normals[i].normalise();
+			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
 			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), normals[i], vertexColor));
 		}
 	}
@@ -133,9 +135,7 @@ public class Sphere extends GameObject3D
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-			
-			if(radius != 1)
-				vertices[i].scale(radius);
+			vertices[i].scale((float)Math.sin(i) + radius);
 		}
 	}
 	
