@@ -21,9 +21,9 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram toonShader = new ShaderProgram("toonShader");
 	
-	public Renderer(float fovParam)
+	public Renderer(float fovParam, int windowWidth, int windowHeight)
 	{
-		initProjectionMatrix(fovParam);
+		initProjectionMatrix(fovParam, windowWidth, windowHeight);
 		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
@@ -88,13 +88,13 @@ public class Renderer
         GL30.glBindVertexArray(0);
 	}
     
-    private void initProjectionMatrix(float fovParam)
+    private void initProjectionMatrix(float fovParam, int width, int height)
 	{
 		perspectiveProjectionMatrix = new Matrix4f();
 		float fov = fovParam;
 		float zFar = 500.0f;
 		float zNear = 0.1f;
-		float aspectRatio = 4.0f/3.0f;		
+		float aspectRatio = (float)width/height;		
 		float frustumLength = zFar - zNear;
 		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
 		float xScale = yScale / aspectRatio;
