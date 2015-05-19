@@ -8,4 +8,5 @@ public interface ICamera
 {
 	public Matrix4f getViewMatrix();
 	public ICameraControl getCameraControl();
+	public float getDistanceToPlanetSurface(Planet planet);
 }

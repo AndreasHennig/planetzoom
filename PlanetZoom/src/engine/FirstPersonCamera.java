@@ -19,7 +19,7 @@ public class FirstPersonCamera implements ICamera
 		this(new Vector3f(0, 0, 0));
 	}
 	
-	public FirstPersonCamera(long windowHandle, float x, float y, float z)
+	public FirstPersonCamera(float x, float y, float z)
 	{	
 		this(new Vector3f(x, y, z));
 	}
