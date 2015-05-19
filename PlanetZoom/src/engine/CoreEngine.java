@@ -20,7 +20,7 @@ public class CoreEngine
     public boolean running;
     public long windowHandle;
   
-    boolean fullscreen = false;
+    boolean fullscreen = true;
     
     int windowWidth = 800; 
     int windowHeight = 600;
@@ -74,12 +74,13 @@ public class CoreEngine
     	
     	if(fullscreen)
     	{
-            //TODO: redo the stuff	
     		long monitor = glfwGetPrimaryMonitor();
     		GLFWvidmode mode = new GLFWvidmode(glfwGetVideoMode(monitor));
     		
     		windowWidth = mode.getWidth();
     		windowHeight = mode.getHeight();
+    		
+    		//System.out.println("width: " + windowWidth + " |height: " + windowHeight);
     		
     		windowHandle = glfwCreateWindow(windowWidth, windowHeight, "Stare into it device: " + windowHandle, monitor, NULL);
        	} 
