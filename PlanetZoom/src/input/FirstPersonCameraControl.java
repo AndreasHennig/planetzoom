@@ -34,13 +34,8 @@ public class FirstPersonCameraControl implements ICameraControl
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
 			cam.moveDown(0.1f);
 		
-
 		cam.addYaw((float) - Cursor.getDx() /250.0f);
-			
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
-
-		
-
 			
 		return cam;	
 	}

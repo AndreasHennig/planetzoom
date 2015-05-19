@@ -7,8 +7,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import input.Cursor;
 import input.Keyboard;
 
-import java.nio.ByteBuffer;
-
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;

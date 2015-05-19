@@ -4,7 +4,6 @@ import geometry.Vertex2D;
 
 import java.util.ArrayList;
 
-import lenz.utils.ShaderProgram;
 import lenz.utils.Texture;
 
 import org.lwjgl.util.vector.Vector2f;

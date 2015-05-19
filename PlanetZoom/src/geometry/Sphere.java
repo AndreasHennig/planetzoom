@@ -6,13 +6,15 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import engine.FirstPersonCamera;
 import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
 	final static int AMOUNT_VALUES_PER_COLOR = 3;
 	final static int AMOUNT_VALUES_PER_VERTEX = 3;
-	final static int MAX_SUBDIVISIONS = 11;
+	public final static int MAX_SUBDIVISIONS = 9;
+	public final static int MIN_SUBDIVISIONS = 1;
 		
 	private int subdivisions;
 	private float radius;
@@ -61,6 +63,28 @@ public class Sphere extends GameObject3D
 		
 		for(int i = 0; i < vertices.length; i++)
 			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), vertices[i], vertexColor));	
+	}
+	
+	/**
+	 * Gives a value between 0 and 1 that depends on the distance between
+	 * a point and the sphere. Can be used to compute a subdivision that
+	 * looks "okay" from to given point.
+	 * The distance gets clamped to a max value.
+	 * @param distanceToSphere
+	 * @return value between 0 and 1
+	 */
+	public float getSubdivisionCoefficient(float distanceToSphere) {
+		// distances over 100 don't affect the planets resolution
+		float maxDistance = 100;
+		distanceToSphere = distanceToSphere > maxDistance ? maxDistance : distanceToSphere;
+		
+		float subdivisionCoefficient = (maxDistance - distanceToSphere) / 100;
+		
+		// (100 - x) ^ 5 / (100 ^ 5)
+		float curveSlope = 3f;
+		subdivisionCoefficient = (float) (Math.pow(maxDistance - distanceToSphere, curveSlope) / Math.pow(maxDistance, curveSlope));
+		
+		return subdivisionCoefficient;
 	}
 	
 	private void createOctahedron(int resolution)
