@@ -1,6 +1,7 @@
 package engine;
 
 import lenz.utils.ShaderProgram;
+import lenz.utils.Texture;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;

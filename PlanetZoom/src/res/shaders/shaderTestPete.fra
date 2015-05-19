@@ -1,5 +1,6 @@
 #version 410 
 
+in vec2 uvs;
 in float intensity;
 in vec3 normalDir;
 in vec3 lightDir;
@@ -30,5 +31,5 @@ void main(void)
 		color = vec4(0.1, 0.1, 0.1, 1.0);
 	}
 	
-	out_Color = color;
+	out_Color = color * vec4(uvs.x, 1.0, 1.0, 1.0);
 }

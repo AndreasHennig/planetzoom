@@ -10,9 +10,11 @@ layout (location = 3) in vec4 color;
 
 out vec3 lightDir;
 out vec3 normalDir;
+out vec2 uvs;
 
 void main(void)
 {		
+	uvs = uv;
 	normalDir = normal;
 	lightDir = normalize(vec3(-10.0, 10.0, 2.0));
 		 

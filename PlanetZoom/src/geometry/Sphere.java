@@ -2,12 +2,10 @@
 
 package geometry;
 
-import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import engine.FirstPersonCamera;
 import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
@@ -22,6 +20,7 @@ public class Sphere extends GameObject3D
 	
 	private Vector3f[] vertices;
 	private Vector3f[] normals; 
+	private Vector2f[] uv;
 	private Vector4f vertexColor;
 	
 	public float getRadius() 
@@ -62,6 +61,7 @@ public class Sphere extends GameObject3D
 		int resolution = 1 << this.subdivisions;
 		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		normals = new Vector3f[vertices.length];
+		uv = new Vector2f[vertices.length];
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 
 		// very slow!! TO FIX
@@ -69,6 +69,7 @@ public class Sphere extends GameObject3D
 		
 		createOctahedron(resolution);
 		applyMeshModifications();
+		createUVs();
 		uploadVertexData();
 	}
 	
@@ -213,11 +214,42 @@ public class Sphere extends GameObject3D
 		return t;
 	}
 	
+	private void createUVs()
+	{
+		float previousX = 1f;
+		
+		for (int i = 0; i < vertices.length; i++)
+		{
+			Vector3f vector = new Vector3f(vertices[i]);
+			
+			if(vector.x == previousX)
+			{
+				uv[i - 1].x = 1f;
+			}
+			previousX = vector.x;
+			
+			Vector2f texCoords = new Vector2f();
+			texCoords.x = (float)Math.atan2(vector.x, vector.y) / (-2f * (float)Math.PI);
+			
+			if(texCoords.x < 0)
+			{
+				texCoords.x += 1f;
+			}
+			texCoords.y = (float)Math.asin(vector.y) / (float)Math.PI + 0.5f;
+			uv[i] = texCoords;
+		}
+		
+		uv[vertices.length - 4].x = uv[0].x = 0.125f;
+		uv[vertices.length - 3].x = uv[1].x = 0.375f;
+		uv[vertices.length - 2].x = uv[2].x = 0.625f;
+		uv[vertices.length - 1].x = uv[3].x = 0.875f;
+	}
+	
 	private void uploadVertexData()
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{
-			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), normals[i], vertexColor));
+			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
 		}
 	}
 }
