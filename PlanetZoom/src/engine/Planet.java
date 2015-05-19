@@ -1,21 +1,34 @@
 package engine;
 
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
+
 import geometry.Sphere;
 
 public class Planet 
 {
 	private Sphere sphere;
+	private Vector3f position;
 	
-	public Planet(Sphere sphere)
-	{
-		this.sphere = sphere;
+	public float getRadius() {
+		return sphere.getRadius();
 	}
-	public Sphere getSphere()
-	{
+	
+	public Vector3f getPosition() {
+		return position;
+	}
+	
+	public GameObject3D getMesh() {
 		return sphere;
 	}
-	public void setSphere(Sphere sphere)
+	
+	public Planet(float radius, Vector3f position)
 	{
-		this.sphere = sphere;
+		this.position = position;
+		this.sphere = new Sphere(3, new Vector4f(1f, 1f, 1f, 1f), radius);
+	}
+	
+	public void update(int subdivisions) {
+		sphere.update(subdivisions);
 	}
 }

@@ -4,11 +4,9 @@ import static org.lwjgl.opengl.GL11.GL_VENDOR;
 import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
-import geometry.Sphere;
 import input.ICameraControl;
 
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector4f;
+import org.lwjgl.util.vector.*;
 
 import engine.CoreEngine;
 import engine.FirstPersonCamera;
@@ -17,7 +15,6 @@ import engine.IGame;
 import engine.Planet;
 import engine.Renderer;
 
-
 public class Game implements IGame
 {
 	private Matrix4f projectionMatrix;
@@ -25,12 +22,12 @@ public class Game implements IGame
 	private Renderer renderer;
 	
 	private long windowHandle;
+	private Planet planet;
 	
     public static void main(String[] args)
     {
         CoreEngine game = new CoreEngine(new Game());
         game.start();
-
     }
 
     @Override
@@ -41,6 +38,8 @@ public class Game implements IGame
         initProjectionMatrix(45.0f);
         initCamera();
         initRenderer();
+        
+        planet = new Planet(1f, new Vector3f(0f, 0f, 0f));
     }
 
     @Override
@@ -49,19 +48,20 @@ public class Game implements IGame
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();
         
+        planet.update(1);
     }
 
     @Override
     public void render()
     {
-        //initRenderer();
-    	renderer.render(new Planet(new Sphere(4, new Vector4f(1, 1, 1, 1))), camera.getViewMatrix());
+    	renderer.render(planet, camera.getViewMatrix());
     }
 
     private void initCamera()
     {
         camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -2f);
-    }   
+    }
+    
     private void initProjectionMatrix(float fovParam)
 	{
 		projectionMatrix = new Matrix4f();

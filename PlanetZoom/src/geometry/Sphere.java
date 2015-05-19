@@ -14,42 +14,54 @@ public class Sphere extends GameObject3D
 	final static int AMOUNT_VALUES_PER_VERTEX = 3;
 	final static int MAX_SUBDIVISIONS = 11;
 		
-	private int subdivisions = 1;
-	private Vector4f color;
+	private int subdivisions;
+	private float radius;
 	
-	private Vector3f[] positions;
+	private Vector3f[] vertices;
+	private Vector4f vertexColor;
+	
+	public float getRadius() {
+		return radius;
+	}
 	
 	private static Vector3f[] directions = 
 	{
-		Vertex3D.left,
-		Vertex3D.back,
-		Vertex3D.right,
-		Vertex3D.forward
+		Vertex3D.left(),
+		Vertex3D.back(),
+		Vertex3D.right(),
+		Vertex3D.front()
 	};
 	
-	public Sphere(int subdivisions, Vector4f color)
+	public Sphere() {
+		this(1, new Vector4f(1, 1, 1, 1), 1);
+	}
+	
+	public Sphere(int subdivisions, Vector4f color, float radius)
 	{
-		if(subdivisions > MAX_SUBDIVISIONS)
-		{
-			this.subdivisions = MAX_SUBDIVISIONS;
-		}
+		this.vertexColor = color;
+		this.radius = radius;
 		
-		else
-		{
-			this.subdivisions = subdivisions;
-		}
+		update(subdivisions);
+	}
+	
+	public void update(int subdivisions) {
+		if(subdivisions == this.subdivisions)
+			return;
 		
-		this.color = color;
+		this.subdivisions = subdivisions > MAX_SUBDIVISIONS ? MAX_SUBDIVISIONS : subdivisions;
+		
 		int resolution = 1 << this.subdivisions;
-		positions =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
+		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 		
 		createOctahedron(resolution);
 		
-		for(int i = 0; i < positions.length; i++)
-			vertices.add(new Vertex3D(positions[i], new Vector2f(0.0f, 0.0f), positions[i], color));	
+		// very slow!! TO FIX
+		vertexData.clear();
+		
+		for(int i = 0; i < vertices.length; i++)
+			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), vertices[i], vertexColor));	
 	}
-	
 	
 	private void createOctahedron(int resolution)
 	{		
@@ -59,7 +71,7 @@ public class Sphere extends GameObject3D
 		
 		for(int i = 0; i < 4; i++)
 		{
-			positions[v++] = Vertex3D.down;
+			vertices[v++] = Vertex3D.down();
 		}
 		
 		//LOWERSPHERE
@@ -68,12 +80,12 @@ public class Sphere extends GameObject3D
 			float progress = (float)i / resolution;
 			Vector3f from;
 			Vector3f to;
-			positions[v++] = to = Vertex3D.lerp(Vertex3D.down, Vertex3D.forward, progress);
+			vertices[v++] = to = Vertex3D.lerp(Vertex3D.down(), Vertex3D.front(), progress);
 			
 			for(int d = 0; d < 4; d++)
 			{
 				from = to;
-				to = Vertex3D.lerp(Vertex3D.down, directions[d], progress);
+				to = Vertex3D.lerp(Vertex3D.down(), directions[d], progress);
 				t = createLowerStrip(i, v, vBottom, t);
 				v = createVertexLine(from, to, i, v);
 				vBottom += i > 1 ? (i - 1) : 1;
@@ -87,12 +99,12 @@ public class Sphere extends GameObject3D
 			float progress = (float)i / resolution;
 			Vector3f from;
 			Vector3f to;
-			positions[v++] = to = Vertex3D.lerp(Vertex3D.up, Vertex3D.forward, progress);
+			vertices[v++] = to = Vertex3D.lerp(Vertex3D.up(), Vertex3D.front(), progress);
 			
 			for(int d = 0; d < 4; d++)
 			{
 				from = to;
-				to = Vertex3D.lerp(Vertex3D.up, directions[d], progress);
+				to = Vertex3D.lerp(Vertex3D.up(), directions[d], progress);
 				t = createUpperStrip(i, v, vBottom, t);
 				v = createVertexLine(from, to, i, v);
 				vBottom += i + 1;
@@ -106,21 +118,23 @@ public class Sphere extends GameObject3D
 			indices[t++] = v;
 			indices[t++] = ++vBottom;
 			
-			positions[v++] = Vertex3D.up;
+			vertices[v++] = Vertex3D.up();
 		}
 		
-		for(int i = 0; i < positions.length; i++)
+		for(int i = 0; i < vertices.length; i++)
 		{
-			positions[i].normalise();
+			vertices[i].normalise();
+			
+			if(radius != 1)
+				vertices[i].scale(radius);
 		}
-		
 	}
 	
 	private int createVertexLine(Vector3f from, Vector3f to, int steps, int v)
 	{
 		for(int i = 1; i <= steps; i++)
 		{
-			positions[v++] = Vertex3D.lerp(from, to, (float)i / steps);
+			vertices[v++] = Vertex3D.lerp(from, to, (float)i / steps);
 		}
 		
 		return v;

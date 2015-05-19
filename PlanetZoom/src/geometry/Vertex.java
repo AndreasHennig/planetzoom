@@ -10,10 +10,21 @@ public abstract class Vertex
 	protected Vector3f normal;
 	protected Vector4f colorRGBA;
 	
-	public static final Vector3f down = new Vector3f(0, -1, 0);
-	public static final Vector3f up = new Vector3f(0, 1, 0);
-	public static final Vector3f left = new Vector3f(-1, 0, 0);
-	public static final Vector3f right = new Vector3f(1, 0, 0);
+	public static Vector3f up() {
+		return new Vector3f(0, 1, 0);
+	}
+	
+	public static Vector3f down() {
+		return new Vector3f(0, -1, 0);
+	}
+	
+	public static Vector3f left() {
+		return new Vector3f(-1, 0, 0);
+	}
+	
+	public static Vector3f right() {
+		return new Vector3f(1, 0, 0);
+	}
 	
 	public Vertex(Vector2f uv, Vector3f normal)
 	{

@@ -40,7 +40,7 @@ public class Renderer
 		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
-		renderVAO(new VertexArrayObject(planet.getSphere()), GL_LINE_STRIP);	
+		renderVAO(new VertexArrayObject(planet.getMesh()), GL_LINE_STRIP);	
 		
 		// TO FIX: uncommented because of issues under OS X
 //		Matrix4f modelViewMatrix = new Matrix4f();
