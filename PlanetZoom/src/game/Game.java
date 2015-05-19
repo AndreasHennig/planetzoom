@@ -48,8 +48,8 @@ public class Game implements IGame
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();
         
-//        planet.update(subdivisions);
-        planet.update(camera);
+        planet.update(3);
+        //planet.update(camera);
     }
 
     @Override
