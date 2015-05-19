@@ -31,4 +31,22 @@ public class Planet
 	public void update(int subdivisions) {
 		sphere.update(subdivisions);
 	}
+	
+	public void update(FirstPersonCamera cam) {
+		update(cam, false);
+	}
+	
+	public void update(FirstPersonCamera cam, boolean adjustCamSpeed) {
+		float planetCamDistance = cam.getDistanceToPlanetSurface(this);
+
+		float subdivisionCoefficient = sphere.getSubdivisionCoefficient(planetCamDistance);
+		
+		int subdivisions = (int)(subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
+		
+		// clamp
+		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
+		this.update(subdivisions);
+		
+		// TODO: adjust cam speed with subdivisionCoefficient if adjustCamSpeed is true
+	}
 }
