@@ -62,6 +62,7 @@ public class Game implements IGame
     {
         camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -2f);
     }   
+    
     private void initProjectionMatrix(float fovParam)
 	{
 		projectionMatrix = new Matrix4f();
