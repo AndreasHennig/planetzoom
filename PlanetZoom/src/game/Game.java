@@ -17,6 +17,7 @@ import engine.Renderer;
 
 public class Game implements IGame
 {
+	private static CoreEngine game;
 	private ICamera camera; 
 	private Renderer renderer;
 	float fovParam = 45.0f;
@@ -26,7 +27,7 @@ public class Game implements IGame
 	
     public static void main(String[] args)
     {
-        CoreEngine game = new CoreEngine(new Game());
+        game = new CoreEngine(new Game());
         game.start();
     }
 
@@ -64,7 +65,7 @@ public class Game implements IGame
     
     private void initRenderer()
     {
-    	renderer = new Renderer(fovParam);
+    	renderer = new Renderer(fovParam, game.getWindowWidth(), game.getWindowHeight());
     }
     
     private void printVersionInfo()
