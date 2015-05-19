@@ -19,7 +19,7 @@ public class Renderer
 	
 	private ShaderProgram testShader = new ShaderProgram("testShader");
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
-	private ShaderProgram toonShader = new ShaderProgram("toonShader");
+	private ShaderProgram shaderTestPete = new ShaderProgram("shaderTestPete");
 	
 	public Renderer(Matrix4f projectionMatrix)
 	{
@@ -36,11 +36,11 @@ public class Renderer
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
-		glUseProgram(testShader.getId());
+		glUseProgram(shaderTestPete.getId());
 		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
 		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
-		renderVAO(new VertexArrayObject(planet.getMesh()), GL_LINE_STRIP);	
+		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
 		
 		// TO FIX: uncommented because of issues under OS X
 //		Matrix4f modelViewMatrix = new Matrix4f();

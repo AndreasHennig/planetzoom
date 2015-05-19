@@ -48,7 +48,7 @@ public class Game implements IGame
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();
         
-        planet.update(1);
+        planet.update(4);
     }
 
     @Override
@@ -89,6 +89,6 @@ public class Game implements IGame
     {
         System.out.println("GPU Vendor: " + glGetString(GL_VENDOR));
         System.out.println("OpenGL version: " + glGetString(GL_VERSION));
-        System.out.println("OpenGL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
+        System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
     }
 }

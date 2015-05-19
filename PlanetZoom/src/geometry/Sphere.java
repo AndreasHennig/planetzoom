@@ -18,6 +18,7 @@ public class Sphere extends GameObject3D
 	private float radius;
 	
 	private Vector3f[] vertices;
+	private Vector3f[] normals; 
 	private Vector4f vertexColor;
 	
 	public float getRadius() {
@@ -32,7 +33,8 @@ public class Sphere extends GameObject3D
 		Vertex3D.front()
 	};
 	
-	public Sphere() {
+	public Sphere() 
+	{
 		this(1, new Vector4f(1, 1, 1, 1), 1);
 	}
 	
@@ -44,9 +46,12 @@ public class Sphere extends GameObject3D
 		update(subdivisions);
 	}
 	
-	public void update(int subdivisions) {
+	public void update(int subdivisions) 
+	{
 		if(subdivisions == this.subdivisions)
+		{
 			return;
+		}
 		
 		this.subdivisions = subdivisions > MAX_SUBDIVISIONS ? MAX_SUBDIVISIONS : subdivisions;
 		
@@ -55,12 +60,16 @@ public class Sphere extends GameObject3D
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 		
 		createOctahedron(resolution);
-		
+		normals = vertices.clone();
+				
 		// very slow!! TO FIX
 		vertexData.clear();
 		
 		for(int i = 0; i < vertices.length; i++)
-			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), vertices[i], vertexColor));	
+		{
+			normals[i].normalise();
+			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f), normals[i], vertexColor));
+		}
 	}
 	
 	private void createOctahedron(int resolution)
