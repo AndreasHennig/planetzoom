@@ -4,7 +4,6 @@ import geometry.Vertex3D;
 
 import java.util.ArrayList;
 
-import lenz.utils.ShaderProgram;
 import lenz.utils.Texture;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -12,16 +11,16 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class GameObject3D extends GameObject
 {
-	protected ArrayList<Vertex3D> vertices;
+	protected ArrayList<Vertex3D> vertexData;
 	
 	public GameObject3D()
 	{
-		this.vertices= new ArrayList<Vertex3D>();
+		this.vertexData= new ArrayList<Vertex3D>();
 	}
 	
 	public GameObject3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{
-		this.vertices= vertices;
+		this.vertexData= vertices;
 		this.indices = indices;
 	}
 
@@ -99,12 +98,12 @@ public class GameObject3D extends GameObject
 
 	public ArrayList<Vertex3D> getVertices()
 	{
-		return vertices;
+		return vertexData;
 	}
 
 
 	public void setVertices(ArrayList<Vertex3D> vertices)
 	{
-		this.vertices = vertices;
+		this.vertexData = vertices;
 	}	
 }

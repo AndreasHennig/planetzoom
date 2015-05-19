@@ -27,7 +27,6 @@ public class CoreEngine
     private GLFWCursorPosCallback cursorCallback;
 
     public Timer timer;
-	
     
     public CoreEngine(IGame game)
     {
@@ -63,7 +62,8 @@ public class CoreEngine
         }
 
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-        // later necessary for OpenGL 3/4:
+        
+        // necessary for OpenGL 3/4:
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
     	GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
     	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);

@@ -1,15 +1,18 @@
 package geometry;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+import org.lwjgl.util.vector.*;
 
 public class Vertex3D extends Vertex
 {
 	private Vector3f position;
 	
-	public static final Vector3f forward = new Vector3f(0, 0, 1);
-	public static final Vector3f back = new Vector3f(0, 0, -1);
+	public static Vector3f front() {
+		return new Vector3f(0, 0, 1);
+	}
+	
+	public static Vector3f back() {
+		return new Vector3f(0, 0, -1);
+	}
 	
 	public Vertex3D(Vector3f position, Vector2f uv, Vector3f normal)
 	{
