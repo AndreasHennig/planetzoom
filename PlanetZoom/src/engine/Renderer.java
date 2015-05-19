@@ -21,9 +21,9 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram toonShader = new ShaderProgram("toonShader");
 	
-	public Renderer(Matrix4f projectionMatrix)
+	public Renderer(float fovParam)
 	{
-		this.perspectiveProjectionMatrix = projectionMatrix;
+		initProjectionMatrix(fovParam);
 		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
@@ -87,7 +87,25 @@ public class Renderer
         GL20.glDisableVertexAttribArray(3);
         GL30.glBindVertexArray(0);
 	}
-        
+    
+    private void initProjectionMatrix(float fovParam)
+	{
+		perspectiveProjectionMatrix = new Matrix4f();
+		float fov = fovParam;
+		float zFar = 500.0f;
+		float zNear = 0.1f;
+		float aspectRatio = 4.0f/3.0f;		
+		float frustumLength = zFar - zNear;
+		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
+		float xScale = yScale / aspectRatio;
+
+		perspectiveProjectionMatrix.setZero();
+		perspectiveProjectionMatrix.m00 = xScale;
+		perspectiveProjectionMatrix.m11 = yScale;
+		perspectiveProjectionMatrix.m22 =  -((zFar + zNear)/frustumLength);
+		perspectiveProjectionMatrix.m32 = -((2 * zNear * zFar) / frustumLength);
+		perspectiveProjectionMatrix.m23 =  -1.0f;								
+	}
 	
 	public static Matrix4f createOrthographicProjectionMatric(float right, float left, float top, float bottom, float near, float far)
 	{
