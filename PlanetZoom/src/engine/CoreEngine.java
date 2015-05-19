@@ -3,7 +3,6 @@ package engine;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
-
 import input.Cursor;
 import input.Keyboard;
 
@@ -12,6 +11,7 @@ import java.nio.ByteBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GLContext;
 
 public class CoreEngine
@@ -20,6 +20,8 @@ public class CoreEngine
     public boolean running;
     public long windowHandle;
   
+    boolean fullscreen = true;
+    
     int windowWidth = 800; 
     int windowHeight = 600;
     
@@ -69,8 +71,24 @@ public class CoreEngine
     	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
 
-        windowHandle = glfwCreateWindow(800, 600, "Stare into it device: " + windowHandle, NULL, NULL);
-
+    	
+    	if(fullscreen)
+    	{
+    		long monitor = glfwGetPrimaryMonitor();
+    		GLFWvidmode mode = new GLFWvidmode(glfwGetVideoMode(monitor));
+    		
+    		windowWidth = mode.getWidth();
+    		windowHeight = mode.getHeight();
+    		
+    		//System.out.println("width: " + windowWidth + " | height: " + windowHeight);
+    		
+    		windowHandle = glfwCreateWindow(windowWidth, windowHeight, "Stare into it device: " + windowHandle, monitor, NULL);
+       	} 
+    	else 
+    	{
+    		windowHandle = glfwCreateWindow(windowWidth, windowHeight, "Stare into it device: " + windowHandle, NULL, NULL);	
+    	}
+        
         if(windowHandle == NULL)
         {
             System.err.println("Window creation failed");
