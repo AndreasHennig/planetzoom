@@ -86,6 +86,11 @@ public class FreeCamera implements ICamera
 		return 0;
 	}
 	
+	public Vector3f getPosition()
+	{
+		return position;
+	}
+	
 	public float getYaw()
 	{
 		return yaw;
@@ -126,18 +131,21 @@ public class FreeCamera implements ICamera
 		direction.y = (float) Math.sin(pitch);
 		direction.z = (float) (Math.cos(pitch) * Math.sin(yaw));
 		
+		Vector3f wUp = new Vector3f(0, 1, 0);
+		if(pitch > Math.PI / 2.0 || pitch < - (Math.PI / 2.0))
+			wUp.negate();	//Upside down -> right switches
 
-		Vector3f.cross(new Vector3f(0, 1, 0), direction, right);
+		//Use cross-product from wUp and direction to calculate vector pointing right
+		Vector3f.cross(wUp, direction, right);
 		right.normalise();
 		
-		if(pitch > Math.PI / 2.0 || pitch < - (Math.PI / 2.0))
-			right.negate();
-		
+		//Use cross-product from direction and right to calculate up-vector
 		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();	
 		
-		System.out.println("direction: " + (direction));
-		System.out.println("up: " + up);
-		System.out.println("right: " + right);
+		System.out.println("yaw: " + Math.toDegrees(yaw) + " pitch " + Math.toDegrees(pitch) );
+		System.out.println("position: " + position.x + "/" + position.y + "/" + position.z);
+		System.out.println("right: " + right.x + "/" + right.y + "/"+ right.z);
+		System.out.println();
 	}
 	
 	public void moveForwards(float amount)
