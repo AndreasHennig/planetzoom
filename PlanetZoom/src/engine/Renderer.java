@@ -67,14 +67,14 @@ public class Renderer
    
     public void renderVAO(VertexArrayObject vao, int mode)
 	{						
-    	vao.bindBuffers();
+    	vao.bind();
         GL30.glBindVertexArray(vao.getId());
-        GL20.glEnableVertexAttribArray(0); //positions
-        GL20.glEnableVertexAttribArray(1); //uvs
-        GL20.glEnableVertexAttribArray(2); //normals
-        GL20.glEnableVertexAttribArray(3); //color
+        GL20.glEnableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
          
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getIndexHandle());
          
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
