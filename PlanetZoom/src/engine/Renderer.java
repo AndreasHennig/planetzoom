@@ -81,10 +81,10 @@ public class Renderer
          
         // Put everything back to default 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL20.glDisableVertexAttribArray(3);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
         GL30.glBindVertexArray(0);
 	}
         
