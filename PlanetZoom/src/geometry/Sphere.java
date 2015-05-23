@@ -67,10 +67,10 @@ public class Sphere extends GameObject3D
 		// very slow!! TO FIX
 		vertexData.clear();
 		
-		createOctahedron(resolution);
-		applyMeshModifications();
+		createOctahedron(resolution);	
 		createUVs();
-		uploadVertexData();
+		applyMeshModifications();
+		addVertexDataToGameObject();
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class Sphere extends GameObject3D
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-			vertices[i].scale((float)Math.random()*2 + radius);
+			vertices[i].scale((float)(Math.sin(i) / 10) + radius);
 			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
 		}
 	}
@@ -245,7 +245,7 @@ public class Sphere extends GameObject3D
 		uv[vertices.length - 1].x = uv[3].x = 0.875f;
 	}
 	
-	private void uploadVertexData()
+	private void addVertexDataToGameObject()
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{

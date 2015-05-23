@@ -39,7 +39,7 @@ public class Game implements IGame
         initCamera();
         initRenderer();
         
-        planet = new Planet(25f, new Vector3f(0f, 0f, 0f));
+        planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
     }
 
     @Override
@@ -48,19 +48,18 @@ public class Game implements IGame
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();
         
-//      planet.update(subdivisions);
         planet.update((FirstPersonCamera) camera);
     }
 
     @Override
     public void render()
     {
-    	renderer.render(planet, camera.getViewMatrix());
+    	renderer.render(planet, (FirstPersonCamera)camera);
     }
 
     private void initCamera()
     {
-        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -50f);
+        camera = new FirstPersonCamera(windowHandle, 0.0f, 0.0f, -10f);
     }
     
     private void initProjectionMatrix(float fovParam)

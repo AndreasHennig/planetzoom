@@ -105,7 +105,7 @@ public class ShaderProgram
 		}
 	}
 	
-	public static void loadMatrix4f(int shaderId, Matrix4f matrix, String name)
+	public static void loadUniformMat4f(int shaderId, Matrix4f matrix, String name)
 	{
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 		matrix.store(buffer);
@@ -117,8 +117,8 @@ public class ShaderProgram
 		
 		glUniformMatrix4fv(location, false, buffer);
 	}
-	
-	public static void loadVector3f(int shaderId, Vector3f vector, String name)
+
+	public static void loadUniformVec3f(int shaderId, Vector3f vector, String name)
 	{
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
 		vector.store(buffer);
