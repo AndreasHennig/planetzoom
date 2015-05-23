@@ -21,20 +21,12 @@ public class FreeCamera implements ICamera
 	
 	private Matrix4f view;
 	
-	public FreeCamera()
-	{
-		target = new Vector3f(0, 0, 0);
-		direction = (Vector3f) Vector3f.add(position, target, direction).normalise();
-		
-		right = (Vector3f) Vector3f.cross(new Vector3f(0, 1, 0), direction, right).normalise();
-		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();
-		view = new Matrix4f();
-	}
 	
 	public FreeCamera(float x, float y, float z)
 	{
 		position = new Vector3f(x, y ,z);
 		target = new Vector3f(0, 0, 0);
+		
 		direction = new Vector3f();
 		Vector3f.add(position, target, direction);
 		direction.normalise();
@@ -115,14 +107,20 @@ public class FreeCamera implements ICamera
 	
 	public void addYaw(float amount)
 	{
-		yaw = (float) ((yaw + amount) % (2 * Math.PI));
+		yaw += amount;// = (float) ((yaw + amount) % (2 * Math.PI));
 		updateOrientation();
 	}
 	
 	public void addPitch(float amount)
 	{
-		pitch = (float) ((pitch + amount) % (2 * Math.PI));
-		updateOrientation();
+		pitch += amount;
+		
+	    if(pitch > Math.PI / 2.0f)
+	        pitch = (float) (Math.PI / 2.0f);
+	    if(pitch < -Math.PI / 2.0f)
+	        pitch = (float) -(Math.PI / 2.0f);
+		
+	    updateOrientation();
 	}
 	
 	private void updateOrientation()
@@ -131,15 +129,14 @@ public class FreeCamera implements ICamera
 		direction.y = (float) Math.sin(pitch);
 		direction.z = (float) (Math.cos(pitch) * Math.sin(yaw));
 		
+
 		Vector3f wUp = new Vector3f(0, 1, 0);
 		if(pitch > Math.PI / 2.0 || pitch < - (Math.PI / 2.0))
-			wUp.negate();	//Upside down -> right switches
+			wUp.negate();
 
-		//Use cross-product from wUp and direction to calculate vector pointing right
 		Vector3f.cross(wUp, direction, right);
 		right.normalise();
 		
-		//Use cross-product from direction and right to calculate up-vector
 		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();	
 		
 		System.out.println("yaw: " + Math.toDegrees(yaw) + " pitch " + Math.toDegrees(pitch) );
