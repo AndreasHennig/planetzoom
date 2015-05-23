@@ -1,10 +1,12 @@
 #version 410 
+#pragma debug(on)
+#pragma optimize(off)
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
 layout (location = 0) in vec3 position; 
-layout (location = 1) in vec2 uv; 
+layout (location = 1) in vec2 uvCoords; 
 layout (location = 2) in vec3 normal; 
 layout (location = 3) in vec4 color; 
 
@@ -14,7 +16,7 @@ out vec2 uvs;
 
 void main(void)
 {		
-	uvs = uv;
+	uvs = uvCoords;
 	normalDir = normal;
 	lightDir = normalize(vec3(-10.0, 10.0, 2.0));
 		 

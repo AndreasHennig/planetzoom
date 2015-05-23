@@ -1,7 +1,7 @@
 package engine;
 
 import lenz.utils.ShaderProgram;
-import lenz.utils.Texture;
+//import lenz.utils.Texture;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -20,7 +20,7 @@ public class Renderer
 	
 	private ShaderProgram testShader = new ShaderProgram("testShader");
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
-	private ShaderProgram shaderTestPete = new ShaderProgram("shaderTestPete");
+	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
 	public Renderer(Matrix4f projectionMatrix)
 	{
