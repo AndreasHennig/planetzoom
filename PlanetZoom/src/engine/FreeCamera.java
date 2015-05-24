@@ -14,13 +14,13 @@ public class FreeCamera implements ICamera
 	private Vector3f position;
 	private Quaternion orientation;
 	private boolean invertedYAxis;
+	private static final float MOUSE_SENSITIVITY = 1.0f;
 
 	private Matrix4f view;
 	
 	
 	public FreeCamera(float x, float y, float z)
 	{
-		
 		position = new Vector3f(x, y ,z);
 
 		orientation = new Quaternion();
@@ -101,6 +101,8 @@ public class FreeCamera implements ICamera
 	
 	public void addYaw(float amount)
 	{
+		amount *= MOUSE_SENSITIVITY;
+		
 		Quaternion b = new Quaternion();
 		b.setFromAxisAngle(new Vector4f(0, 1, 0, amount));
 		Quaternion.mul(b, orientation, orientation);
@@ -110,6 +112,8 @@ public class FreeCamera implements ICamera
 	
 	public void addPitch(float amount)
 	{
+		amount *= MOUSE_SENSITIVITY;
+		
 		Quaternion rotationQuaternion = new Quaternion();
 		if(invertedYAxis)
 			rotationQuaternion.setFromAxisAngle(new Vector4f(-1, 0, 0, amount));
@@ -129,26 +133,6 @@ public class FreeCamera implements ICamera
 		Quaternion.mul(rotationQuaternion, orientation, orientation);
 
 		orientation.normalise();
-	}
-	
-	private Vector3f calculateMovementVector(Vector3f movement)
-	{
-		Quaternion inverse = new Quaternion();
-		Quaternion.negate(orientation, inverse);
-		
-		Vector3f quatVector = new Vector3f(inverse.x, inverse.y, inverse.z);
-
-		Vector3f v1 = new Vector3f();
-		Vector3f v2 = new Vector3f();
-		Vector3f.cross(quatVector, movement, v1);
-		Vector3f.cross(quatVector, v1, v2);
-		
-		v1.scale(2 * inverse.w);
-		v2.scale(2);	
-		
-		Vector3f.add(movement, v1, movement);
-		Vector3f.add(movement, v2, movement);
-		return movement;
 	}
 	
 	public void moveForwards(float amount)
@@ -195,6 +179,26 @@ public class FreeCamera implements ICamera
 	public void setInvertedYAxis(boolean invertedYAxis)
 	{
 		this.invertedYAxis = invertedYAxis;
+	}
+	
+	private Vector3f calculateMovementVector(Vector3f movement)
+	{
+		Quaternion inverse = new Quaternion();
+		Quaternion.negate(orientation, inverse);
+		
+		Vector3f quatVector = new Vector3f(inverse.x, inverse.y, inverse.z);
+
+		Vector3f v1 = new Vector3f();
+		Vector3f v2 = new Vector3f();
+		Vector3f.cross(quatVector, movement, v1);
+		Vector3f.cross(quatVector, v1, v2);
+		
+		v1.scale(2 * inverse.w);
+		v2.scale(2);	
+		
+		Vector3f.add(movement, v1, movement);
+		Vector3f.add(movement, v2, movement);
+		return movement;
 	}
 	
 	
