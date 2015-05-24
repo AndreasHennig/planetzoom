@@ -4,66 +4,81 @@ import input.FreeCameraControl;
 import input.ICameraControl;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 public class FreeCamera implements ICamera
 {
-	private Vector3f target;
-	private Vector3f direction;
+
 	private Vector3f position;
-	
-	private Vector3f right;
-	private Vector3f up;
-	
-	
-	private float yaw;
-	private float pitch;
-	
+	private Quaternion orientation;
+	private boolean invertedYAxis;
+
 	private Matrix4f view;
 	
 	
 	public FreeCamera(float x, float y, float z)
 	{
+		
 		position = new Vector3f(x, y ,z);
-		target = new Vector3f(0, 0, 0);
-		
-		direction = new Vector3f();
-		Vector3f.add(position, target, direction);
-		direction.normalise();
-		
-		right = new Vector3f();
-		Vector3f.cross(new Vector3f(0, 1, 0), direction, right);
-		right.normalise();
-		
-		up = new Vector3f();
-		Vector3f.cross(direction, right, up);
-		up.normalise();
-		
+
+		orientation = new Quaternion();
 		view = new Matrix4f();
 	}
 	
+	public void rotate(Vector3f axis, float theta)
+	{
+		Quaternion r = new Quaternion();
+		
+		r.x = (float) (axis.x * Math.sin(theta / 2.0f));
+		r.y = (float) (axis.y * Math.sin(theta / 2.0f));
+		r.z = (float) (axis.z * Math.sin(theta / 2.0f));
+		r.w = (float) Math.cos(theta / 2.0f);	
+	}
 	
 	public Matrix4f getViewMatrix()
 	{
-		view = new Matrix4f();
-		view.setIdentity();	
-		view.m00 = right.x;
-		view.m10 = right.y;
-		view.m20 = right.z;
-		
-		view.m01 = up.x;
-		view.m11 = up.y;
-		view.m21 = up.z;
-		
-		view.m02 = direction.x;
-		view.m12 = direction.y;
-		view.m22 = direction.z;
+		view = toMatrix4f(orientation);
 		
 		view.translate(new Vector3f(-position.x, -position.y, -position.z));
 
 		return view;
 	}
 
+	private Matrix4f toMatrix4f(Quaternion q)
+	{
+		Vector3f forward =  new Vector3f(
+				2.0f * (q.x * q.z - q.w * q.y), 
+				2.0f * (q.y * q.z + q.w * q.x), 
+				1.0f - 2.0f * (q.x * q.x + q.y * q.y));
+		Vector3f up = new Vector3f(
+				2.0f * (q.x * q.y + q.w * q.z), 
+				1.0f - 2.0f * (q.x * q.x + q.z * q.z), 
+				2.0f * (q.y * q.z - q.w * q.x));
+		Vector3f right = new Vector3f(
+				1.0f - 2.0f * (q.y * q.y + q.z * q.z), 
+				2.0f * (q.x * q.y - q.w * q.z), 
+				2.0f * (q.x * q.z + q.w * q.y));
+		
+		Matrix4f matrix = new Matrix4f();
+		
+		matrix = new Matrix4f();
+		matrix.setIdentity();	
+		matrix.m00 = right.x;
+		matrix.m10 = right.y;
+		matrix.m20 = right.z;
+		
+		matrix.m01 = up.x;
+		matrix.m11 = up.y;
+		matrix.m21 = up.z;
+		
+		matrix.m02 = forward.x;
+		matrix.m12 = forward.y;
+		matrix.m22 = forward.z;
+
+		return matrix;
+	}
 
 	@Override
 	public ICameraControl getCameraControl()
@@ -83,107 +98,105 @@ public class FreeCamera implements ICamera
 		return position;
 	}
 	
-	public float getYaw()
-	{
-		return yaw;
-	}
-	
-	public float getPitch()
-	{
-		return pitch;
-	}
-	
-	public void setYaw(float yaw)
-	{
-		this.yaw = (float) (yaw % (2 * Math.PI));
-		updateOrientation();
-	}
-	
-	public void setPitch(float pitch)
-	{
-		this.pitch = (float) (pitch % (2 * Math.PI));
-		updateOrientation();
-	}
 	
 	public void addYaw(float amount)
 	{
-		yaw += amount;// = (float) ((yaw + amount) % (2 * Math.PI));
-		updateOrientation();
+		Quaternion b = new Quaternion();
+		b.setFromAxisAngle(new Vector4f(0, 1, 0, amount));
+		Quaternion.mul(b, orientation, orientation);
+
+		orientation.normalise();
 	}
 	
 	public void addPitch(float amount)
 	{
-		pitch += amount;
-		
-	    if(pitch > Math.PI / 2.0f)
-	        pitch = (float) (Math.PI / 2.0f);
-	    if(pitch < -Math.PI / 2.0f)
-	        pitch = (float) -(Math.PI / 2.0f);
-		
-	    updateOrientation();
+		Quaternion rotationQuaternion = new Quaternion();
+		if(invertedYAxis)
+			rotationQuaternion.setFromAxisAngle(new Vector4f(-1, 0, 0, amount));
+		else
+			rotationQuaternion.setFromAxisAngle(new Vector4f(1, 0, 0, amount));
+		Quaternion.mul(rotationQuaternion, orientation, orientation);
+
+		orientation.normalise();
 	}
 	
-	private void updateOrientation()
+	public void addRoll(float amount)
 	{
-		direction.x = (float) (Math.cos(pitch) * Math.cos(yaw));
-		direction.y = (float) Math.sin(pitch);
-		direction.z = (float) (Math.cos(pitch) * Math.sin(yaw));
-		
+		Quaternion rotationQuaternion = new Quaternion();
 
-		Vector3f wUp = new Vector3f(0, 1, 0);
-		if(pitch > Math.PI / 2.0 || pitch < - (Math.PI / 2.0))
-			wUp.negate();
+		rotationQuaternion.setFromAxisAngle(new Vector4f(0, 0, 1, amount));
 
-		Vector3f.cross(wUp, direction, right);
-		right.normalise();
+		Quaternion.mul(rotationQuaternion, orientation, orientation);
+
+		orientation.normalise();
+	}
+	
+	private Vector3f calculateMovementVector(Vector3f movement)
+	{
+		Quaternion inverse = new Quaternion();
+		Quaternion.negate(orientation, inverse);
 		
-		up = (Vector3f) Vector3f.cross(direction, right, up).normalise();	
+		Vector3f quatVector = new Vector3f(inverse.x, inverse.y, inverse.z);
+
+		Vector3f v1 = new Vector3f();
+		Vector3f v2 = new Vector3f();
+		Vector3f.cross(quatVector, movement, v1);
+		Vector3f.cross(quatVector, v1, v2);
 		
-		System.out.println("yaw: " + Math.toDegrees(yaw) + " pitch " + Math.toDegrees(pitch) );
-		System.out.println("position: " + position.x + "/" + position.y + "/" + position.z);
-		System.out.println("right: " + right.x + "/" + right.y + "/"+ right.z);
-		System.out.println();
+		v1.scale(2 * inverse.w);
+		v2.scale(2);	
+		
+		Vector3f.add(movement, v1, movement);
+		Vector3f.add(movement, v2, movement);
+		return movement;
 	}
 	
 	public void moveForwards(float amount)
-	{
-		this.position.x -= direction.x * amount;
-		this.position.y -= direction.y * amount;
-		this.position.z -= direction.z * amount;
+	{			
+		Vector3f movement = calculateMovementVector(new Vector3f(0, 0, -amount));
+		Vector3f.add(position, movement, position);
 	}
 	
 	public void moveBackwards(float amount)
 	{
-		this.position.x += direction.x * amount;
-		this.position.y += direction.y * amount;
-		this.position.z += direction.z * amount;
+		Vector3f movement = calculateMovementVector(new Vector3f(0, 0, amount));
+		Vector3f.add(position, movement, position);
 	}
 	
 	public void strafeLeft(float amount)
 	{
-		this.position.x -= right.x * amount;
-		this.position.y -= right.y * amount;
-		this.position.z -= right.z * amount;
+		Vector3f movement = calculateMovementVector(new Vector3f(-amount, 0, 0));
+		Vector3f.add(position, movement, position);
 	}
 	
 	public void strafeRight(float amount)
 	{
-		this.position.x += right.x * amount;
-		this.position.y += right.y * amount;
-		this.position.z += right.z * amount;
+		Vector3f movement = calculateMovementVector(new Vector3f(amount, 0, -0));
+		Vector3f.add(position, movement, position);
 	}
 	
 	public void moveUp(float amount)
 	{
-		this.position.x += up.x * amount;
-		this.position.y += up.y * amount;
-		this.position.z += up.z * amount;
+		Vector3f movement = calculateMovementVector(new Vector3f(0, amount, 0));
+		Vector3f.add(position, movement, position);
 	}
 	
 	public void moveDown(float amount)
 	{
-		this.position.x -= up.x * amount;
-		this.position.y -= up.y * amount;
-		this.position.z -= up.z * amount;
+		Vector3f movement = calculateMovementVector(new Vector3f(0, -amount, 0));
+		Vector3f.add(position, movement, position);
 	}
+
+	public boolean isInvertedYAxis()
+	{
+		return invertedYAxis;
+	}
+
+	public void setInvertedYAxis(boolean invertedYAxis)
+	{
+		this.invertedYAxis = invertedYAxis;
+	}
+	
+	
 }
+
