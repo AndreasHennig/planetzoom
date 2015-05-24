@@ -2,11 +2,12 @@ package input;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import engine.FirstPersonCamera;
 import engine.FreeCamera;
 
 public class FreeCameraControl implements ICameraControl
@@ -38,6 +39,12 @@ public class FreeCameraControl implements ICameraControl
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
 			cam.moveDown(0.1f);
+		
+		if(Keyboard.isKeyPressed(GLFW_KEY_E))
+			cam.addRoll(0.01f);
+		
+		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
+			cam.addRoll(-0.01f);
 		
 		cam.addYaw((float)  Cursor.getDx() /250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
