@@ -2,6 +2,7 @@
 #pragma debug(on)
 #pragma optimize(off)
 
+
 layout (location = 0) in vec3 vPosition; 
 layout (location = 1) in vec2 vUVCoords; 
 layout (location = 2) in vec3 vNormal; 
@@ -13,5 +14,7 @@ uniform mat4 normalMatrix;
 
 void main(void)
 {		
-	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(vPosition, 1.0);
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);	
+	
+	uv = uvCoords;
 }

@@ -3,6 +3,6 @@ package engine;
 public interface IGame 
 {
     void init();
-    void update();
+    void update(int deltaTime);
     void render();
 }
