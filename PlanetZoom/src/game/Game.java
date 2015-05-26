@@ -37,7 +37,7 @@ public class Game implements IGame
         initCamera();
         initRenderer();
         
-        planet = new Planet(1f, new Vector3f(0f, 0f, 0f));
+        planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Game implements IGame
     @Override
     public void render()
     {
-    	renderer.render(planet, camera.getViewMatrix());
+    	renderer.render(planet, (FirstPersonCamera)camera);
     }
 
     private void initCamera()

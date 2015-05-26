@@ -7,7 +7,7 @@ import javax.naming.NoInitialContextException;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-import engine.FirstPersonCamera;
+
 import engine.GameObject3D;
 import engine.utils.*;
 
@@ -22,7 +22,8 @@ public class Sphere extends GameObject3D
 	private float radius;
 
 	private Vector3f[] vertices;
-	private Vector3f[] normals;
+	private Vector3f[] normals; 
+	private Vector2f[] uv;
 	private Vector4f vertexColor;
 
 	public float getRadius()
@@ -57,22 +58,20 @@ public class Sphere extends GameObject3D
 				: subdivisions;
 
 		int resolution = 1 << this.subdivisions;
-		vertices = new Vector3f[(resolution + 1) * (resolution + 1) * 4
-				- (resolution * 2 - 1) * 3];
-		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 
-		createOctahedron(resolution);
-		normals = vertices.clone();
+		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
+		normals = new Vector3f[vertices.length];
+		uv = new Vector2f[vertices.length];
+
+		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 
 		// very slow!! TO FIX
 		vertexData.clear();
-
-		for (int i = 0; i < vertices.length; i++)
-		{
-			normals[i].normalise();
-			vertexData.add(new Vertex3D(vertices[i], new Vector2f(0.0f, 0.0f),
-					normals[i], vertexColor));
-		}
+		
+		createOctahedron(resolution);	
+		createUVs();
+		applyMeshModifications();
+		addVertexDataToGameObject();
 	}
 
 	/**
@@ -99,6 +98,16 @@ public class Sphere extends GameObject3D
 				curveSlope));
 
 		return subdivisionCoefficient;
+	}
+	
+	public void applyMeshModifications()
+	{
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertices[i].normalise();
+			vertices[i].scale(radius);
+			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+		}
 	}
 
 	private void createOctahedron(int resolution)
@@ -160,25 +169,6 @@ public class Sphere extends GameObject3D
 
 			vertices[v++] = Vertex3D.up();
 		}
-
-		for (int i = 0; i < vertices.length; i++)
-		{
-			vertices[i].normalise();
-			
-			double xin = Math.abs(vertices[i].x);
-			double yin = Math.abs(vertices[i].y);
-			double zin = Math.abs(vertices[i].z);
-			
-			double noise = SimplexNoise.noise(xin, yin) + 1; 
-			
-			System.out.println(normals[i].x);
-			
-			float scale = (float) noise * radius;
-			
-			if (radius != 1)
-				vertices[i].scale(radius);
-			
-		}
 	}
 
 	private int createVertexLine(Vector3f from, Vector3f to, int steps, int v)
@@ -229,5 +219,44 @@ public class Sphere extends GameObject3D
 		indices[t++] = vTop;
 
 		return t;
+	}
+	
+	private void createUVs()
+	{
+		float previousX = 1f;
+		
+		for (int i = 0; i < vertices.length; i++)
+		{
+			Vector3f vector = new Vector3f(vertices[i]);
+			
+			if(vector.x == previousX)
+			{
+				uv[i - 1].x = 1f;
+			}
+			previousX = vector.x;
+			
+			Vector2f texCoords = new Vector2f();
+			texCoords.x = (float)Math.atan2(vector.x, vector.y) / (-2f * (float)Math.PI);
+			
+			if(texCoords.x < 0)
+			{
+				texCoords.x += 1f;
+			}
+			texCoords.y = (float)Math.asin(vector.y) / (float)Math.PI + 0.5f;
+			uv[i] = texCoords;
+		}
+		
+		uv[vertices.length - 4].x = uv[0].x = 0.125f;
+		uv[vertices.length - 3].x = uv[1].x = 0.375f;
+		uv[vertices.length - 2].x = uv[2].x = 0.625f;
+		uv[vertices.length - 1].x = uv[3].x = 0.875f;
+	}
+	
+	private void addVertexDataToGameObject()
+	{
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
+		}
 	}
 }
