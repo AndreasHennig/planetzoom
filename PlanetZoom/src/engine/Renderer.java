@@ -22,16 +22,16 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
-	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/planet-diffuse-specular.png");
 	
-	public Renderer(Matrix4f projectionMatrix)
+	public Renderer(float fovParam, int windowWidth, int windowHeight)
 	{
-		this.perspectiveProjectionMatrix = projectionMatrix;
+		initProjectionMatrix(fovParam, windowWidth, windowHeight);
 		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
 	
-	public void render(Planet planet, FirstPersonCamera camera) 
+	public void render(Planet planet, ICamera camera) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -41,9 +41,13 @@ public class Renderer
 		
 		texture.bind();
 		glUseProgram(shaderTestPete.getId());
+
 		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix", false);
 		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix", false);
 		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix", true);
+		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
+
+
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
 		texture.unbind();
 		
@@ -91,7 +95,25 @@ public class Renderer
         GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
         GL30.glBindVertexArray(0);
 	}
-        
+    
+    private void initProjectionMatrix(float fovParam, int width, int height)
+	{
+		perspectiveProjectionMatrix = new Matrix4f();
+		float fov = fovParam;
+		float zFar = 500.0f;
+		float zNear = 0.1f;
+		float aspectRatio = (float)width/height;		
+		float frustumLength = zFar - zNear;
+		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
+		float xScale = yScale / aspectRatio;
+
+		perspectiveProjectionMatrix.setZero();
+		perspectiveProjectionMatrix.m00 = xScale;
+		perspectiveProjectionMatrix.m11 = yScale;
+		perspectiveProjectionMatrix.m22 =  -((zFar + zNear)/frustumLength);
+		perspectiveProjectionMatrix.m32 = -((2 * zNear * zFar) / frustumLength);
+		perspectiveProjectionMatrix.m23 =  -1.0f;								
+	}
 	
 	public static Matrix4f createOrthographicProjectionMatric(float right, float left, float top, float bottom, float near, float far)
 	{

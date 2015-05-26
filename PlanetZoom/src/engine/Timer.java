@@ -15,15 +15,16 @@ public class Timer {
 	int expectedFPS = 0; // calculates frames based on time difference between two following(?) frames
 	
 	public Timer(){
-		 lastFrame = getTimeInMs();
-		 lastFPStimestamp = getTimeInMs();
+		 lastFrame = getTime();
+		 lastFPStimestamp = getTime();
 	}
 	
-	public long getTimeInMs(){
+	//in case this method should be used it would be simpler to rename this to getTime() and the current getTime() to something else 
+	private long getTime2(){
 		return System.nanoTime() / 1_000_000;
 	}
 	
-	public long getTime(){
+	private long getTime(){
 		//glfwGetTime() returns time in seconds as a double value
 		return (long) (GLFW.glfwGetTime() * 1_000);
 	}
@@ -33,7 +34,7 @@ public class Timer {
 	 * @return the time since the last frame in ms
 	 */
 	public int getDeltaTime() {
-	    long currentTime = getTimeInMs();
+	    long currentTime = getTime();
 	    int delta = (int) (currentTime - lastFrame);
 	    updateFPS();
 	    updateExpectedFPS();
@@ -43,7 +44,7 @@ public class Timer {
 	}
 	
 	private void updateFPS() {
-		if(getTimeInMs() - lastFPStimestamp > 1_000)
+		if(getTime() - lastFPStimestamp > 1_000)
 		{
 			currentFPS = fps;
 			fps = 0;
@@ -57,7 +58,7 @@ public class Timer {
 	}
 	
 	private void updateExpectedFPS(){
-		long timeSinceLastFrame = getTimeInMs()- lastFrame;
+		long timeSinceLastFrame = getTime()- lastFrame;
 		expectedFPS = (int) (1_000.0f / timeSinceLastFrame);
 	}
 	

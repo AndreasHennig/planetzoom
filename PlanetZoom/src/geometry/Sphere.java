@@ -70,6 +70,7 @@ public class Sphere extends GameObject3D
 		vertexData.clear();
 		
 		createOctahedron(resolution);	
+		normalizeVerticesAndCreateNormals();
 		createUVs();
 		applyMeshModifications();
 		addVertexDataToGameObject();
@@ -101,20 +102,28 @@ public class Sphere extends GameObject3D
 		return subdivisionCoefficient;
 	}
 	
-	public void applyMeshModifications()
+	public void normalizeVerticesAndCreateNormals()
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{
+			vertices[i].normalise();
+
+			normals[i] = (Vector3f) new Vector3f(vertices[i]);
+		}
+	}
+	
+	public void applyMeshModifications()
+	{	
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertices[i].scale(radius);			
+			
 			double u = uv[i].x;
 			double v = uv[i].y;
 			
 			double noise = engine.utils.SimplexNoise.noise(u,v);
 			
-			System.out.println("Noise: " + noise);
-			
-			vertices[i].normalise();
-			vertices[i].scale((float) (radius + noise));
-			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+//			System.out.println("Noise: " + noise);
 		}
 	}
 
@@ -230,7 +239,7 @@ public class Sphere extends GameObject3D
 	}
 	
 	private void createUVs()
-	{
+	{			
 		float previousX = 1f;
 		
 		for (int i = 0; i < vertices.length; i++)
@@ -244,7 +253,7 @@ public class Sphere extends GameObject3D
 			previousX = vector.x;
 			
 			Vector2f texCoords = new Vector2f();
-			texCoords.x = (float)Math.atan2(vector.x, vector.y) / (-2f * (float)Math.PI);
+			texCoords.x = (float)Math.atan2(vector.x, vector.z) / (-2f * (float)Math.PI);
 			
 			if(texCoords.x < 0)
 			{
