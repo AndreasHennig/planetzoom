@@ -4,10 +4,10 @@ import geometry.Vertex2D;
 
 import java.util.ArrayList;
 
-import lenz.utils.Texture;
-
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+
+import Peter.TextureUsingPNGDecoder;
 
 public class GameObject2D extends GameObject
 {
@@ -58,7 +58,7 @@ public class GameObject2D extends GameObject
         };
         
         GameObject2D object = new GameObject2D(vertices, indices);
-        object.setTexture(new Texture("crypt_wall.png"));
+        object.setTexture(new TextureUsingPNGDecoder("crypt_wall.png"));
         return object;
 	}
 

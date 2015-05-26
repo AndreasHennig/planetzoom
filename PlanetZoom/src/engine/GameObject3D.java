@@ -4,10 +4,10 @@ import geometry.Vertex3D;
 
 import java.util.ArrayList;
 
-import lenz.utils.Texture;
-
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+
+import Peter.TextureUsingPNGDecoder;
 
 public class GameObject3D extends GameObject
 {
@@ -91,7 +91,7 @@ public class GameObject3D extends GameObject
 
         GameObject3D object = new GameObject3D(vertices, indices);
         //object.shader = new ShaderProgram("testShader");
-        object.setTexture(new Texture("woodenBox.jpg"));
+        object.setTexture(new TextureUsingPNGDecoder("woodenBox.jpg"));
         return object;
 	}
 
