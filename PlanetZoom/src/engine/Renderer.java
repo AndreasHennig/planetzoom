@@ -22,7 +22,7 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
-	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("/Users/Pete/git/planetzoom/PlanetZoom/src/res/textures/crypt_wall.png");
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
 	
 	public Renderer(Matrix4f projectionMatrix)
 	{
@@ -71,24 +71,24 @@ public class Renderer
    
     public void renderVAO(VertexArrayObject vao, int mode)
 	{						
-    	vao.bindBuffers();
+    	vao.bind();
         GL30.glBindVertexArray(vao.getId());
-        GL20.glEnableVertexAttribArray(0); //positions
-        GL20.glEnableVertexAttribArray(1); //uvs
-        GL20.glEnableVertexAttribArray(2); //normals
-        GL20.glEnableVertexAttribArray(3); //color
+        GL20.glEnableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
          
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getIndexHandle());
          
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
          
         // Put everything back to default 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL20.glDisableVertexAttribArray(3);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
         GL30.glBindVertexArray(0);
 	}
         
