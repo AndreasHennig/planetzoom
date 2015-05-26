@@ -9,5 +9,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="PlanetZoom/libs/lwjgl_3.0.0a/native"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/PNGDecoder.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

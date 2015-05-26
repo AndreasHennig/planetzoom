@@ -6,11 +6,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Matrix4f;
 
+import Peter.TextureUsingPNGDecoder;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-
-import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
 {
@@ -21,6 +21,8 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("shaderTestPete");
 	
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
+	
 	public Renderer(Matrix4f projectionMatrix)
 	{
 		this.perspectiveProjectionMatrix = projectionMatrix;
@@ -28,29 +30,32 @@ public class Renderer
 		init();
 	}
 	
-	public void render(Planet planet, Matrix4f viewMatrix) 
+	public void render(Planet planet, FirstPersonCamera camera) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		Matrix4f viewMatrix = camera.getViewMatrix();
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
+		texture.bind();
 		glUseProgram(shaderTestPete.getId());
-		ShaderProgram.loadMatrix4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(testShader.getId(), viewMatrix, "modelViewMatrix");
-		ShaderProgram.loadMatrix4f(testShader.getId(), normalMatrix, "normalMatrix");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix");
+		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
+		texture.unbind();
 		
 		// TO FIX: uncommented because of issues under OS X
 //		Matrix4f modelViewMatrix = new Matrix4f();
 //		modelViewMatrix.setIdentity();
 //		
 //		glClear(GL_DEPTH_BUFFER_BIT);
-//		
 //		glUseProgram(hudShader.getId());
-//		ShaderProgram.loadMatrix4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
-//		ShaderProgram.loadMatrix4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
+//		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
+//		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
 //		GameObject2D t = TextRenderer2D.textToObject2D("Sample text", "arial_nm.png", 0, 0, 16);
 //		VertexArrayObject text = new VertexArrayObject(t);
 //		renderVAO(text, GL_TRIANGLES);
