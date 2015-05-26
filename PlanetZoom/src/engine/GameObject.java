@@ -1,19 +1,20 @@
 package engine;
 
 import lenz.utils.Texture;
+import Peter.TextureUsingPNGDecoder;
 
 public abstract class GameObject
 {
-	protected Texture texture;
+	protected TextureUsingPNGDecoder texture;
 	protected int[] indices;
 	
 		
-	public Texture getTexture()
+	public TextureUsingPNGDecoder getTexture()
 	{
 		return texture;
 	}
 
-	public void setTexture(Texture textTexture)
+	public void setTexture(TextureUsingPNGDecoder textTexture)
 	{
 		this.texture = textTexture;
 	}
