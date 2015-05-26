@@ -51,7 +51,7 @@ public class Game implements IGame
 		Vector3f camToPlanet = new Vector3f();
 		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
 		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
-		
+	
         planet.update(planetCamDistance, false);
     }
 

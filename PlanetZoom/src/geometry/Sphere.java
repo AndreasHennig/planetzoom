@@ -2,12 +2,14 @@
 
 package geometry;
 
+import javax.naming.NoInitialContextException;
+
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-
 import engine.FirstPersonCamera;
 import engine.GameObject3D;
+import engine.utils.*;
 
 public class Sphere extends GameObject3D
 {
@@ -162,9 +164,20 @@ public class Sphere extends GameObject3D
 		for (int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-
+			
+			double xin = Math.abs(vertices[i].x);
+			double yin = Math.abs(vertices[i].y);
+			double zin = Math.abs(vertices[i].z);
+			
+			double noise = SimplexNoise.noise(xin, yin) + 1; 
+			
+			System.out.println(normals[i].x);
+			
+			float scale = (float) noise * radius;
+			
 			if (radius != 1)
 				vertices[i].scale(radius);
+			
 		}
 	}
 

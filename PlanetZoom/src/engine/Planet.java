@@ -36,7 +36,6 @@ public class Planet
 		sphere.update(subdivisions);
 	}
 
-
 	public void update(float planetCamDistance, boolean adjustCamSpeed)
 	{
 		float subdivisionCoefficient = sphere
