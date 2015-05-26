@@ -35,91 +35,85 @@ public class VertexArrayObject
 	private int indexCount;
 	private boolean is3D;
 	
-	private static final int POSITION_ATTRIBUTE_LOCATION = 0;
-	private static final int UV_ATTRIBUTE_LOCATION = 1;
-	private static final int NORMAL_ATTRIBUTE_LOCATION = 2;
-	private static final int COLOR_ATTRIBUTE_LOCATION = 3;
+	public static final int POSITION_LOCATION = 0;
+	public static final int UV_LOCATION = 1;
+	public static final int NORMAL_LOCATION = 2;
+	public static final int COLOR_LOCATION = 3;
+	
+	private VertexArrayObject(GameObject gameObject)
+	{
+		id = GL30.glGenVertexArrays();	
+		indexCount = gameObject.getIndices().length;
+	}
 	
 	public VertexArrayObject(GameObject2D object2D)
 	{
-		is3D = false;
-		id = GL30.glGenVertexArrays();	
+		this((GameObject)object2D);
 		initBuffers2D(object2D.getVertices(), object2D.getIndices());
-		indexCount = object2D.getIndices().length;
 	}
 	
 	public VertexArrayObject(GameObject3D object3D)
 	{
+		this((GameObject)object3D);
 		is3D = true;
-		id = GL30.glGenVertexArrays();	
 		initBuffers3D(object3D.getVertices(), object3D.getIndices());
-		indexCount = object3D.getIndices().length;
 	}
 	
-	public void bindBuffers()
+	/**
+	 * binds the VAO and it's buffers
+	 */
+	public void bind()
 	{
 		GL30.glBindVertexArray(id); 
 		
 		if(is3D)
-		{
-			bindArrayBuffer(POSITION_ATTRIBUTE_LOCATION, 3, positionHandle, positionBuffer);
-		}
+			bindArrayBuffer(POSITION_LOCATION, 3, positionHandle, positionBuffer);
 		else
-		{
-			bindArrayBuffer(POSITION_ATTRIBUTE_LOCATION, 2, positionHandle, positionBuffer);
-		}
+			bindArrayBuffer(POSITION_LOCATION, 2, positionHandle, positionBuffer);
 		
-		bindArrayBuffer(UV_ATTRIBUTE_LOCATION, 2, uvHandle, uvBuffer);
-		bindArrayBuffer(NORMAL_ATTRIBUTE_LOCATION, 3, normalHandle, normalBuffer);
-		bindArrayBuffer(COLOR_ATTRIBUTE_LOCATION, 4, colorHandle, colorBuffer);
+		bindArrayBuffer(UV_LOCATION, 2, uvHandle, uvBuffer);
+		bindArrayBuffer(NORMAL_LOCATION, 3, normalHandle, normalBuffer);
+		bindArrayBuffer(COLOR_LOCATION, 4, colorHandle, colorBuffer);
+		
 		bindIndexBuffer(indexHandle, indexBuffer);
 		
 		GL30.glBindVertexArray(0); 
 	}
 	
-	public void delete()
+	public int getIndexHandle()
 	{
-        // Disable the VBO index from the VAO attributes list
-        GL20.glDisableVertexAttribArray(0);
-         
-        // Delete the VBOs
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glDeleteBuffers(positionHandle);
-        GL15.glDeleteBuffers(uvHandle);
-        GL15.glDeleteBuffers(normalHandle);
-        GL15.glDeleteBuffers(colorHandle);
-         
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL15.glDeleteBuffers(indexHandle);
-         
-        // Delete the VAO
-        GL30.glBindVertexArray(0);
-        GL30.glDeleteVertexArrays(id);
+		return indexHandle;
 	}
 
-	private void createBuffers(int vertexCount, boolean is3D, int indexCount)
+	public int getId()
 	{
-		positionHandle = GL15.glGenBuffers();
-		uvHandle = GL15.glGenBuffers();
-		indexHandle = GL15.glGenBuffers();
-		normalHandle = GL15.glGenBuffers();
-		colorHandle = GL15.glGenBuffers();
-		
-		if(is3D)
-			positionBuffer = BufferUtils.createFloatBuffer(vertexCount * 3);
-		else
-			positionBuffer = BufferUtils.createFloatBuffer(vertexCount * 2);
-		
-		uvBuffer = BufferUtils.createFloatBuffer(vertexCount * 2);
-		normalBuffer = BufferUtils.createFloatBuffer(vertexCount * 3);
-		colorBuffer = BufferUtils.createFloatBuffer(vertexCount * 4);
-		indexBuffer = BufferUtils.createIntBuffer(indexCount);
+		return id;
+	}
+
+	public int getIndexCount()
+	{
+		return indexCount;
+	}
+
+	private void bindArrayBuffer(int location, int dataSize, int handle, FloatBuffer buffer) 
+	{ 
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, handle);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW); 
+		GL20.glVertexAttribPointer(location, dataSize, GL11.GL_FLOAT, false, 0, 0); 
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+	}
+	
+	private void bindIndexBuffer(int handle, IntBuffer buffer) 
+	{ 
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, handle);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
 	private void initBuffers3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{		
-		createBuffers(vertices.size(), true, indices.length);
-		
+		createHandles();
+		createBuffers(vertices.size(), true, indices.length);	
 		indexBuffer.put(indices);
 
 		for (int i = 0; i < vertices.size(); i++)
@@ -130,16 +124,13 @@ public class VertexArrayObject
 			colorBuffer.put(asFloats(vertices.get(i).getColorRGBA()));
 		}
 		
-		positionBuffer.flip();
-		uvBuffer.flip();
-		normalBuffer.flip();	
-		colorBuffer.flip();
-		indexBuffer.flip();			
+		flipBuffers();
 	}
 	
 	private void initBuffers2D(ArrayList<Vertex2D> vertices, int[] indices)
 	{		
 		createBuffers(vertices.size(), false, indices.length);
+		
 		indexBuffer.put(indices);
 
 		for (int i = 0; i < vertices.size(); i++)
@@ -149,10 +140,40 @@ public class VertexArrayObject
 			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
 		}
 		
+		flipBuffers();	
+	}
+	
+	private void createHandles()
+	{
+		positionHandle = GL15.glGenBuffers();
+		uvHandle = GL15.glGenBuffers();
+		indexHandle = GL15.glGenBuffers();
+		normalHandle = GL15.glGenBuffers();
+		colorHandle = GL15.glGenBuffers();
+	}
+	
+	private void createBuffers(int vertexCount, boolean is3D, int indexCount)
+	{
+		
+		if(is3D)
+			positionBuffer = BufferUtils.createFloatBuffer(vertexCount * 3);
+		else
+			positionBuffer = BufferUtils.createFloatBuffer(vertexCount * 2);
+		
+		uvBuffer = BufferUtils.createFloatBuffer(vertexCount * 2);
+		indexBuffer = BufferUtils.createIntBuffer(indexCount);
+		normalBuffer = BufferUtils.createFloatBuffer(vertexCount * 3);
+		colorBuffer = BufferUtils.createFloatBuffer(vertexCount * 4);
+
+	}
+	
+	private void flipBuffers()
+	{
 		positionBuffer.flip();
 		uvBuffer.flip();
-		normalBuffer.flip();
-		indexBuffer.flip();			
+		normalBuffer.flip();	
+		colorBuffer.flip();
+		indexBuffer.flip();	
 	}
 	
 	private float[] asFloats(Vector2f v) 
@@ -169,46 +190,4 @@ public class VertexArrayObject
 	{
 		return new float[]{v.x, v.y, v.z, v.w};
 	}	
-	
-	private void bindArrayBuffer(int location, int dataSize, int handle, FloatBuffer buffer) 
-	{ 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, handle);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW); 
-		GL20.glVertexAttribPointer(location, dataSize, GL11.GL_FLOAT, false, 0, 0); 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-	}
-	
-	private void bindIndexBuffer(int handle, IntBuffer buffer) 
-	{ 
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, handle);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
-	}
-
-	public int getVboIndexHandle()
-	{
-		return indexHandle;
-	}
-
-	public void setVboIndexHandle(int vboIndexHandle)
-	{
-		this.indexHandle = vboIndexHandle;
-	}
-	
-	public int getIndexCount()
-	{
-		return indexCount;
-	}
-	
-
 }

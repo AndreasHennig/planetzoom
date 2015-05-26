@@ -1,32 +1,38 @@
-#version 330	
+#version 410 
+#pragma debug(on)
+#pragma optimize(off)
 
-in float pass_intensity;
-in vec3 pass_normal;
-in vec3 pass_viewDir;
-in vec4 pass_color;
+in vec2 uvs;
+in float intensity;
+in vec3 normalDir;
+in vec3 lightDir;
 
-out vec4 out_color;
-
-void main()
+out vec4 out_Color;
+ 
+void main(void)
 {
 	vec4 color;
+	float intensity;
 	
-	if(pass_intensity > 0.90)
-		color = vec4(1.0, 1.0, 1.0, 1.0);
+	intensity = dot(normalize(lightDir), normalize(normalDir));
 	
-	else if(pass_intensity > 0.5)
+	if(intensity > 0.95)
+	{
 		color = vec4(0.5, 0.5, 0.5, 1.0);
-	
-	else if(pass_intensity > 0.25)
+	}
+	else if(intensity > 0.5)
+	{
 		color = vec4(0.3, 0.3, 0.3, 1.0);
-	
+	}
+	else if(intensity > 0.1)
+	{
+		color = vec4(0.2, 0.2, 0.2, 1.0);
+	}
 	else
-		color = vec4(0.0, 0.0, 0.0, 1.0);
+	{
+		color = vec4(0.1, 0.1, 0.1, 1.0);
+	}
 	
-	if(dot(pass_viewDir, pass_normal) < -1.0)
-		out_color = (pass_color + color) / 3.0;
+	out_Color = color * vec4(uvs.y, 1.0, 1.0, 1.0);
 	
-	else
-		out_color = vec4(0.0, 0.0, 0.0, 1.0);
-      
 }

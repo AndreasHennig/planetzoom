@@ -6,11 +6,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Matrix4f;
 
+import Peter.TextureUsingPNGDecoder;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-
-import org.lwjgl.util.vector.Matrix4f;
 
 public class Renderer 
 {
@@ -21,36 +21,43 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("shaderTestPete");
 	
-	public Renderer(Matrix4f projectionMatrix)
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
+	
+	public Renderer(float fovParam, int windowWidth, int windowHeight)
 	{
-		this.perspectiveProjectionMatrix = projectionMatrix;
+		initProjectionMatrix(fovParam, windowWidth, windowHeight);
 		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		init();
 	}
 	
-	public void render(Planet planet, Matrix4f viewMatrix) 
+	public void render(Planet planet, FirstPersonCamera camera) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		Matrix4f viewMatrix = camera.getViewMatrix();
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
+		texture.bind();
 		glUseProgram(shaderTestPete.getId());
-		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), perspectiveProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), viewMatrix, "modelViewMatrix");
-		ShaderProgram.loadMatrix4f(shaderTestPete.getId(), normalMatrix, "normalMatrix");
+
+		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix");
+		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
+
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
+		texture.unbind();
 		
 		// TO FIX: uncommented because of issues under OS X
 //		Matrix4f modelViewMatrix = new Matrix4f();
 //		modelViewMatrix.setIdentity();
 //		
 //		glClear(GL_DEPTH_BUFFER_BIT);
-//		
 //		glUseProgram(hudShader.getId());
-//		ShaderProgram.loadMatrix4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
-//		ShaderProgram.loadMatrix4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
+//		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
+//		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
 //		GameObject2D t = TextRenderer2D.textToObject2D("Sample text", "arial_nm.png", 0, 0, 16);
 //		VertexArrayObject text = new VertexArrayObject(t);
 //		renderVAO(text, GL_TRIANGLES);
@@ -67,27 +74,45 @@ public class Renderer
    
     public void renderVAO(VertexArrayObject vao, int mode)
 	{						
-    	vao.bindBuffers();
+    	vao.bind();
         GL30.glBindVertexArray(vao.getId());
-        GL20.glEnableVertexAttribArray(0); //positions
-        GL20.glEnableVertexAttribArray(1); //uvs
-        GL20.glEnableVertexAttribArray(2); //normals
-        GL20.glEnableVertexAttribArray(3); //color
+        GL20.glEnableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glEnableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
          
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getVboIndexHandle());
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vao.getIndexHandle());
          
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
          
         // Put everything back to default 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL20.glDisableVertexAttribArray(3);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.UV_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
+        GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
         GL30.glBindVertexArray(0);
 	}
-        
+    
+    private void initProjectionMatrix(float fovParam, int width, int height)
+	{
+		perspectiveProjectionMatrix = new Matrix4f();
+		float fov = fovParam;
+		float zFar = 500.0f;
+		float zNear = 0.1f;
+		float aspectRatio = (float)width/height;		
+		float frustumLength = zFar - zNear;
+		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
+		float xScale = yScale / aspectRatio;
+
+		perspectiveProjectionMatrix.setZero();
+		perspectiveProjectionMatrix.m00 = xScale;
+		perspectiveProjectionMatrix.m11 = yScale;
+		perspectiveProjectionMatrix.m22 =  -((zFar + zNear)/frustumLength);
+		perspectiveProjectionMatrix.m32 = -((2 * zNear * zFar) / frustumLength);
+		perspectiveProjectionMatrix.m23 =  -1.0f;								
+	}
 	
 	public static Matrix4f createOrthographicProjectionMatric(float right, float left, float top, float bottom, float near, float far)
 	{

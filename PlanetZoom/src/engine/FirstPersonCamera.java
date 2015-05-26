@@ -149,19 +149,4 @@ public class FirstPersonCamera implements ICamera
         
         viewMatrix.translate(position);
 	}
-	
-	/**
-	 * 
-	 * @param planet
-	 * @return Distance to planet surface, or more precise: To the sea level of a planet. 
-	 * 		   So it gives positive values for "over sea level" and negative values for "under sea level".
-	 */
-	public float getDistanceToPlanetSurface(Planet planet) {
-		Vector3f planetPos = planet.getPosition();
-		
-		Vector3f camToPlanet = new Vector3f();
-		Vector3f.sub(planetPos, position, camToPlanet);
-		
-		return Math.abs(camToPlanet.length()) - planet.getRadius();
-	}
 }

@@ -85,13 +85,6 @@ public class FreeCamera implements ICamera
 	{
 		return new FreeCameraControl(this);
 	}
-
-	@Override
-	public float getDistanceToPlanetSurface(Planet planet)
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
 	
 	public Vector3f getPosition()
 	{
