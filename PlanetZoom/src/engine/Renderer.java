@@ -22,7 +22,7 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
-	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/earth.png");
 	
 	public Renderer(Matrix4f projectionMatrix)
 	{

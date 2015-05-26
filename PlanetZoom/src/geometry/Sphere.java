@@ -66,7 +66,7 @@ public class Sphere extends GameObject3D
 		vertexData.clear();
 		
 		createOctahedron(resolution);	
-		createUVs();
+		
 		applyMeshModifications();
 		addVertexDataToGameObject();
 	}
@@ -102,8 +102,14 @@ public class Sphere extends GameObject3D
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-			vertices[i].scale(radius);
-			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+			normals[i] = (Vector3f) new Vector3f(vertices[i]);
+		}
+		
+		createUVs();
+		
+		for(int i = 0; i < vertices.length; i++)
+		{
+			vertices[i].scale(radius);			
 		}
 	}
 
