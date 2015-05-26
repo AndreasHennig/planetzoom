@@ -17,15 +17,16 @@ import engine.Renderer;
 
 public class Game implements IGame
 {
-	private Matrix4f projectionMatrix;
+	private static CoreEngine game;
 	private ICamera camera; 
 	private Renderer renderer;
+	float fovParam = 45.0f;
 	
 	private Planet planet;
 	
     public static void main(String[] args)
     {
-        CoreEngine game = new CoreEngine(new Game());
+        game = new CoreEngine(new Game());
         game.start();
     }
 
@@ -33,7 +34,7 @@ public class Game implements IGame
     public void init()
     {
         printVersionInfo();
-        initProjectionMatrix(45.0f);
+        
         initCamera();
         initRenderer();
         
@@ -66,27 +67,9 @@ public class Game implements IGame
         camera = new FirstPersonCamera(0.0f, 0.0f, -2f);
     }
     
-    private void initProjectionMatrix(float fovParam)
-	{
-		projectionMatrix = new Matrix4f();
-		float fov = fovParam;
-		float zFar = 500.0f;
-		float zNear = 0.1f;
-		float aspectRatio = 4.0f/3.0f;				
-		float frustumLength = zFar - zNear;
-		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
-		float xScale = yScale / aspectRatio;
-
-		projectionMatrix.setZero();
-		projectionMatrix.m00 = xScale;		
-		projectionMatrix.m11 = yScale;								
-		projectionMatrix.m22 =  -((zFar + zNear)/frustumLength);	
-		projectionMatrix.m32 = -((2 * zNear * zFar) / frustumLength);
-		projectionMatrix.m23 =  -1.0f;								
-	}   
     private void initRenderer()
     {
-    	renderer = new Renderer(projectionMatrix);
+    	renderer = new Renderer(fovParam, game.getWindowWidth(), game.getWindowHeight());
     }
     
     private void printVersionInfo()

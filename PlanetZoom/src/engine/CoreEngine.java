@@ -126,4 +126,11 @@ public class CoreEngine
         glfwSwapBuffers(windowHandle);
     }
     
+    public int getWindowWidth() {
+		return windowWidth;
+	}
+
+	public int getWindowHeight() {
+		return windowHeight;
+	}
 }
