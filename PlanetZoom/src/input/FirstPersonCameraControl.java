@@ -7,6 +7,7 @@ import engine.FirstPersonCamera;
 public class FirstPersonCameraControl implements ICameraControl
 {
 	private FirstPersonCamera cam;
+	private float inputSensitivity = 0.01f;
 
 	public FirstPersonCameraControl(FirstPersonCamera cam)
 	{
@@ -14,30 +15,29 @@ public class FirstPersonCameraControl implements ICameraControl
 	}
 
 	@Override
-	public FirstPersonCamera handleInput()
+	public FirstPersonCamera handleInput(int deltaTime)
 	{
 		if(Keyboard.isKeyPressed(GLFW_KEY_W))
-			cam.moveForwards(0.1f);
-		
+			cam.moveForwards(inputSensitivity * deltaTime);
+
 		if(Keyboard.isKeyPressed(GLFW_KEY_S))
-			cam.moveBackwards(0.1f);
-		
+			cam.moveBackwards(inputSensitivity * deltaTime);
+
 		if(Keyboard.isKeyPressed(GLFW_KEY_A))
-			cam.strafeLeft(0.1f);
+			cam.strafeLeft(inputSensitivity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_D))
-			cam.strafeRight(0.1f);
-			
+			cam.strafeRight(inputSensitivity * deltaTime);
+
 		if(Keyboard.isKeyPressed(GLFW_KEY_SPACE))
-			cam.moveUp(0.1f);
-		
+			cam.moveUp(inputSensitivity * deltaTime);
+
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
-			cam.moveDown(0.1f);
-		
-		cam.addYaw((float) - Cursor.getDx() /250.0f);
+			cam.moveDown(inputSensitivity * deltaTime);
+
+		cam.addYaw((float) -Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
-			
-		return cam;	
+
+		return cam;
 	}
-	
 }

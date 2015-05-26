@@ -124,9 +124,6 @@ public class CoreEngine
         
         if(Keyboard.isKeyPressed(GLFW_KEY_ESCAPE))
         	glfwSetWindowShouldClose(windowHandle, GL_TRUE);
-        
-        
-
     }
 
     public void render()

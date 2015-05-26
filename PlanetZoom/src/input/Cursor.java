@@ -14,14 +14,14 @@ public class Cursor extends GLFWCursorPosCallback
 	
 	public static double getDx()
 	{
-		double dx =  xPos - lastXPos;
+		double dx = xPos - lastXPos;
 		lastXPos = xPos;
 		return dx;
 	}
 	
 	public static double getDy()
 	{
-		double dy =  yPos - lastYPos;
+		double dy = yPos - lastYPos;
 		lastYPos = yPos;
 		return dy;
 	}

@@ -4,5 +4,5 @@ import engine.ICamera;
 
 public interface ICameraControl 
 {
-	public ICamera handleInput();
+	public ICamera handleInput(int deltaTime);
 }

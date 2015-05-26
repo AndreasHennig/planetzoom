@@ -48,9 +48,8 @@ public class Game implements IGame
     public void update(int deltaTime)
     {
         ICameraControl cameraControl = camera.getCameraControl();
-        this.camera = cameraControl.handleInput();
+        this.camera = cameraControl.handleInput(deltaTime);
         
-
         planet.update(3);
         //planet.update(camera);
 
@@ -71,7 +70,7 @@ public class Game implements IGame
 
     private void initCamera()
     {
-        camera = new FreeCamera(0.0f, 0.0f, -3f);
+        camera = new FreeCamera(0.0f, 0.0f, 5.0f);
     }
     
     private void initRenderer()
