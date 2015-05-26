@@ -1,8 +1,11 @@
 package engine;
 
 import geometry.Vertex2D;
+
 import java.util.ArrayList;
-import lenz.utils.Texture;
+
+import Peter.TextureUsingPNGDecoder;
+
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -93,7 +96,7 @@ public class TextRenderer2D
 			index += 4;
 		}
 		
-		Texture textTexture = new Texture("fonts/" + font);
+		TextureUsingPNGDecoder textTexture = new TextureUsingPNGDecoder("src/res/textures/fonts/" + font);
 
 		GameObject2D obj =  new GameObject2D(vertices, indices);
 		obj.setTexture(textTexture);
