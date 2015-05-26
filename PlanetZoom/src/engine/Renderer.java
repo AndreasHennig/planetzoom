@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import Peter.TextureUsingPNGDecoder;
 import static org.lwjgl.opengl.GL11.*;
@@ -39,6 +40,8 @@ public class Renderer
 		Matrix4f.transpose(viewMatrix, normalMatrix);
 		Matrix4f.invert(normalMatrix, normalMatrix);
 		
+		
+		
 		texture.bind();
 		glUseProgram(shaderTestPete.getId());
 
@@ -50,17 +53,30 @@ public class Renderer
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
 		texture.unbind();
 		
-		// TO FIX: uncommented because of issues under OS X
-//		Matrix4f modelViewMatrix = new Matrix4f();
-//		modelViewMatrix.setIdentity();
-//		
-//		glClear(GL_DEPTH_BUFFER_BIT);
-//		glUseProgram(hudShader.getId());
-//		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
-//		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
-//		GameObject2D t = TextRenderer2D.textToObject2D("Sample text", "arial_nm.png", 0, 0, 16);
-//		VertexArrayObject text = new VertexArrayObject(t);
-//		renderVAO(text, GL_TRIANGLES);
+		
+		
+		Vector3f camToPlanet = new Vector3f();
+		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
+		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
+		GameObject2D t1 = TextRenderer2D.textToObject2D("Position: " + camera.getPosition().x + "/ " + camera.getPosition().y + "/ " + camera.getPosition().z, "arial_nm.png", 0, 0, 16);
+		GameObject2D t2 = TextRenderer2D.textToObject2D("Distance: " + planetCamDistance , "arial_nm.png", 0, 20, 16);
+
+		Matrix4f modelViewMatrix = new Matrix4f();
+		modelViewMatrix.setIdentity();
+		
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glUseProgram(hudShader.getId());
+		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
+		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
+
+		t1.getTexture().bind();
+		t2.getTexture().bind();
+		VertexArrayObject text1 = new VertexArrayObject(t1);
+		VertexArrayObject text2 = new VertexArrayObject(t2);
+		renderVAO(text1, GL_TRIANGLES);
+		renderVAO(text2, GL_TRIANGLES);
+		t1.getTexture().unbind();
+		t2.getTexture().unbind();
 	}
 	
 	private void init()
