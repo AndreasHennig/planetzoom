@@ -42,7 +42,7 @@ public class Game implements IGame
     }
 
     @Override
-    public void update()
+    public void update(int deltaTime)
     {
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput();

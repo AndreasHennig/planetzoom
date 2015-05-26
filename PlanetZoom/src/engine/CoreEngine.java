@@ -113,10 +113,20 @@ public class CoreEngine
     public void update()
     {
         glfwPollEvents();
-        game.update();
+        
+        int deltaTime = timer.getDeltaTime();
+        /*
+            int fps = timer.getFPS();
+        	int fps2 = timer.getExpectedFPS();
+        	System.out.println("dt: " + deltaTime + " | fps: " + fps + " | efps: " + fps2);
+         */
+        game.update(deltaTime);
         
         if(Keyboard.isKeyPressed(GLFW_KEY_ESCAPE))
         	glfwSetWindowShouldClose(windowHandle, GL_TRUE);
+        
+        
+
     }
 
     public void render()
