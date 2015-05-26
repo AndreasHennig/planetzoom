@@ -105,7 +105,7 @@ public class CoreEngine
         glfwSetKeyCallback(windowHandle, keyCallback = new Keyboard());
         glfwSetCursorPosCallback(windowHandle, cursorCallback = new Cursor());
 
-        game.init(windowHandle);
+        game.init();
         
         timer = new Timer(); //not sure if best here
     }
