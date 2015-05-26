@@ -2,12 +2,11 @@
 #pragma debug(on)
 #pragma optimize(off)
 
-uniform sampler2D s;
-smooth in vec2 uv;
+
 
 out vec4 out_Color;
  
 void main(void)
 {
-	out_Color =  texture(s, uv);
+	out_Color =  vec4(1.0, 0.4, 0.5, 1.0);
 }
