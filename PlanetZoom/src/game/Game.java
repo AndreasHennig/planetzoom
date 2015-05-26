@@ -56,8 +56,9 @@ public class Game implements IGame
 
 //        planet.update(subdivisions);
         	
+
         float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
-		
+	
         planet.update(planetCamDistance, false);
     }
 

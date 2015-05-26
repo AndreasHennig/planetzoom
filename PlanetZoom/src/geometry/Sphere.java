@@ -2,11 +2,15 @@
 
 package geometry;
 
+import javax.naming.NoInitialContextException;
+
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
+import engine.utils.*;
+import engine.utils.*;
 
 public class Sphere extends GameObject3D
 {
@@ -75,6 +79,7 @@ public class Sphere extends GameObject3D
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
+
 			normals[i] = (Vector3f) new Vector3f(vertices[i]);
 		}
 	}
@@ -82,8 +87,17 @@ public class Sphere extends GameObject3D
 	public void applyMeshModifications()
 	{	
 		for(int i = 0; i < vertices.length; i++)
-		{
-			vertices[i].scale(radius);			
+		{		
+			double x = vertices[i].x;
+			double y = vertices[i].y;
+			double z = vertices[i].z;
+			
+			float frequencyScale = 0.75f;
+			int octaves = 5;
+			
+			double noise = calcNoise(x, y, z, octaves, frequencyScale);
+			
+			vertices[i].scale((float) (radius + noise));
 		}
 	}
 
@@ -232,8 +246,29 @@ public class Sphere extends GameObject3D
 	private void addVertexDataToGameObject()
 	{
 		for(int i = 0; i < vertices.length; i++)
-		{
+		{			
 			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param octaves
+	 * @param frequency
+	 * @return Value between 0 and 1.
+	 */
+	private double calcNoise(double x, double y, double z, int octaves, double frequencyScale) {
+		double noise = 0;
+		int n = octaves - 1;
+		
+		for(double i = 0; i < n; i++) {
+			double freq = Math.pow(2, i) * frequencyScale;
+			noise += (float) ((engine.utils.SimplexNoise.noise(x * freq, y * freq, z * freq) + 1) / 2);
+		}
+		
+		return noise / octaves;
 	}
 }
