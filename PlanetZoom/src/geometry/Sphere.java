@@ -12,8 +12,6 @@ public class Sphere extends GameObject3D
 {
 	public final static int MAX_SUBDIVISIONS = 9;
 	public final static int MIN_SUBDIVISIONS = 1;
-	private final static int AMOUNT_VALUES_PER_COLOR = 3;
-	private final static int AMOUNT_VALUES_PER_VERTEX = 3;
 	
 	private int subdivisions;
 	private float radius;
