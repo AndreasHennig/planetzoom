@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import Peter.TextureUsingPNGDecoder;
 import static org.lwjgl.opengl.GL11.*;
@@ -19,7 +20,7 @@ public class Renderer
 	
 	private ShaderProgram testShader = new ShaderProgram("testShader");
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
-	private ShaderProgram shaderTestPete = new ShaderProgram("shaderTestPete");
+	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
 	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png");
 	
@@ -35,16 +36,14 @@ public class Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Matrix4f viewMatrix = camera.getViewMatrix();
-		Matrix4f normalMatrix = new Matrix4f();
-		Matrix4f.transpose(viewMatrix, normalMatrix);
-		Matrix4f.invert(normalMatrix, normalMatrix);
+		Matrix4f normalMatrix = new Matrix4f(viewMatrix);
+		normalMatrix.invert();
 		
 		texture.bind();
 		glUseProgram(shaderTestPete.getId());
-		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix");
-		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix");
-		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix");
-		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
+		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix", false);
+		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix", false);
+		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix", true);
 		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
 		texture.unbind();
 		
