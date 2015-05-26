@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
 import engine.utils.*;
+import engine.utils.*;
 
 public class Sphere extends GameObject3D
 {
@@ -104,8 +105,15 @@ public class Sphere extends GameObject3D
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{
+			double u = uv[i].x;
+			double v = uv[i].y;
+			
+			double noise = engine.utils.SimplexNoise.noise(u,v);
+			
+			System.out.println("Noise: " + noise);
+			
 			vertices[i].normalise();
-			vertices[i].scale(radius);
+			vertices[i].scale((float) (radius + noise));
 			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
 		}
 	}
