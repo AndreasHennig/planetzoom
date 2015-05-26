@@ -20,8 +20,8 @@ public class CoreEngine
   
     boolean fullscreen = false;
     
-    int windowWidth = 800; 
-    int windowHeight = 600;
+    private int windowWidth = 800; 
+    private int windowHeight = 600;
     
     private GLFWKeyCallback keyCallback;
     private GLFWCursorPosCallback cursorCallback;
