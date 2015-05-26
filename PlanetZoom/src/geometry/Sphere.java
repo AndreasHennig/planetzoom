@@ -99,13 +99,16 @@ public class Sphere extends GameObject3D
 	
 	public void applyMeshModifications()
 	{
+		float pi = (float)Math.PI;
+		
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
 			normals[i] = (Vector3f) new Vector3f(vertices[i]);
+			uv[i] = new Vector2f(normals[i].x / 2.0f + 0.5f, normals[i].y / 2.0f + 0.5f);
 		}
 		
-		createUVs();
+		//createUVs();
 		
 		for(int i = 0; i < vertices.length; i++)
 		{

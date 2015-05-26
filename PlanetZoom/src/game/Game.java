@@ -71,7 +71,7 @@ public class Game implements IGame
 
     private void initCamera()
     {
-        camera = new FreeCamera(0.0f, 0.0f, -3f);
+        camera = new FreeCamera(0.0f, 0.0f, 5f);
     }
     
     private void initRenderer()
