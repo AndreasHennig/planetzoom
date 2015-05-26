@@ -2,10 +2,12 @@
 #pragma debug(on)
 #pragma optimize(off)
 
-in vec2 uvs;
-in float intensity;
-in vec3 normalDir;
-in vec3 lightDir;
+in DATA
+{
+	vec3 lightDir;
+	vec3 normal;
+	vec2 uv;
+} pass_data;
 
 uniform sampler2D s;
 
@@ -13,28 +15,28 @@ out vec4 out_Color;
  
 void main(void)
 {
-	vec4 color;
+	vec4 shadeColor;
 	float intensity;
 	
-	intensity = dot(normalize(lightDir), normalize(normalDir));
+	intensity = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
 	
 	if(intensity > 0.95)
 	{
-		color = vec4(0.5, 0.5, 0.5, 1.0);
+		shadeColor = vec4(0.5, 0.5, 0.5, 1.0);
 	}
 	else if(intensity > 0.5)
 	{
-		color = vec4(0.3, 0.3, 0.3, 1.0);
+		shadeColor = vec4(0.3, 0.3, 0.3, 1.0);
 	}
 	else if(intensity > 0.1)
 	{
-		color = vec4(0.2, 0.2, 0.2, 1.0);
+		shadeColor = vec4(0.2, 0.2, 0.2, 1.0);
 	}
 	else
 	{
-		color = vec4(0.1, 0.1, 0.1, 1.0);
+		shadeColor = vec4(0.1, 0.1, 0.1, 1.0);
 	}
 	
-	out_Color = (color + texture(s, uvs)) / 2.0;
+	out_Color = (shadeColor + texture(s, pass_data.uv)) / 2.0;
 	
 }

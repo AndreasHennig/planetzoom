@@ -16,6 +16,7 @@ import engine.ICamera;
 import engine.IGame;
 import engine.Planet;
 import engine.Renderer;
+import engine.utils.GameUtils;
 
 public class Game implements IGame
 {
@@ -48,17 +49,14 @@ public class Game implements IGame
     public void update(int deltaTime)
     {
         ICameraControl cameraControl = camera.getCameraControl();
-        this.camera = cameraControl.handleInput();
+        this.camera = cameraControl.handleInput(deltaTime);
         
-
         planet.update(3);
         //planet.update(camera);
 
 //        planet.update(subdivisions);
         	
-		Vector3f camToPlanet = new Vector3f();
-		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
-		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
+        float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
 		
         planet.update(planetCamDistance, false);
     }
@@ -71,7 +69,7 @@ public class Game implements IGame
 
     private void initCamera()
     {
-        camera = new FreeCamera(0.0f, 0.0f, 5f);
+        camera = new FreeCamera(0.0f, 0.0f, 5.0f);
     }
     
     private void initRenderer()

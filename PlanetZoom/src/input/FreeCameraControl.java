@@ -13,40 +13,41 @@ import engine.FreeCamera;
 public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
-
+	private float inputSensitivity = 0.01f;
+	
 	public FreeCameraControl(FreeCamera cam)
 	{
 		this.cam = cam;
 	}
 
 	@Override
-	public FreeCamera handleInput()
+	public FreeCamera handleInput(int deltaTime)
 	{
 		if(Keyboard.isKeyPressed(GLFW_KEY_W))
-			cam.moveForwards(0.1f);
+			cam.moveForwards(inputSensitivity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_S))
-			cam.moveBackwards(0.1f);
+			cam.moveBackwards(inputSensitivity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_A))
-			cam.strafeLeft(0.1f);
+			cam.strafeLeft(inputSensitivity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_D))
-			cam.strafeRight(0.1f);
+			cam.strafeRight(inputSensitivity * deltaTime);
 			
 		if(Keyboard.isKeyPressed(GLFW_KEY_SPACE))
-			cam.moveUp(0.1f);
+			cam.moveUp(inputSensitivity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
-			cam.moveDown(0.1f);
+			cam.moveDown(inputSensitivity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_E))
-			cam.addRoll(0.01f);
+			cam.addRoll(0.1f * inputSensitivity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
-			cam.addRoll(-0.01f);
+			cam.addRoll(-0.1f * inputSensitivity * deltaTime);
 		
-		cam.addYaw((float)  Cursor.getDx() /250.0f);
+		cam.addYaw((float) Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
 			
 		return cam;	
