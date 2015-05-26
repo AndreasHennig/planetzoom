@@ -22,7 +22,7 @@ public class Renderer
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	private ShaderProgram shaderTestPete = new ShaderProgram("toonShader");
 	
-	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/earth.png");
+	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/planet-diffuse-specular.png");
 	
 	public Renderer(float fovParam, int windowWidth, int windowHeight)
 	{
