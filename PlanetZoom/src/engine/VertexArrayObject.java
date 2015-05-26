@@ -44,6 +44,7 @@ public class VertexArrayObject
 	{
 		id = GL30.glGenVertexArrays();	
 		indexCount = gameObject.getIndices().length;
+		createHandles();
 	}
 	
 	public VertexArrayObject(GameObject2D object2D)
@@ -112,7 +113,6 @@ public class VertexArrayObject
 	
 	private void initBuffers3D(ArrayList<Vertex3D> vertices, int[] indices)
 	{		
-		createHandles();
 		createBuffers(vertices.size(), true, indices.length);	
 		indexBuffer.put(indices);
 
