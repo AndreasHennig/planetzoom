@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-#version 330
-=======
 #version 410 
 #pragma debug(on)
 #pragma optimize(off)
->>>>>>> refs/remotes/origin/master
+
 
 uniform sampler2D s;
 smooth in vec2 uv;

@@ -66,7 +66,7 @@ public class Game implements IGame
     @Override
     public void render()
     {
-    	renderer.render(planet, (FirstPersonCamera)camera);
+    	renderer.render(planet, camera);
     }
 
     private void initCamera()

@@ -30,7 +30,7 @@ public class Renderer
 		init();
 	}
 	
-	public void render(Planet planet, FirstPersonCamera camera) 
+	public void render(Planet planet, ICamera camera) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
