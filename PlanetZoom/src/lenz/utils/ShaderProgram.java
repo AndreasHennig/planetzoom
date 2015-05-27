@@ -1,26 +1,8 @@
 package lenz.utils;
 
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
-import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glBindAttribLocation;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
-import static org.lwjgl.opengl.GL20.glGetProgrami;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderi;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUniform3fv;
-import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL32.*;
 
 import java.io.InputStream;
 import java.nio.FloatBuffer;
@@ -32,7 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class ShaderProgram 
 {
-	private int id;
+	private int shaderID;
 
 	public ShaderProgram(String resourceNameWithoutExtension) 
 	{
@@ -46,21 +28,31 @@ public class ShaderProgram
 
 	public ShaderProgram(String vertexResourceName, String geometryResourceName, String fragmentResourceName) 
 	{
-		id = glCreateProgram();
+		shaderID = glCreateProgram();
 		compileFromSourceAndAttach(vertexResourceName, GL_VERTEX_SHADER);
 		compileFromSourceAndAttach(fragmentResourceName, GL_FRAGMENT_SHADER);
 		compileFromSourceAndAttach(geometryResourceName, GL_GEOMETRY_SHADER);
 
-		glLinkProgram(id);
-		if (glGetProgrami(id, GL_LINK_STATUS) == GL_FALSE) {
-			throw new RuntimeException(glGetProgramInfoLog(id, glGetProgrami(id, GL_INFO_LOG_LENGTH)));
+		glLinkProgram(shaderID);
+		if (glGetProgrami(shaderID, GL_LINK_STATUS) == GL_FALSE) {
+			throw new RuntimeException(glGetProgramInfoLog(shaderID, glGetProgrami(shaderID, GL_INFO_LOG_LENGTH)));
 		}
 	}
 
 	public int getId() {
-		return id;
+		return shaderID;
 	}
 
+	public void bind()
+	{
+		glUseProgram(shaderID);
+	}
+	
+	public void unbind()
+	{
+		glUseProgram(0);
+	}
+	
 	private InputStream getInputStreamFromResourceName(String resourceName) {
 		return getClass().getResourceAsStream("/res/shaders/" + resourceName);
 	}
@@ -87,7 +79,7 @@ public class ShaderProgram
 				System.err.println(resourceName + ": " + compileLog);
 			}
 
-			glAttachShader(id, shaderId);
+			glAttachShader(shaderID, shaderId);
 		}
 	}
 
@@ -96,12 +88,12 @@ public class ShaderProgram
 		int i = 0;
 		for (String var : variableNames) 
 		{
-			glBindAttribLocation(id, i, var);
+			glBindAttribLocation(shaderID, i, var);
 			++i;
 		}
-		glLinkProgram(id);
-		if (glGetProgrami(id, GL_LINK_STATUS) == GL_FALSE) {
-			throw new RuntimeException(glGetProgramInfoLog(id, glGetProgrami(id, GL_INFO_LOG_LENGTH)));
+		glLinkProgram(shaderID);
+		if (glGetProgrami(shaderID, GL_LINK_STATUS) == GL_FALSE) {
+			throw new RuntimeException(glGetProgramInfoLog(shaderID, glGetProgrami(shaderID, GL_INFO_LOG_LENGTH)));
 		}
 	}
 	
@@ -111,9 +103,6 @@ public class ShaderProgram
 		matrix.store(buffer);
 		buffer.flip();
 		int location = glGetUniformLocation(shaderId, name);
-
-		//if(location < 0)
-			//System.out.println("Matrix4f " + name + " not loaded into shader"); //May occur when not used in shader
 		
 		glUniformMatrix4fv(location, transpose, buffer);
 	}
@@ -124,10 +113,15 @@ public class ShaderProgram
 		vector.store(buffer);
 		buffer.flip();		
 		int location = 	glGetUniformLocation(shaderId, name);		
-		
-		//if(location < 0)
-			//System.out.println("Vector3f " + name + " not loaded into shader"); //May occur when not used in shader
-		
+	
 		glUniform3fv(location, buffer);
 	}
+
+	public static void loadUniform1f(int shaderId, float value, String name)
+	{		
+		int location = 	glGetUniformLocation(shaderId, name);			
+		
+		glUniform1f(location, value);
+	}
+	
 }

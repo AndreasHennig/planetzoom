@@ -19,7 +19,7 @@ public class Renderer
 	private Matrix4f perspectiveProjectionMatrix;
 	private Matrix4f orthographicProjectionMatrix;
 	
-	private ShaderProgram testShader = new ShaderProgram("testShader");
+	private ShaderProgram testShader = new ShaderProgram("toonShader");
 	private ShaderProgram hudShader = new ShaderProgram("HUDShader");
 	
 	private TextureUsingPNGDecoder texture = new TextureUsingPNGDecoder("src/res/textures/uv-test.png");
@@ -40,12 +40,15 @@ public class Renderer
 		normalMatrix.invert();
 		
 		texture.bind();
-		glUseProgram(testShader.getId());
+		testShader.bind();
 		ShaderProgram.loadUniformMat4f(testShader.getId(), perspectiveProjectionMatrix, "projectionMatrix", false);
 		ShaderProgram.loadUniformMat4f(testShader.getId(), viewMatrix, "modelViewMatrix", false);
 		ShaderProgram.loadUniformMat4f(testShader.getId(), normalMatrix, "normalMatrix", true);
 		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
-		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);	
+		ShaderProgram.loadUniform1f(testShader.getId(), planet.getRadius(), "radius");
+		
+		renderVAO(new VertexArrayObject(planet.getMesh()), GL_LINE_STRIP);
+		testShader.unbind();
 		texture.unbind();
 		
 		// TO FIX: uncommented because of issues under OS X
