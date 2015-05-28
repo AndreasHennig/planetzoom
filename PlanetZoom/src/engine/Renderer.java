@@ -47,7 +47,7 @@ public class Renderer
 		ShaderProgram.loadUniformVec3f(testShader.getId(), camera.getPosition(), "cameraPosition");
 		ShaderProgram.loadUniform1f(testShader.getId(), planet.getRadius(), "radius");
 		
-		renderVAO(new VertexArrayObject(planet.getMesh()), GL_LINE_STRIP);
+		renderVAO(new VertexArrayObject(planet.getMesh()), GL_TRIANGLES);
 		testShader.unbind();
 		texture.unbind();
 		
