@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class GameObject2D extends GameObject
 {
-	private ArrayList<Vertex2D> vertices;
+	protected ArrayList<Vertex2D> vertices;
 
 	public GameObject2D()
 	{
