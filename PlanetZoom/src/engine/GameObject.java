@@ -47,7 +47,6 @@ public abstract class GameObject
 	
 	private void enableVertexAttributeArrays()
 	{
-        GL30.glBindVertexArray(vao.getId());
         GL20.glEnableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
         GL20.glEnableVertexAttribArray(VertexArrayObject.UV_LOCATION);
         GL20.glEnableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
@@ -56,12 +55,10 @@ public abstract class GameObject
 	
 	private void disableVertexAttributeArrays()
 	{
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
         GL20.glDisableVertexAttribArray(VertexArrayObject.UV_LOCATION);
         GL20.glDisableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
         GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
-        GL30.glBindVertexArray(0);
 	}
 	
 	public TextureUsingPNGDecoder getTexture()
