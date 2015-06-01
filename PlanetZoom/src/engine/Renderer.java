@@ -58,25 +58,20 @@ public class Renderer
 		Vector3f camToPlanet = new Vector3f();
 		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
 		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
-		GameObject2D t1 = TextRenderer2D.textToObject2D("Position: " + camera.getPosition().x + "/ " + camera.getPosition().y + "/ " + camera.getPosition().z, "arial_nm.png", 0, 0, 16);
-		GameObject2D t2 = TextRenderer2D.textToObject2D("Distance: " + planetCamDistance , "arial_nm.png", 0, 20, 16);
+
 
 		Matrix4f modelViewMatrix = new Matrix4f();
 		modelViewMatrix.setIdentity();
-		
+		GameObject2D hud = new HeadsUpDisplay(0,0,"arial_nm.png", camera.getPosition(), new Vector3f(), planetCamDistance, 0).getText2D();
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glUseProgram(hudShader.getId());
 		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
 		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
 
-		t1.getTexture().bind();
-		t2.getTexture().bind();
-		VertexArrayObject text1 = new VertexArrayObject(t1);
-		VertexArrayObject text2 = new VertexArrayObject(t2);
+		hud.getTexture().bind();
+		VertexArrayObject text1 = new VertexArrayObject(hud);
 		renderVAO(text1, GL_TRIANGLES);
-		renderVAO(text2, GL_TRIANGLES);
-		t1.getTexture().unbind();
-		t2.getTexture().unbind();
+		hud.getTexture().unbind();
 	}
 	
 	private void init()
