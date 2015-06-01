@@ -56,18 +56,29 @@ public class TextRenderer2D
         
 		for(int i = 0; i < text.length(); i++)
 		{
-			positions.add(new Vector2f(x + (i * size), (y + size))); 		 	// top left			index
-			positions.add(new Vector2f(x + ((i + 1) * size), (y + size))); 		// top right		index + 1
-			positions.add(new Vector2f(x + (i * size), y)); 			 		// bottom left		index + 2
-			positions.add(new Vector2f(x + ((i + 1) * size), y)); 		 		// bottom right		index + 3
-				
 			currentChar = text.charAt(i);
-
 			row = (currentChar % rowCount);
 			column = (currentChar / colCount);
 			
 			uv_x =  row / (float) rowCount;
 			uv_y =  column / (float) colCount;
+			
+			if(currentChar == '\n')
+			{
+				y += size;
+				x = 0;
+				continue;
+			}
+				
+				 
+			positions.add(new Vector2f(x, (y + size))); 		 	// top left			index
+			positions.add(new Vector2f(x + size, (y + size))); 		// top right		index + 1
+			positions.add(new Vector2f(x, y)); 			 		// bottom left		index + 2
+			positions.add(new Vector2f(x + size, y)); 		 		// bottom right		index + 3
+				
+			x += size;
+
+
 			
 			uvs.add(new Vector2f(uv_x, uv_y + cellHeight)); 	  			// top left			index 
 			uvs.add(new Vector2f(uv_x + cellWidth, uv_y + cellHeight));  	// top right		index + 1
