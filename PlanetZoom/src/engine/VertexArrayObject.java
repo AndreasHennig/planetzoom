@@ -77,8 +77,26 @@ public class VertexArrayObject
 		bindArrayBuffer(COLOR_LOCATION, 4, colorHandle, colorBuffer);
 		
 		bindIndexBuffer(indexHandle, indexBuffer);
-		
-		GL30.glBindVertexArray(0); 
+	}
+	
+
+	public void unbind()
+	{
+		 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+	        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+	        GL30.glBindVertexArray(0);
+	}
+	public void delete()
+	{         
+		//Delete handles
+        GL15.glDeleteBuffers(positionHandle);
+        GL15.glDeleteBuffers(uvHandle);
+        GL15.glDeleteBuffers(normalHandle);
+        GL15.glDeleteBuffers(colorHandle);
+        GL15.glDeleteBuffers(indexHandle);
+         
+        // Delete the VAO
+        GL30.glDeleteVertexArrays(id);
 	}
 	
 	public int getIndexHandle()
