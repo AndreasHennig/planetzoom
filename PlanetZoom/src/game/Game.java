@@ -6,16 +6,15 @@ import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
 import input.ICameraControl;
 
-import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
-
+import Peter.TextureUsingPNGDecoder;
 import engine.CoreEngine;
-import engine.FirstPersonCamera;
 import engine.FreeCamera;
 import engine.ICamera;
 import engine.IGame;
 import engine.Planet;
 import engine.Renderer;
+import engine.Text2D;
 
 public class Game implements IGame
 {
@@ -42,6 +41,8 @@ public class Game implements IGame
         initRenderer();
         
         planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
+        planet.getMesh().setTexture(new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png"));
+        planet.getMesh().setShaderID(Renderer.testPeteShaderID);
     }
 
     @Override
@@ -49,23 +50,25 @@ public class Game implements IGame
     {
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput(deltaTime);
-        
-        planet.update(3);
-        //planet.update(camera);
-
-//        planet.update(subdivisions);
         	
 		Vector3f camToPlanet = new Vector3f();
 		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
 		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
 		
         planet.update(planetCamDistance, false);
-    }
+
+        Text2D t = new Text2D("Distance: " + planetCamDistance, "arial_nm.png", 0, 0, 16);
+        t.setShaderID(Renderer.hudShaderID);
+
+	    renderer.clearGameObjects();
+        renderer.addGameObject3D(planet.getMesh());
+        renderer.addGameObject2D(t);
+    } 
 
     @Override
     public void render()
     {
-    	renderer.render(planet, camera);
+    	renderer.render(camera);
     }
 
     private void initCamera()
