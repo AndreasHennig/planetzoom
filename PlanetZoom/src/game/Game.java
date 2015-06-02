@@ -16,6 +16,7 @@ import engine.ICamera;
 import engine.IGame;
 import engine.Planet;
 import engine.Renderer;
+import engine.utils.GameUtils;
 
 public class Game implements IGame
 {
@@ -55,9 +56,7 @@ public class Game implements IGame
 
 //        planet.update(subdivisions);
         	
-		Vector3f camToPlanet = new Vector3f();
-		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
-		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
+        float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
 		
         planet.update(planetCamDistance, false);
     }
