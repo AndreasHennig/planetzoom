@@ -1,10 +1,9 @@
 package engine;
 
+import engine.utils.Texture;
 import geometry.Vertex2D;
 
 import java.util.ArrayList;
-
-import Peter.TextureUsingPNGDecoder;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -14,6 +13,8 @@ public class Text2D extends GameObject2D
 	
 	private static final int ROWCOUNT_STANDARD = 16;
 	private static final int COLUMNCOUNT_STANDARD = 16;
+	
+	private String font;
 	/**
 	 * 
 	 * @param text text to be rendered
@@ -40,6 +41,8 @@ public class Text2D extends GameObject2D
 	public Text2D(String text, String font, int x, int y, int size, int rowCount, int colCount)
 	{
 		super();
+		this.font = font;
+		
 		int index = 0;
 		char currentChar;
 		float uv_x, uv_y;
@@ -102,7 +105,15 @@ public class Text2D extends GameObject2D
 			index += 4;
 		}
 		
-		setTexture(new TextureUsingPNGDecoder("src/res/textures/fonts/" + font));
 		createVAO();
+	}
+	
+	@Override
+	public void draw(int mode)
+	{
+		Texture t = new Texture("src/res/textures/fonts/" + font);
+		t.bind();
+		super.draw(mode);
+		t.unbind();
 	}
 }

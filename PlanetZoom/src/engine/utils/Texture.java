@@ -1,4 +1,4 @@
-package Peter;
+package engine.utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,13 +11,13 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class TextureUsingPNGDecoder 
+public class Texture 
 {
 	private int width;
 	private int height;
 	private int textureID;
 	
-	public TextureUsingPNGDecoder(String path)
+	public Texture(String path)
 	{
 		load(path);
 	}

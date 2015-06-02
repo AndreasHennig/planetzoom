@@ -10,7 +10,7 @@ public class MatrixUtils
 		float fov = fovParam;
 		float zFar = 500.0f;
 		float zNear = 0.1f;
-		float aspectRatio = (float)width/height;		
+		float aspectRatio = (float) width/height;		
 		float frustumLength = zFar - zNear;
 		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
 		float xScale = yScale / aspectRatio;
