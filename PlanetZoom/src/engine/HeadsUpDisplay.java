@@ -2,7 +2,6 @@ package engine;
 
 import org.lwjgl.util.vector.Vector3f;
 
-
 public class HeadsUpDisplay
 {
 	private Vector3f cameraPosition;
@@ -46,14 +45,13 @@ public class HeadsUpDisplay
 	
 	public GameObject2D getText2D()
 	{
-		String text = String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nSubdivions: %d",
+		String text = String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nSubdivisions: %d",
 				cameraPosition.x, cameraPosition.y, cameraPosition.z, 
 				cameraLookAt.x, cameraLookAt.y, cameraLookAt.z,
 				distanceToPlanetSurface,
 				subdivisions);
 		
-		return TextRenderer2D.textToObject2D(text, font, position_x, position_y, 16);
-		
+		return new Text2D(text, font, position_x, position_y, 16);
 	}
 
 	public void setCameraPosition(Vector3f cameraPosition)
@@ -70,5 +68,4 @@ public class HeadsUpDisplay
 	{
 		this.distanceToPlanetSurface = distanceToPlanetSurface;
 	}	
-	
 }

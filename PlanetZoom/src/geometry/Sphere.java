@@ -10,10 +10,9 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 9;
+	public final static int MAX_SUBDIVISIONS = 10;
 	public final static int MIN_SUBDIVISIONS = 1;
-	private final static int AMOUNT_VALUES_PER_COLOR = 3;
-	private final static int AMOUNT_VALUES_PER_VERTEX = 3;
+
 	
 	private int subdivisions;
 	private float radius;
@@ -34,6 +33,7 @@ public class Sphere extends GameObject3D
 	public Sphere()
 	{
 		this(1, new Vector4f(1, 1, 1, 1), 1);
+		createVAO();
 	}
 
 	public Sphere(int subdivisions, Vector4f color, float radius)
@@ -69,6 +69,7 @@ public class Sphere extends GameObject3D
 		createUVs();
 		applyMeshModifications();
 		addVertexDataToGameObject();
+		createVAO();
 	}
 	
 	public void applyMeshModifications()

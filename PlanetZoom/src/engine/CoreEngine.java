@@ -18,7 +18,7 @@ public class CoreEngine
     public boolean running;
     public long windowHandle;
   
-    boolean fullscreen = false;
+    boolean fullscreen = true;
     
     private int windowWidth = 800; 
     private int windowHeight = 600;
