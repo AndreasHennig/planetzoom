@@ -46,14 +46,14 @@ public class HeadsUpDisplay
 	
 	public GameObject2D getText2D()
 	{
-		GameObject2D text = TextRenderer2D.textToObject2D(""
-				+ "Position: " + cameraPosition.x + "/ " + cameraPosition.y + "/ " + cameraPosition.z + "\n"
-				+ "Look at: " + cameraLookAt.x + "/ " + cameraLookAt.y + "/ " + cameraLookAt.z + "\n\n" 
-				+ "Distance: " + distanceToPlanetSurface  + "\n"
-				+ "Subdivisions: " + subdivisions,
-				font, position_x, position_y, 16);
+		String text = String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nSubdivions: %d",
+				cameraPosition.x, cameraPosition.y, cameraPosition.z, 
+				cameraLookAt.x, cameraLookAt.y, cameraLookAt.z,
+				distanceToPlanetSurface,
+				subdivisions);
 		
-		return text;
+		return TextRenderer2D.textToObject2D(text, font, position_x, position_y, 16);
+		
 	}
 
 	public void setCameraPosition(Vector3f cameraPosition)
