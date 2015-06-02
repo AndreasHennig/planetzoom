@@ -17,7 +17,6 @@ public class HeadsUpDisplay
 	private int position_y;
 	private String font;
 	
-	
 	public HeadsUpDisplay()
 	{
 		position_x = STANDARD_POSITION_X;
@@ -34,8 +33,8 @@ public class HeadsUpDisplay
 	
 	public HeadsUpDisplay(int x, int y, String font, Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int subdivisions)
 	{
-		position_x = x;
-		position_y = y;
+		this.position_x = x;
+		this.position_y = y;
 		this.font = font;
 		this.cameraPosition = cameraPosition;
 		this.cameraLookAt = cameraLookAt;
