@@ -124,8 +124,9 @@ public class Sphere extends GameObject3D
 			int octaves = 5;
 			
 			double noise = calcNoise(x, y, z, octaves, frequencyScale);
+			double height = Math.cos(x + noise);
 			
-			vertices[i].scale((float) (radius + noise));
+			vertices[i].scale((float) (radius + height));
 		}
 	}
 

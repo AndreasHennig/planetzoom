@@ -6,7 +6,6 @@ public abstract class GameObject
 {
 	protected Texture texture;
 	protected int[] indices;
-	
 		
 	public Texture getTexture()
 	{
