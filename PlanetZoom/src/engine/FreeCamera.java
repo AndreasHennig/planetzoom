@@ -200,7 +200,4 @@ public class FreeCamera implements ICamera
 		Vector3f.add(movement, v2, movement);
 		return movement;
 	}
-	
-	
 }
-

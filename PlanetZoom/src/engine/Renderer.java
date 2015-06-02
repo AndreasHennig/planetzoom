@@ -35,15 +35,10 @@ public class Renderer
 	
 	public Renderer(float fovParam, int windowWidth, int windowHeight)
 	{
-//<<<<<<< HEAD
 		perspectiveProjectionMatrix = MatrixUtils.perspectiveProjectionMatrix(fovParam, windowWidth, windowHeight);
 		orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
-//=======
-//		initProjectionMatrix(fovParam, windowWidth, windowHeight);
-//		this.orthographicProjectionMatrix = Renderer.createOrthographicProjectionMatric(0.0f, -800.0f, -600.0f, 0.0f, -1.0f, 1.0f);
 		gameObjects2D = new ArrayList<GameObject2D>();
 		gameObjects3D = new ArrayList<GameObject3D>();
-//>>>>>>> origin/45_Refactoring_Rendering
 		init();
 	}
 	public static void initShader()
@@ -96,23 +91,6 @@ public class Renderer
 		
 		glClear(GL_DEPTH_BUFFER_BIT);
 		
-//		Vector3f camToPlanet = new Vector3f();
-//		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
-//		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
-//
-//		Matrix4f modelViewMatrix = new Matrix4f();
-//		modelViewMatrix.setIdentity();
-//		GameObject2D hud = new HeadsUpDisplay(0,0,"arial_nm.png", camera.getPosition(), new Vector3f(), planetCamDistance, 0).getText2D();
-//		glClear(GL_DEPTH_BUFFER_BIT);
-//		glUseProgram(hudShader.getId());
-//		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix");
-//		ShaderProgram.loadUniformMat4f(hudShader.getId(), modelViewMatrix, "modelViewMatrix");
-//
-//		hud.getTexture().bind();
-//		VertexArrayObject text1 = new VertexArrayObject(hud);
-//		renderVAO(text1, GL_TRIANGLES);
-//		hud.getTexture().unbind();
-		
 		for(GameObject2D gameObject2D : gameObjects2D)
 		{
 			glUseProgram(hudShader.getId());
@@ -154,41 +132,6 @@ public class Renderer
         glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
         glBindVertexArray(0);
 	}
-    
-//    private void initProjectionMatrix(float fovParam, int width, int height)
-//	{
-//		perspectiveProjectionMatrix = new Matrix4f();
-//		float fov = fovParam;
-//		float zFar = 500.0f;
-//		float zNear = 0.1f;
-//		float aspectRatio = (float)width/height;		
-//		float frustumLength = zFar - zNear;
-//		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));
-//		float xScale = yScale / aspectRatio;
-//
-//		perspectiveProjectionMatrix.setZero();
-//		perspectiveProjectionMatrix.m00 = xScale;
-//		perspectiveProjectionMatrix.m11 = yScale;
-//		perspectiveProjectionMatrix.m22 =  -((zFar + zNear)/frustumLength);
-//		perspectiveProjectionMatrix.m32 = -((2 * zNear * zFar) / frustumLength);
-//		perspectiveProjectionMatrix.m23 =  -1.0f;								
-//	}
-	
-//	public static Matrix4f createOrthographicProjectionMatric(float right, float left, float top, float bottom, float near, float far)
-//	{
-//		Matrix4f projectionMatrix = new Matrix4f();
-//		projectionMatrix.setZero();
-//		
-//		projectionMatrix.m00 = (2.0f / (right - left));
-//		projectionMatrix.m11 = (2.0f / (top - bottom));
-//		projectionMatrix.m22 = -(2.0f / (far - near));
-//		projectionMatrix.m33 = 1;
-//		projectionMatrix.m30 = (right + left) / (right - left);
-//		projectionMatrix.m31 = (top + bottom) / (top - bottom);
-//		projectionMatrix.m32 = (far + near) / (far - near);
-//		
-//		return projectionMatrix;
-//	}
 	
 	public void addGameObject3D(GameObject3D gameObject3D)
 	{
