@@ -1,12 +1,15 @@
 package engine;
 
 import geometry.Vertex2D;
+
 import java.util.ArrayList;
-import lenz.utils.Texture;
+
+import Peter.TextureUsingPNGDecoder;
+
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class TextRenderer2D
+public class Text2D extends GameObject2D
 {
 	
 	private static final int ROWCOUNT_STANDARD = 16;
@@ -19,9 +22,9 @@ public class TextRenderer2D
 	 * @param y y_coordinate
 	 * @param size size of a character in the given bitmap
 	 */
-	public static GameObject2D textToObject2D(String text, String font, int x, int y, int size)
+	public Text2D(String text, String font, int x, int y, int size)
 	{
-		return textToObject2D(text, font, x, y, size, ROWCOUNT_STANDARD, COLUMNCOUNT_STANDARD);
+		this(text, font, x, y, size, ROWCOUNT_STANDARD, COLUMNCOUNT_STANDARD);
 	}
 	
 	/**
@@ -34,8 +37,9 @@ public class TextRenderer2D
 	 * @param number of character rows in the given bitmap
 	 * @param number of character columns in the given bitmap
 	 */
-	public static GameObject2D textToObject2D(String text, String font, int x, int y, int size, int rowCount, int colCount)
+	public Text2D(String text, String font, int x, int y, int size, int rowCount, int colCount)
 	{
+		super();
 		int index = 0;
 		char currentChar;
 		float uv_x, uv_y;
@@ -45,26 +49,34 @@ public class TextRenderer2D
 		
 		int row, column;
 		
-		int[] indices = new int[text.length() * 6];
+		indices = new int[text.length() * 6];
 		ArrayList<Vector2f> positions = new ArrayList<>();;
 		ArrayList<Vector2f> uvs = new ArrayList<>();
-		ArrayList<Vertex2D> vertices = new ArrayList<>();
+		
         Vector3f normal = new Vector3f(0, 0, 1);
         
 		for(int i = 0; i < text.length(); i++)
 		{
-			positions.add(new Vector2f(x + (i * size), (y + size))); 		 	// top left			index
-			positions.add(new Vector2f(x + ((i + 1) * size), (y + size))); 		// top right		index + 1
-			positions.add(new Vector2f(x + (i * size), y)); 			 		// bottom left		index + 2
-			positions.add(new Vector2f(x + ((i + 1) * size), y)); 		 		// bottom right		index + 3
-				
 			currentChar = text.charAt(i);
-
 			row = (currentChar % rowCount);
 			column = (currentChar / colCount);
 			
 			uv_x =  row / (float) rowCount;
 			uv_y =  column / (float) colCount;
+			
+			if(currentChar == '\n')
+			{
+				y += size;
+				x = 0;
+				continue;
+			}
+				 
+			positions.add(new Vector2f(x, (y + size))); 		 	// top left			index
+			positions.add(new Vector2f(x + size, (y + size))); 		// top right		index + 1
+			positions.add(new Vector2f(x, y)); 			 		// bottom left		index + 2
+			positions.add(new Vector2f(x + size, y)); 		 		// bottom right		index + 3
+				
+			x += size;
 			
 			uvs.add(new Vector2f(uv_x, uv_y + cellHeight)); 	  			// top left			index 
 			uvs.add(new Vector2f(uv_x + cellWidth, uv_y + cellHeight));  	// top right		index + 1
@@ -86,19 +98,11 @@ public class TextRenderer2D
 			indices[(i * 6) + 3] = index;
 			indices[(i * 6) + 4] = index + 1;
 			indices[(i * 6) + 5] = index + 3;
-
-
 			
-						
 			index += 4;
 		}
 		
-		Texture textTexture = new Texture("fonts/" + font);
-
-		GameObject2D obj =  new GameObject2D(vertices, indices);
-		obj.setTexture(textTexture);
-		return obj;
+		setTexture(new TextureUsingPNGDecoder("src/res/textures/fonts/" + font));
+		createVAO();
 	}
-	
-	
 }
