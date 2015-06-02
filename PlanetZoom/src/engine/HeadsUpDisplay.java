@@ -17,7 +17,6 @@ public class HeadsUpDisplay
 	private int position_y;
 	private String font;
 	
-	
 	public HeadsUpDisplay()
 	{
 		position_x = STANDARD_POSITION_X;
