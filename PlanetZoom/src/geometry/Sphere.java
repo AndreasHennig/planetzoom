@@ -7,12 +7,13 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
+import engine.utils.*;
+import engine.utils.CustomNoise;
 
 public class Sphere extends GameObject3D
 {
 	public final static int MAX_SUBDIVISIONS = 10;
 	public final static int MIN_SUBDIVISIONS = 1;
-
 	
 	private int subdivisions;
 	private float radius;
@@ -66,19 +67,39 @@ public class Sphere extends GameObject3D
 		vertexData.clear();
 		
 		createOctahedron(resolution);	
+		normalizeVerticesAndCreateNormals();
 		createUVs();
 		applyMeshModifications();
 		addVertexDataToGameObject();
 		createVAO();
 	}
 	
-	public void applyMeshModifications()
+	public void normalizeVerticesAndCreateNormals()
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-			vertices[i].scale(radius);
-			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+
+			normals[i] = (Vector3f) new Vector3f(vertices[i]);
+		}
+	}
+	
+	public void applyMeshModifications()
+	{	
+		for(int i = 0; i < vertices.length; i++)
+		{		
+			double x = vertices[i].x;
+			double y = vertices[i].y;
+			double z = vertices[i].z;
+			
+			// Planetary stuff happens here.
+			float frequencyScale = 0.75f;
+			int octaves = 5;
+			
+			double noise = engine.utils.CustomNoise.overlayNoise(x, y, z, octaves, frequencyScale);
+			double height = Math.cos(x + noise);
+			
+			vertices[i].scale((float) (radius + height));
 		}
 	}
 
@@ -194,7 +215,7 @@ public class Sphere extends GameObject3D
 	}
 	
 	private void createUVs()
-	{
+	{			
 		float previousX = 1f;
 		
 		for (int i = 0; i < vertices.length; i++)
@@ -208,7 +229,7 @@ public class Sphere extends GameObject3D
 			previousX = vector.x;
 			
 			Vector2f texCoords = new Vector2f();
-			texCoords.x = (float)Math.atan2(vector.x, vector.y) / (-2f * (float)Math.PI);
+			texCoords.x = (float)Math.atan2(vector.x, vector.z) / (-2f * (float)Math.PI);
 			
 			if(texCoords.x < 0)
 			{
@@ -227,7 +248,7 @@ public class Sphere extends GameObject3D
 	private void addVertexDataToGameObject()
 	{
 		for(int i = 0; i < vertices.length; i++)
-		{
+		{			
 			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
 		}
 	}

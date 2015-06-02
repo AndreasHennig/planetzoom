@@ -7,6 +7,8 @@ in float intensity;
 in vec3 normalDir;
 in vec3 lightDir;
 
+uniform sampler2D s;
+
 out vec4 out_Color;
  
 void main(void)
@@ -33,6 +35,6 @@ void main(void)
 		color = vec4(0.1, 0.1, 0.1, 1.0);
 	}
 	
-	out_Color = color * vec4(uvs.y, 1.0, 1.0, 1.0);
+	out_Color = (color + texture(s, uvs)) / 2.0;
 	
 }

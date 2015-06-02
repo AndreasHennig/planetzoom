@@ -1,22 +1,21 @@
-
 #version 410 
 #pragma debug(on)
 #pragma optimize(off)
 
 
+layout (location = 0) in vec3 vPosition; 
+layout (location = 1) in vec2 vUVCoords; 
+layout (location = 2) in vec3 vNormal; 
+layout (location = 3) in vec4 vColor; 
+
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
-
-layout (location = 0) in vec3 position; 
-layout (location = 1) in vec2 uvCoords; 
-layout (location = 2) in vec3 normal; 
-layout (location = 3) in vec4 color; 
-
-smooth out vec2 uv;
-
+uniform mat4 normalMatrix;
+out vec4 color_out;
+out vec2 uv_out;
 void main(void)
-{		
-	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);	
-	
-	uv = uvCoords;
+{
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(vPosition, 1.0);	
+	color_out = vColor;
+	uv_out = vUVCoords;
 }

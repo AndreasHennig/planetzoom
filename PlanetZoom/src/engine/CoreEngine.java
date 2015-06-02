@@ -67,9 +67,8 @@ public class CoreEngine
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
     	GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
     	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    	
     	if(fullscreen)
     	{
     		long monitor = glfwGetPrimaryMonitor();
@@ -77,8 +76,6 @@ public class CoreEngine
     		
     		windowWidth = mode.getWidth();
     		windowHeight = mode.getHeight();
-    		
-    		//System.out.println("width: " + windowWidth + " | height: " + windowHeight);
     		
     		windowHandle = glfwCreateWindow(windowWidth, windowHeight, "Stare into it device: " + windowHandle, monitor, NULL);
        	} 

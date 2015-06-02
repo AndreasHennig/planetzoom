@@ -52,23 +52,12 @@ public class Game implements IGame
     public void update(int deltaTime)
     {
         ICameraControl cameraControl = camera.getCameraControl();
+
         this.camera = cameraControl.handleInput(deltaTime);
         	
         float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
 		
         planet.update(planetCamDistance, false);
-
-//        Vector3f cameraPosition = this.camera.getPosition();
-//        
-//        // 2D
-//		String text = String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nSubdivions: %d",
-//				cameraPosition.x, cameraPosition.y, cameraPosition.z, 
-//				cameraLookAt.x, cameraLookAt.y, cameraLookAt.z,
-//				distanceToPlanetSurface,
-//				subdivisions);
-//        
-//        Text2D t = new Text2D("Distance: " + planetCamDistance, "arial_nm.png", 0, 0, 16);
-//        t.setShaderID(Renderer.hudShaderID);
 
         FreeCamera cam = (FreeCamera) this.camera;
         
@@ -87,7 +76,7 @@ public class Game implements IGame
 
     private void initCamera()
     {
-        camera = new FreeCamera(0.0f, 0.0f, 5.0f);
+        camera = new FreeCamera(0.0f, 0.0f, 5f);
     }
     
     private void initRenderer()
