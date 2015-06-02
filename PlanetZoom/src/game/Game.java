@@ -6,16 +6,18 @@ import static org.lwjgl.opengl.GL11.glGetString;
 import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
 import input.ICameraControl;
 
-import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import Peter.TextureUsingPNGDecoder;
 import engine.CoreEngine;
-import engine.FirstPersonCamera;
 import engine.FreeCamera;
+import engine.HeadsUpDisplay;
 import engine.ICamera;
 import engine.IGame;
 import engine.Planet;
 import engine.Renderer;
+import engine.utils.GameUtils;
+import engine.Text2D;
 
 public class Game implements IGame
 {
@@ -42,30 +44,34 @@ public class Game implements IGame
         initRenderer();
         
         planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
+        planet.getMesh().setTexture(new TextureUsingPNGDecoder("src/res/textures/crypt_wall.png"));
+        planet.getMesh().setShaderID(Renderer.testPeteShaderID);
     }
 
     @Override
     public void update(int deltaTime)
     {
         ICameraControl cameraControl = camera.getCameraControl();
-        this.camera = cameraControl.handleInput();
-        
-        planet.update(3);
-        //planet.update(camera);
 
-//        planet.update(subdivisions);
+        this.camera = cameraControl.handleInput(deltaTime);
         	
-		Vector3f camToPlanet = new Vector3f();
-		Vector3f.sub(planet.getPosition(), camera.getPosition(), camToPlanet);
-		float planetCamDistance = Math.abs(camToPlanet.length()) - planet.getRadius();
-	
+        float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
+		
         planet.update(planetCamDistance, false);
-    }
+
+        FreeCamera cam = (FreeCamera) this.camera;
+        
+        HeadsUpDisplay hud = new HeadsUpDisplay(0,0,"arial_nm.png", this.camera.getPosition(), cam.getLookAt(), planetCamDistance, 0);
+        
+	    renderer.clearGameObjects();
+        renderer.addGameObject3D(planet.getMesh());
+        renderer.addGameObject2D(hud.getText2D());
+    } 
 
     @Override
     public void render()
     {
-    	renderer.render(planet, camera);
+    	renderer.render(camera);
     }
 
     private void initCamera()

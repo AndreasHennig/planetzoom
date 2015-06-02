@@ -105,7 +105,7 @@ public class ShaderProgram
 		}
 	}
 	
-	public static void loadUniformMat4f(int shaderId, Matrix4f matrix, String name, boolean transpose)
+	public static void loadUniformMat4f(int shaderId, Matrix4f matrix, String name)
 	{
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 		matrix.store(buffer);
@@ -115,7 +115,7 @@ public class ShaderProgram
 		//if(location < 0)
 			//System.out.println("Matrix4f " + name + " not loaded into shader"); //May occur when not used in shader
 		
-		glUniformMatrix4fv(location, transpose, buffer);
+		glUniformMatrix4fv(location, false, buffer);
 	}
 
 	public static void loadUniformVec3f(int shaderId, Vector3f vector, String name)

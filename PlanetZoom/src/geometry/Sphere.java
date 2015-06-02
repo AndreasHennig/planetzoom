@@ -14,10 +14,9 @@ import engine.utils.*;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 9;
+	public final static int MAX_SUBDIVISIONS = 10;
 	public final static int MIN_SUBDIVISIONS = 1;
-	private final static int AMOUNT_VALUES_PER_COLOR = 3;
-	private final static int AMOUNT_VALUES_PER_VERTEX = 3;
+
 	
 	private int subdivisions;
 	private float radius;
@@ -38,6 +37,7 @@ public class Sphere extends GameObject3D
 	public Sphere()
 	{
 		this(1, new Vector4f(1, 1, 1, 1), 1);
+		createVAO();
 	}
 
 	public Sphere(int subdivisions, Vector4f color, float radius)
@@ -74,32 +74,7 @@ public class Sphere extends GameObject3D
 		createUVs();
 		applyMeshModifications();
 		addVertexDataToGameObject();
-	}
-
-	/**
-	 * Gives a value between 0 and 1 that depends on the distance between a
-	 * point and the sphere. Can be used to compute a subdivision that looks
-	 * "okay" from a given point. The distance gets clamped to a max value.
-	 * 
-	 * @param distanceToSphere
-	 * @return value between 0 and 1
-	 */
-	public float getSubdivisionCoefficient(float distanceToSphere)
-	{
-		// distances over 100 don't affect the planets resolution
-		float maxDistance = 100;
-		distanceToSphere = distanceToSphere > maxDistance ? maxDistance
-				: distanceToSphere;
-
-		float subdivisionCoefficient = (maxDistance - distanceToSphere) / 100;
-
-		// (100 - x) ^ 5 / (100 ^ 5)
-		float curveSlope = 3f;
-		subdivisionCoefficient = (float) (Math.pow(maxDistance
-				- distanceToSphere, curveSlope) / Math.pow(maxDistance,
-				curveSlope));
-
-		return subdivisionCoefficient;
+		createVAO();
 	}
 	
 	public void normalizeVerticesAndCreateNormals()

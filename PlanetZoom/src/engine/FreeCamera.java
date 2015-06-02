@@ -128,6 +128,13 @@ public class FreeCamera implements ICamera
 		orientation.normalise();
 	}
 	
+	public Vector3f getLookAt()
+	{
+		Vector3f lookAt = calculateMovementVector(new Vector3f(0, 0, -1));
+		lookAt.normalise();
+		return lookAt;
+	}
+	
 	public void moveForwards(float amount)
 	{			
 		Vector3f movement = calculateMovementVector(new Vector3f(0, 0, -amount));

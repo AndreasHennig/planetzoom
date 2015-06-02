@@ -3,6 +3,7 @@ package engine;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import engine.utils.GameUtils;
 import geometry.Sphere;
 
 public class Planet
@@ -38,8 +39,7 @@ public class Planet
 
 	public void update(float planetCamDistance, boolean adjustCamSpeed)
 	{
-		float subdivisionCoefficient = sphere
-				.getSubdivisionCoefficient(planetCamDistance);
+		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
 
 		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
 
