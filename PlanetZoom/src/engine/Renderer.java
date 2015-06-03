@@ -2,7 +2,6 @@ package engine;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-
 import engine.utils.Texture;
 
 public class Renderer 
@@ -14,6 +13,8 @@ public class Renderer
 	
 	public void renderGameObject(GameObject gameObject, Texture texture, int shaderID, int renderMode)
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 		glUseProgram(shaderID);
 		
 		if(texture != null)

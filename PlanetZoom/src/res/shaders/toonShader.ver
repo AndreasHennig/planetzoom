@@ -19,7 +19,7 @@ out DATA
 } pass_data;
 
 void main(void)
-{		
+{	
 	pass_data.uv = uvCoords;
 	pass_data.normal = normal;
 	pass_data.position = position;
