@@ -109,7 +109,7 @@ public class Game implements IGame
 		renderer.renderGameObject(planet.getMesh(), planetTexture, toonShader.getId(), GL_TRIANGLES);
 		
 		glUseProgram(hudShader.getId());
-		Matrix4f orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), 0, -game.getWindowHeight(), -1.0f, 1.0f);
+		Matrix4f orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), -game.getWindowHeight(), 0.0f, -1.0f, 1.0f);
 		ShaderProgram.loadUniformMat4f(hudShader.getId(), orthographicProjectionMatrix, "projectionMatrix", false);
 		ShaderProgram.loadUniformMat4f(hudShader.getId(), new Matrix4f(), "modelViewMatrix", false);
 		glUseProgram(0);
