@@ -73,15 +73,14 @@ public class Game implements IGame
 		toonShader = new ShaderProgram("toonShader");
     }
 
+    float sin = 0;
+    
     @Override
     public void update(int deltaTime)
     {
-    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    	
         ICameraControl cameraControl = camera.getCameraControl();
         this.camera = cameraControl.handleInput(deltaTime);
-        
-
+       
         float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();;
 
         planet.update(planetCamDistance, false);
@@ -98,6 +97,7 @@ public class Game implements IGame
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
+		
 		glUseProgram(toonShader.getId());
 		ShaderProgram.loadUniformMat4f(toonShader.getId(), perspectiveProjectionMatrix, "projectionMatrix", false);
 		ShaderProgram.loadUniformMat4f(toonShader.getId(), viewMatrix, "modelViewMatrix", false);
@@ -105,7 +105,7 @@ public class Game implements IGame
 		ShaderProgram.loadUniformVec3f(toonShader.getId(), camera.getPosition(), "cameraPosition");
 		ShaderProgram.loadUniform1f(toonShader.getId(), planet.getRadius(), "radius");
 		glUseProgram(0);
-			
+		
 		renderer.renderGameObject(planet.getMesh(), planetTexture, toonShader.getId(), GL_TRIANGLES);
 		
 		glUseProgram(hudShader.getId());
