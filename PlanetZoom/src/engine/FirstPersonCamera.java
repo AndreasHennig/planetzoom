@@ -149,4 +149,10 @@ public class FirstPersonCamera implements ICamera
         
         viewMatrix.translate(position);
 	}
+
+	@Override
+	public Vector3f getLookAt() {
+		// TODO Auto-generated method stub - Mr David Schmöcker plz
+		return null;
+	}
 }

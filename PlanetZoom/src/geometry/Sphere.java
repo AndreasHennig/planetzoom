@@ -30,11 +30,13 @@ public class Sphere extends GameObject3D
 	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
 			Vertex3D.right(), Vertex3D.front() };
 
+	
 	public Sphere()
 	{
 		this(1, new Vector4f(1, 1, 1, 1), 1);
 		createVAO();
 	}
+	
 
 	public Sphere(int subdivisions, Vector4f color, float radius)
 	{

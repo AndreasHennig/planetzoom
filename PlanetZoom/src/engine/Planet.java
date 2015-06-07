@@ -30,6 +30,7 @@ public class Planet
 	{
 		this.position = position;
 		this.sphere = new Sphere(3, new Vector4f(1f, 1f, 1f, 1f), radius);
+		
 	}
 
 	public void update(int subdivisions)

@@ -10,4 +10,5 @@ public interface ICamera
 	public Matrix4f getViewMatrix();
 	public ICameraControl getCameraControl();
 	public Vector3f getPosition();
+	public Vector3f getLookAt();
 }

@@ -70,9 +70,7 @@ public class Game implements IGame
 //        Text2D t = new Text2D("Distance: " + planetCamDistance, "arial_nm.png", 0, 0, 16);
 //        t.setShaderID(Renderer.hudShaderID);
 
-        FreeCamera cam = (FreeCamera) this.camera;
-        
-        HeadsUpDisplay hud = new HeadsUpDisplay(0,0,"arial_nm.png", this.camera.getPosition(), cam.getLookAt(), planetCamDistance, 0);
+        HeadsUpDisplay hud = new HeadsUpDisplay(0,0,"arial_nm.png", this.camera.getPosition(), camera.getLookAt(), planetCamDistance, 0);
         
 	    renderer.clearGameObjects();
         renderer.addGameObject3D(planet.getMesh());
@@ -88,6 +86,7 @@ public class Game implements IGame
     private void initCamera()
     {
         camera = new FreeCamera(0.0f, 0.0f, 5.0f);
+        GameUtils.currentCam = camera;
     }
     
     private void initRenderer()

@@ -2,13 +2,19 @@ package engine.utils;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import engine.ICamera;
+
 public class GameUtils 
 {
+	public static ICamera currentCam;
+	//public static Timer timer; //?
+	
 	public static float getDistanceBetween(Vector3f position1, Vector3f position2 )
 	{
 		Vector3f distance = new Vector3f();
 		Vector3f.sub(position1, position2, distance);
 		float result = Math.abs(distance.length());
+		
 		
 		return result;
 	}
