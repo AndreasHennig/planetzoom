@@ -9,7 +9,7 @@ import engine.utils.GameUtils;
 public class Graph {
 	
 	int subdivisions;
-	Vertex3D camera;
+	Vertex3D camera; //is this enough or should we consider the planet being behind the camera?
 	ArrayList<Node> nodes;
 	
 	public Graph(int subdivisions, Vertex3D camera){
