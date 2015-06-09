@@ -130,10 +130,7 @@ public class Game implements IGame
 		
 		glUseProgram(hudShader.getId());
 		hud.getText2D().draw(GL_TRIANGLES);
-		glUseProgram(0);
-			
-		System.out.println(info.getCamera().getPosition());
-		
+		glUseProgram(0);		
     } 
     
     private void printVersionInfo()
