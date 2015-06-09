@@ -79,15 +79,15 @@ public class Graph {
 			Vector3f.sub(v3, v1, rhs);
 			Vector3f.cross(lhs, rhs, faceNormal);
 			
-			/*
+			
 			System.out.println("cam: " + cameraAngle);
-			System.out.println("v1: " + v1);
-			System.out.println("v2: " + v2);
 			System.out.println("normal: " + faceNormal);
-			*/
+			
 			double angle = Vector3f.angle(cameraAngle, faceNormal) * 180 / Math.PI;
-
-			float angleTolerance = 90 / (depth + 2);
+			
+			System.out.println(angle);
+			
+			float angleTolerance = 0;//90 / (depth + 2);
 
 			return angle > 90 - angleTolerance && angle < 270 + angleTolerance;
 		}

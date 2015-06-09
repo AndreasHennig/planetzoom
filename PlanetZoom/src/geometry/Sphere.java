@@ -13,8 +13,8 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 10;
-	public final static int MIN_SUBDIVISIONS = 1;
+	public final static int MAX_SUBDIVISIONS = 0;
+	public final static int MIN_SUBDIVISIONS = 0;
 
 	private int subdivisions;
 	private float radius;
@@ -63,17 +63,18 @@ public class Sphere extends GameObject3D
 		int indicesMagic = 0;
 		
 		Vector2f uvDummy = new Vector2f(1, 1);
+		Vector4f colorDummy = new Vector4f(1,1,1,1);
 		
 		for(int i = 0; i < nodes.size(); i++)
 		{
 			Graph.Node currentNode = nodes.get(i);
-			vertexData.add(new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal));
+			vertexData.add(new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy));
 			indices[indicesMagic] = indicesMagic;
 			indicesMagic++;
-			vertexData.add(new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal));
+			vertexData.add(new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal, colorDummy));
 			indices[indicesMagic] = indicesMagic;
 			indicesMagic++;
-			vertexData.add(new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal));
+			vertexData.add(new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal, colorDummy));
 			indices[indicesMagic] = indicesMagic;
 			indicesMagic++;
 		}
