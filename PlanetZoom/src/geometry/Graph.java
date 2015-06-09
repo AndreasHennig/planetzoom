@@ -9,22 +9,27 @@ import engine.utils.GameUtils;
 public class Graph {
 	
 	int subdivisions;
-	Vertex3D camera; //is this enough or should we consider the planet being behind the camera?
+	Vector3f cameraAngle; //is this enough or should we consider the planet being behind the camera?
 	ArrayList<Node> nodes;
+	float angleTolerance = -10f; //90 degrees is standard
 	
-	public Graph(int subdivisions, Vertex3D camera){
+	public Graph(int subdivisions, Vector3f cameraAngle){
 		this.subdivisions = subdivisions;
-		this.camera = camera;
+		this.cameraAngle = cameraAngle;
 		
 		createOctahedron();
 	}
 	
 	private void createOctahedron() {
-		// TODO Auto-generated method stub
-		
+		new Node(0, Vertex3D.up(), Vertex3D.front(), Vertex3D.right()); //front up right
+		new Node(0, Vertex3D.up(), Vertex3D.left(), Vertex3D.front()); //front up left
+		new Node(0, Vertex3D.front(), Vertex3D.down(), Vertex3D.right()); //front down right 
+		new Node(0, Vertex3D.front(), Vertex3D.left(), Vertex3D.down()); //front down left
+		new Node(0, Vertex3D.back(), Vertex3D.up(), Vertex3D.right()); //back up right
+		new Node(0, Vertex3D.back(), Vertex3D.left(), Vertex3D.up()); //back up left
+		new Node(0, Vertex3D.down(), Vertex3D.back(), Vertex3D.right()); //back down right
+		new Node(0, Vertex3D.down(), Vertex3D.left(), Vertex3D.back()); //back down left
 	}
-
-
 
 	class Node {
 		int depth;
@@ -67,8 +72,8 @@ public class Graph {
 			Vector3f.sub(v3, v1, rhs);
 			Vector3f.cross(lhs, rhs, faceNormal);
 			
-			float angleTolerance = -10f; //in degrees
-			return Vector3f.angle(GameUtils.currentCam.getLookAt(), faceNormal) < Math.PI * (90 + angleTolerance) / 180;
+			double angle = Vector3f.angle(cameraAngle, faceNormal);
+			return angle > Math.PI * (90 + angleTolerance) / 180 && angle < Math.PI * (270 - angleTolerance) / 180;
 		}
 	}
 }
