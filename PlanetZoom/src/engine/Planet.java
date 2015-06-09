@@ -29,13 +29,13 @@ public class Planet
 	public Planet(float radius, Vector3f position)
 	{
 		this.position = position;
-		this.sphere = new Sphere(3, new Vector4f(1f, 1f, 1f, 1f), radius);
+		this.sphere = new Sphere();
 		
 	}
 
 	public void update(int subdivisions)
 	{
-		sphere.update(subdivisions);
+		sphere.update(subdivisions, GameUtils.currentCam.getLookAt()); //where to apply cam? 
 	}
 
 	public void update(float planetCamDistance, boolean adjustCamSpeed)

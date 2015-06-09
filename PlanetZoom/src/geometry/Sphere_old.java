@@ -7,14 +7,13 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
-import engine.utils.GameUtils;
+import engine.utils.*;
+//import engine.utils.CustomNoise;
 
-public class Sphere_new extends GameObject3D
+public class Sphere_old extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 9;
+	public final static int MAX_SUBDIVISIONS = 10;
 	public final static int MIN_SUBDIVISIONS = 1;
-	private final static int AMOUNT_VALUES_PER_COLOR = 3;
-	private final static int AMOUNT_VALUES_PER_VERTEX = 3;
 	
 	private int subdivisions;
 	private float radius;
@@ -23,7 +22,7 @@ public class Sphere_new extends GameObject3D
 	private Vector3f[] normals; 
 	private Vector2f[] uv;
 	private Vector4f vertexColor;
-	
+
 	public float getRadius()
 	{
 		return radius;
@@ -32,11 +31,17 @@ public class Sphere_new extends GameObject3D
 	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
 			Vertex3D.right(), Vertex3D.front() };
 
-	public Sphere_new(int subdivisions, Vector4f color, float radius)
+	public Sphere_old()
+	{
+		this(1, new Vector4f(1, 1, 1, 1), 1);
+		createVAO();
+	}
+
+	public Sphere_old(int subdivisions, Vector4f color, float radius)
 	{
 		this.vertexColor = color;
 		this.radius = radius;
-				
+
 		update(subdivisions);
 	}
 
@@ -62,44 +67,40 @@ public class Sphere_new extends GameObject3D
 		vertexData.clear();
 		
 		createOctahedron(resolution);	
+		normalizeVerticesAndCreateNormals();
 		createUVs();
 		applyMeshModifications();
 		addVertexDataToGameObject();
-	}
-
-	/**
-	 * Gives a value between 0 and 1 that depends on the distance between a
-	 * point and the sphere. Can be used to compute a subdivision that looks
-	 * "okay" from a given point. The distance gets clamped to a max value.
-	 * 
-	 * @param distanceToSphere
-	 * @return value between 0 and 1
-	 */
-	public float getSubdivisionCoefficient(float distanceToSphere)
-	{
-		// distances over 100 don't affect the planets resolution
-		float maxDistance = 100;
-		distanceToSphere = distanceToSphere > maxDistance ? maxDistance
-				: distanceToSphere;
-
-		float subdivisionCoefficient = (maxDistance - distanceToSphere) / 100;
-
-		// (100 - x) ^ 5 / (100 ^ 5)
-		float curveSlope = 3f;
-		subdivisionCoefficient = (float) (Math.pow(maxDistance
-				- distanceToSphere, curveSlope) / Math.pow(maxDistance,
-				curveSlope));
-
-		return subdivisionCoefficient;
+		createVAO();
 	}
 	
-	public void applyMeshModifications()
+	public void normalizeVerticesAndCreateNormals()
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{
 			vertices[i].normalise();
-			vertices[i].scale(radius);
-			normals[i] = (Vector3f) new Vector3f(vertices[i]).normalise();
+
+			normals[i] = (Vector3f) new Vector3f(vertices[i]);
+		}
+	}
+	
+	public void applyMeshModifications()
+	{	
+		for(int i = 0; i < vertices.length; i++)
+		{		
+			double x = vertices[i].x;
+			double y = vertices[i].y;
+			double z = vertices[i].z;
+			
+			// Planetary stuff happens here.
+			float frequencyScale = 0.75f;
+			int octaves = 5;
+			
+			/*
+			double noise = engine.utils.CustomNoise.overlayNoise(x, y, z, octaves, frequencyScale);
+			double height = Math.cos(x + noise);
+			*/
+			vertices[i].scale((float) (radius));
 		}
 	}
 
@@ -215,7 +216,7 @@ public class Sphere_new extends GameObject3D
 	}
 	
 	private void createUVs()
-	{
+	{			
 		float previousX = 1f;
 		
 		for (int i = 0; i < vertices.length; i++)
@@ -229,7 +230,7 @@ public class Sphere_new extends GameObject3D
 			previousX = vector.x;
 			
 			Vector2f texCoords = new Vector2f();
-			texCoords.x = (float)Math.atan2(vector.x, vector.y) / (-2f * (float)Math.PI);
+			texCoords.x = (float)Math.atan2(vector.x, vector.z) / (-2f * (float)Math.PI);
 			
 			if(texCoords.x < 0)
 			{
@@ -248,51 +249,8 @@ public class Sphere_new extends GameObject3D
 	private void addVertexDataToGameObject()
 	{
 		for(int i = 0; i < vertices.length; i++)
-		{
+		{			
 			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
 		}
-	}
-}
-
-class GraphNode{
-	int depth, subdivisions;
-	Vector3f v1, v2, v3;
-	GraphNode child1, child2, child3, child4;
-	Vector3f faceNormal;
-	
-	public GraphNode(int currentDepth, int subdivisions, Vector3f point1, Vector3f point2, Vector3f point3){
-		depth = currentDepth;
-		this.subdivisions = subdivisions; 
-		v1 = point1;
-		v2 = point2;
-		v3 = point3;
-	
-		if(isVisible()){
-			if(depth >= subdivisions){
-				//to array - siehe sphere
-			}
-			else{
-				createChildren();
-			}
-		}
-	}
-
-	private void createChildren() {
-		child1 = new GraphNode(depth + 1, subdivisions, v1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v1, v2, 0.5f));
-		child2 = new GraphNode(depth + 1, subdivisions, Vertex3D.lerp(v1, v2, 0.5f), v2, Vertex3D.lerp(v2, v3, 0.5f));
-		child3 = new GraphNode(depth + 1, subdivisions, Vertex3D.lerp(v1, v3, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), v3);
-		child4 = new GraphNode(depth + 1, subdivisions, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v3, v1, 0.5f));
-	}
-
-	private boolean isVisible() {
-		Vector3f lhs = new Vector3f();
-		Vector3f rhs = new Vector3f();
-		
-		Vector3f.sub(v2, v1, lhs);
-		Vector3f.sub(v3, v1, rhs);
-		Vector3f.cross(lhs, rhs, faceNormal);
-		
-		float angleTolerance = -10f; //in degrees
-		return Vector3f.angle(GameUtils.currentCam.getLookAt(), faceNormal) < Math.PI * (90 + angleTolerance) / 180;
 	}
 }
