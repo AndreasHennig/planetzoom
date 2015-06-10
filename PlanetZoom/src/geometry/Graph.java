@@ -61,6 +61,7 @@ public class Graph {
 		}
 
 		private void createChildren() {
+			// TODO: check for errors
 			new Node(depth + 1, v1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v1, v2, 0.5f));
 			new Node(depth + 1, Vertex3D.lerp(v1, v2, 0.5f), v2, Vertex3D.lerp(v2, v3, 0.5f));
 			new Node(depth + 1, Vertex3D.lerp(v1, v3, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), v3);
@@ -72,6 +73,8 @@ public class Graph {
 		}
 
 		private boolean isVisible() {
+			return true;
+			/*
 			Vector3f lhs = new Vector3f();
 			Vector3f rhs = new Vector3f();
 
@@ -90,6 +93,13 @@ public class Graph {
 			float angleTolerance = 0;//90 / (depth + 2);
 
 			return angle > 90 - angleTolerance && angle < 270 + angleTolerance;
+			
+			/*
+			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
+			 * jeden Punkt des Dreiecks
+			 * eventuell Rechnung vereinfachen
+			 * eventuell nur alle drei Tiefenstufen (%3)
+			 */
 		}
 	}
 }

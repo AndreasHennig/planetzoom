@@ -13,8 +13,8 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 0;
-	public final static int MIN_SUBDIVISIONS = 0;
+	public final static int MAX_SUBDIVISIONS = 1;
+	public final static int MIN_SUBDIVISIONS = 4;
 
 	private int subdivisions;
 	private float radius;
