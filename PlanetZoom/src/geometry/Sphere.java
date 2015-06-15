@@ -48,7 +48,7 @@ public class Sphere extends GameObject3D
 		this.subdivisions = subdivisions > MAX_SUBDIVISIONS ? MAX_SUBDIVISIONS : subdivisions;
 		this.subdivisions = subdivisions < MIN_SUBDIVISIONS ? MIN_SUBDIVISIONS : subdivisions;
 
-		nodes = graph.createGraph(subdivisions, cameraAngle);
+		nodes = graph.createGraph(this.subdivisions, cameraAngle);
 		
 		vertices = new Vector3f[nodes.size() * 3];
 		normals = new Vector3f[vertices.length];

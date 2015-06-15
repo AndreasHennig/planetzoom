@@ -11,7 +11,7 @@ public class Graph {
 	int subdivisions;
 	Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
 	ArrayList<Node> nodes;
-
+		
 	public ArrayList<Node> createGraph(int subdivisions, Vector3f cameraAngle) {
 	
 		this.subdivisions = subdivisions;
@@ -28,6 +28,8 @@ public class Graph {
 		new Node(0, Vertex3D.down(), Vertex3D.back(), Vertex3D.right()); 	// back, down, right
 		new Node(0, Vertex3D.down(), Vertex3D.left(), Vertex3D.back()); 	// back, down, left
 		
+		System.out.print("Should have: " + 8 * Math.pow(4, subdivisions) + " | " );
+		System.out.println("Has: " + nodes.size());
 		return nodes;
 	}
 
@@ -38,6 +40,7 @@ public class Graph {
 
 		public Node(int currentDepth, Vector3f point1, Vector3f point2, Vector3f point3) {
 			depth = currentDepth;
+			//counter-clockwise
 			v1 = point1;
 			v2 = point2;
 			v3 = point3;
@@ -61,11 +64,10 @@ public class Graph {
 		}
 
 		private void createChildren() {
-			// TODO: check for errors
-			new Node(depth + 1, v1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v1, v2, 0.5f));
-			new Node(depth + 1, Vertex3D.lerp(v1, v2, 0.5f), v2, Vertex3D.lerp(v2, v3, 0.5f));
-			new Node(depth + 1, Vertex3D.lerp(v1, v3, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), v3);
-			new Node(depth + 1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v3, v1, 0.5f));
+			new Node(depth + 1, v1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v2, v3, 0.5f)); //top
+			new Node(depth + 1, v2, Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v1, v2, 0.5f)); //left
+			new Node(depth + 1, v3, Vertex3D.lerp(v1, v3, 0.5f), Vertex3D.lerp(v2, v3, 0.5f)); //right
+			new Node(depth + 1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v1, v3, 0.5f)); //center
 		}
 
 		private void addNodeToArrayList() {
