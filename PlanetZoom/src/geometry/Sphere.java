@@ -96,7 +96,7 @@ public class Sphere extends GameObject3D
 			float frequencyScale = 0.75f;
 			int octaves = 5;
 			
-			double noise = engine.utils.CustomNoise.overlayNoise(x, y, z, octaves, frequencyScale);
+			double noise = engine.utils.CustomNoise.perlinNoise(x, y, z, octaves, frequencyScale);
 			double height = Math.cos(x + noise);
 			
 			vertices[i].scale((float) (radius + height));
