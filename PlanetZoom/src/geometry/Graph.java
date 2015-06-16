@@ -28,9 +28,6 @@ public class Graph {
 		new Node(0, Vertex3D.down(), Vertex3D.back(), Vertex3D.right()); 	// back, down, right
 		new Node(0, Vertex3D.down(), Vertex3D.left(), Vertex3D.back()); 	// back, down, left
 		
-		
-		System.out.print("Should have: " + 8 * Math.pow(4, subdivisions) + " | " );
-		System.out.println("Has: " + nodes.size());
 		return nodes;
 	}
 

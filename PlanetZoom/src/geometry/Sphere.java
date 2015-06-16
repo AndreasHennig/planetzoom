@@ -3,7 +3,6 @@
 package geometry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -13,8 +12,8 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 1;
-	public final static int MIN_SUBDIVISIONS = 3;
+	public final static int MAX_SUBDIVISIONS = 3;
+	public final static int MIN_SUBDIVISIONS = 1;
 
 	private int subdivisions;
 	private float radius;
@@ -81,7 +80,6 @@ public class Sphere extends GameObject3D
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 		}
-		//System.out.println(metaIndex / 3);
 	}
 	
 	public int getTriangleCount(){

@@ -105,7 +105,7 @@ public class Game implements IGame {
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 
-		planet.update(planetCamDistance, false);
+		planet.update(camera, planetCamDistance, false);
 
 		glUseProgram(toonShader.getId());
 
@@ -119,7 +119,7 @@ public class Game implements IGame {
 		glUseProgram(0);
 
 		// 2D Rendering.
-		hud.update(this.camera.getPosition(), camera.getLookAt(), planetCamDistance, 0);
+		hud.update(this.camera.getPosition(), camera.getLookAt(), planetCamDistance, planet.getTriangleCount());
 
 		glUseProgram(hudShader.getId());
 
