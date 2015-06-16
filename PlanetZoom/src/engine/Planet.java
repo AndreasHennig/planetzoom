@@ -35,7 +35,8 @@ public class Planet
 
 	public void update(int subdivisions)
 	{
-		sphere.update(subdivisions, GameUtils.currentCam.getLookAt()); //where to apply cam? 
+		sphere.update(subdivisions, new Vector3f());
+		//sphere.update(subdivisions, GameUtils.currentCam.getLookAt()); //where to apply cam? 
 	}
 
 	public void update(float planetCamDistance, boolean adjustCamSpeed)
