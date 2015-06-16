@@ -11,11 +11,10 @@ public class Renderer
 		init();
 	}		
 	
-	public void renderGameObject(GameObject gameObject, Texture texture, int shaderID, int renderMode)
+	public void renderGameObject(GameObject gameObject, Texture texture, int renderMode)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		glUseProgram(shaderID);
 		
 		if(texture != null)
 			texture.bind();
@@ -25,7 +24,6 @@ public class Renderer
         //Clean up
 		if(texture != null)
 			texture.unbind();
-		glUseProgram(0);
 	}
 	
 	private void init()
