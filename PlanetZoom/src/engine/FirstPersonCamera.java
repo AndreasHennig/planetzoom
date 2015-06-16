@@ -151,8 +151,9 @@ public class FirstPersonCamera implements ICamera
 	}
 
 	@Override
-	public Vector3f getLookAt() {
-		// TODO Auto-generated method stub - Mr David Schmöcker plz
+	public Vector3f getLookAt()
+	{
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

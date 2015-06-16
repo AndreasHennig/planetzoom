@@ -3,16 +3,13 @@ package engine;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import Peter.TextureUsingPNGDecoder;
+import engine.utils.Texture;
 
 public abstract class GameObject
 {
-	protected TextureUsingPNGDecoder texture;
 	protected int[] indices;
-	protected int shaderID;
 	protected Matrix4f modelMatrix;
 	protected VertexArrayObject vao;
 	
@@ -24,9 +21,6 @@ public abstract class GameObject
 		
 	public void draw(int mode)
 	{
-		if(texture != null)
-			texture.bind();
-		
     	vao.bind();
 
         enableVertexAttributeArrays();
@@ -34,11 +28,7 @@ public abstract class GameObject
          
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
-        
-        //Clean up
-		if(texture != null)
-			texture.unbind();
-        
+      
 		disableVertexAttributeArrays();
         vao.unbind();
 	}
@@ -61,16 +51,6 @@ public abstract class GameObject
         GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
 	}
 	
-	public TextureUsingPNGDecoder getTexture()
-	{
-		return texture;
-	}
-
-	public void setTexture(TextureUsingPNGDecoder textTexture)
-	{
-		this.texture = textTexture;
-	}
-	
 	public int[] getIndices()
 	{
 		return indices;
@@ -89,18 +69,5 @@ public abstract class GameObject
 	public void setModelMatrix(Matrix4f modelMatrix)
 	{
 		this.modelMatrix = modelMatrix;
-	}
-	
-	public int getShaderID()
-	{
-		return shaderID;
-	}
-	
-	public void setShaderID(int shaderID)
-	{
-		this.shaderID = shaderID;
-	}
-	
-	
-	
+	}	
 }
