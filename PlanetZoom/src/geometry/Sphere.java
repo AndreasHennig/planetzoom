@@ -18,8 +18,8 @@ public class Sphere extends GameObject3D
 	private int subdivisions;
 	private float radius;
 	
-	Graph graph;
-	ArrayList<Graph.Node> nodes;
+	private SphereGraph graph;
+	private ArrayList<SphereGraph.TriangleNode> nodes;
 	
 	private Vector3f[] vertices;
 	private Vector3f[] normals; 
@@ -33,7 +33,7 @@ public class Sphere extends GameObject3D
 	public Sphere(float radius)
 	{
 		this.radius = radius;
-		graph = new Graph();
+		graph = new SphereGraph();
 	}
 
 	public float getRadius()
@@ -66,7 +66,7 @@ public class Sphere extends GameObject3D
 		
 		for(int i = 0; i < nodes.size(); i++)
 		{
-			Graph.Node currentNode = nodes.get(i);
+			SphereGraph.TriangleNode currentNode = nodes.get(i);
 			
 			vertexData.add(new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy));
 			indices[metaIndex] = metaIndex;
