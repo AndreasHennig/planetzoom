@@ -18,7 +18,6 @@ public class GameObject2D extends GameObject
 		this.vertices = vertices;
 		this.indices = indices;
 	}
-	
 
 	public ArrayList<Vertex2D> getVertices()
 	{
