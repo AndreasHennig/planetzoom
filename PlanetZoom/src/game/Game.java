@@ -20,6 +20,7 @@ import engine.IGame;
 import engine.Info;
 import engine.Planet;
 import engine.Renderer;
+import engine.Timer;
 import engine.utils.GameUtils;
 import engine.utils.MatrixUtils;
 import engine.utils.Texture;
@@ -119,7 +120,7 @@ public class Game implements IGame {
 		glUseProgram(0);
 
 		// 2D Rendering.
-		hud.update(this.camera.getPosition(), camera.getLookAt(), planetCamDistance, planet.getTriangleCount());
+		hud.update(this.camera.getPosition(), camera.getLookAt(), planetCamDistance, game.timer.getFPS());
 
 		glUseProgram(hudShader.getId());
 

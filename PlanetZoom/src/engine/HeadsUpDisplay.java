@@ -7,7 +7,7 @@ public class HeadsUpDisplay
 	private Vector3f cameraPosition;
 	private Vector3f cameraLookAt;
 	private float distanceToPlanetSurface;
-	private int triangleCount;
+	private int fps;
 	
 	private static final int STANDARD_POSITION_X = 0;
 	private static final int STANDARD_POSITION_Y = 0;
@@ -32,35 +32,36 @@ public class HeadsUpDisplay
 		this.font = font;
 	}
 	
-	public HeadsUpDisplay(int x, int y, String font, Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int triangleCount)
+	public HeadsUpDisplay(int x, int y, String font, Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int fps)
 	{
 	    	this(x, y, font);
 		this.cameraPosition = cameraPosition;
 		this.cameraLookAt = cameraLookAt;
 		this.distanceToPlanetSurface = distanceToPlanet;
-		this.triangleCount = triangleCount;  
+		this.fps = fps;  
 		
 		text = new Text2D(getHUDText(), font, position_x, position_y, 16);
 	
 	}
 	
-	public void update(Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int triangleCount)
+	public void update(Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int fps)
 	{
 		this.cameraPosition = cameraPosition;
 		this.cameraLookAt = cameraLookAt;
 		this.distanceToPlanetSurface = distanceToPlanet;
-		this.triangleCount = triangleCount;  
+		this.fps = fps;  
 		
 		text.update(getHUDText());
 	}
 	
 	private String getHUDText()
 	{
-	    return String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nTriangle count: %d",
+		return String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nFPS: %d",
 			cameraPosition.x, cameraPosition.y, cameraPosition.z, 
 			cameraLookAt.x, cameraLookAt.y, cameraLookAt.z,
 			distanceToPlanetSurface,
-			triangleCount);
+			fps
+			);
 	}
 	public Text2D getMesh()
 	{
