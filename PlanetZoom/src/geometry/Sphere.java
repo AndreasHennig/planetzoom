@@ -12,7 +12,7 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 5;
+	public final static int MAX_SUBDIVISIONS = 7;
 	public final static int MIN_SUBDIVISIONS = 1;
 
 	private int subdivisions;
@@ -82,7 +82,6 @@ public class Sphere extends GameObject3D
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 		}
-		System.out.println(vertexData.size());
 	}
 	
 	public int getTriangleCount(){
