@@ -1,0 +1,19 @@
+#version 410 
+#pragma debug(on)
+#pragma optimize(off)
+
+uniform sampler2D s;
+
+in DATA
+{
+	vec4 color;
+	vec2 uv;
+} pass_data;
+
+out vec4 out_Color;
+ 
+void main(void)
+{
+	out_Color = pass_data.color;
+	//out_Color =  (pass_data.color + texture(s, pass_data.uv)) / 2.0;
+}

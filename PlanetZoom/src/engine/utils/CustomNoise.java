@@ -18,6 +18,8 @@ public class CustomNoise {
 	 * Kleinere Werte -> "raueres" Rauschen
 	 * Hoehere Werte -> "weicheres" Rauschen
 	 * 
+	 * By changing the lambda of the first octave we can control the size of the continents.
+	 * 
 	 * Fractal Dimension
 	 * wtf?!
 	 * 
@@ -28,16 +30,54 @@ public class CustomNoise {
 	 * @param frequency
 	 * @return Value between 0 and 1.
 	 */
-	public static double perlinNoise(double x, double y, double z, int octaves, double frequencyScale) {
-		double noise = 0;
-		int n = octaves - 1;
+	public static double perlinNoise(double x, double y, double z, 
+									 int octaves, double lambda, double amplitude) {
+		double sum = 0;
+		double maxAmp = 0;
+		double poweredOctave;
+		double octaveAmplitude;
+		double octaveLambda;
+		double add;
 		
-		for(double i = 0; i < n; i++) {
-			double lacunarity = Math.pow(2, i);
-			double persistence = i / 2;
-			noise += (float) (engine.utils.SimplexNoise.noise(x * lacunarity, y * lacunarity, z * lacunarity) / persistence);
+		for(double octave = 1; octave <= octaves; octave++) {
+			// speed up 2^x via bit shift?
+			poweredOctave = Math.pow(2, octave);
+			
+			octaveAmplitude = amplitude / poweredOctave;
+			octaveLambda = lambda / poweredOctave;
+			
+			// TODO: Perlin Noise Ridged Multifractal
+			
+			// Perlin Noise Ridget
+//			add = (engine.utils.SimplexNoise.noise(x / octaveLambda, y / octaveLambda, z / octaveLambda));
+//			
+//			System.out.println(add);
+//			
+//			if (add > 0) {
+//				add = -1 * add + 1;
+//			} else {
+//				add = add + 1;
+//			}
+
+			// Perlin Noise Multi Fractal
+			add = (engine.utils.SimplexNoise.noise(x / octaveLambda, y / octaveLambda, z / octaveLambda) * octaveAmplitude);
+
+//			if (octave > 1) {
+//				// Add *= [constant] * Sum;
+//				// Konstante wird verwendet um den Bereich der Anhebung zu steuern
+//				add = add * 1.75 * sum;
+////				
+//
+////				maxAmp += octaveAmplitude * 1 * (sum != 0 ? sum : 1);
+//			} else {
+//				maxAmp += octaveAmplitude;
+//			}
+			
+			sum += add;
+			
+//			sum += (add * octaveAmplitude);
 		}
 		
-		return noise;
+		return sum;
 	}
 }

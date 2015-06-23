@@ -12,15 +12,16 @@ import engine.utils.CustomNoise;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 10;
-	public final static int MIN_SUBDIVISIONS = 1;
+	public final static int MAX_SUBDIVISIONS = 7;
+	public final static int MIN_SUBDIVISIONS = 7;
 	
 	private int subdivisions;
 	private float radius;
 
 	private Vector3f[] vertices;
-	private Vector3f[] normals; 
+	private Vector3f[] normals;
 	private Vector2f[] uv;
+	private Vector4f[] colors;
 	private Vector4f vertexColor;
 
 	public float getRadius()
@@ -28,13 +29,20 @@ public class Sphere extends GameObject3D
 		return radius;
 	}
 
+	public Vector4f[] getColors() {
+		return colors;
+	}
+	
+	public int getSubdivision() {
+		return subdivisions;
+	}
+	
 	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
 			Vertex3D.right(), Vertex3D.front() };
 
 	public Sphere()
 	{
 		this(1, new Vector4f(1, 1, 1, 1), 1);
-		createVAO();
 	}
 
 	public Sphere(int subdivisions, Vector4f color, float radius)
@@ -60,6 +68,7 @@ public class Sphere extends GameObject3D
 		vertices =  new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		normals = new Vector3f[vertices.length];
 		uv = new Vector2f[vertices.length];
+		colors = new Vector4f[vertices.length];
 
 		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
 
@@ -87,19 +96,11 @@ public class Sphere extends GameObject3D
 	public void applyMeshModifications()
 	{	
 		for(int i = 0; i < vertices.length; i++)
-		{		
-			double x = vertices[i].x;
-			double y = vertices[i].y;
-			double z = vertices[i].z;
+		{
+			// rgba
+//			colors[i] = new Vector4f(1, 1, 1, 1);
 			
-			// Planetary stuff happens here.
-			float frequencyScale = 0.75f;
-			int octaves = 5;
-			
-			double noise = engine.utils.CustomNoise.perlinNoise(x, y, z, octaves, frequencyScale);
-			double height = Math.cos(x + noise);
-			
-			vertices[i].scale((float) (radius + height));
+//			vertices[i].scale((float) (radius));
 		}
 	}
 
@@ -249,7 +250,8 @@ public class Sphere extends GameObject3D
 	{
 		for(int i = 0; i < vertices.length; i++)
 		{			
-			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
+//			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], vertexColor));
+			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i], colors[i]));
 		}
 	}
 }

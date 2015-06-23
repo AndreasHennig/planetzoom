@@ -36,6 +36,7 @@ public class Game implements IGame
 	//SHADERS
 	private ShaderProgram toonShader;
 	private ShaderProgram hudShader;
+	private ShaderProgram planetDebugShader;
 	
 	
     public static void main(String[] args)
@@ -53,7 +54,7 @@ public class Game implements IGame
         initShaders();
         camera = new FreeCamera(0.0f, 0.0f, 5.0f);
         renderer = new Renderer();
-        planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
+        planet = new Planet(4f, new Vector3f(0f, 0f, 0f));
     }
     
     /**
@@ -71,6 +72,7 @@ public class Game implements IGame
     {
 		hudShader = new ShaderProgram("HUDShader");
 		toonShader = new ShaderProgram("toonShader");
+		planetDebugShader = new ShaderProgram("planetDebugShader");
     }
 
     float sin = 0;
@@ -97,16 +99,18 @@ public class Game implements IGame
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
+		int shaderId = planetDebugShader.getId();
 		
-		glUseProgram(toonShader.getId());
-		ShaderProgram.loadUniformMat4f(toonShader.getId(), perspectiveProjectionMatrix, "projectionMatrix", false);
-		ShaderProgram.loadUniformMat4f(toonShader.getId(), viewMatrix, "modelViewMatrix", false);
-		ShaderProgram.loadUniformMat4f(toonShader.getId(), normalMatrix, "normalMatrix", true);
-		ShaderProgram.loadUniformVec3f(toonShader.getId(), camera.getPosition(), "cameraPosition");
-		ShaderProgram.loadUniform1f(toonShader.getId(), planet.getRadius(), "radius");
+		glUseProgram(shaderId);
+		
+		ShaderProgram.loadUniformMat4f(shaderId, perspectiveProjectionMatrix, "projectionMatrix", false);
+		ShaderProgram.loadUniformMat4f(shaderId, viewMatrix, "modelViewMatrix", false);
+		ShaderProgram.loadUniformMat4f(shaderId, normalMatrix, "normalMatrix", true);
+		ShaderProgram.loadUniformVec3f(shaderId, camera.getPosition(), "cameraPosition");
+		ShaderProgram.loadUniform1f(shaderId, planet.getRadius(), "radius");
 		glUseProgram(0);
 		
-		renderer.renderGameObject(planet.getMesh(), planetTexture, toonShader.getId(), GL_TRIANGLES);
+		renderer.renderGameObject(planet.getMesh(), planetTexture, shaderId, GL_TRIANGLES);
 		
 		glUseProgram(hudShader.getId());
 		Matrix4f orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), -game.getWindowHeight(), 0.0f, -1.0f, 1.0f);
