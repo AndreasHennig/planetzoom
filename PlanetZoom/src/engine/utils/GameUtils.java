@@ -6,7 +6,7 @@ import engine.ICamera;
 
 public class GameUtils 
 {
-	public static ICamera currentCam;
+	//public static ICamera currentCam;
 	//public static Timer timer; //?
 	
 	public static float getDistanceBetween(Vector3f position1, Vector3f position2 )

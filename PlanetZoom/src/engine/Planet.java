@@ -9,7 +9,6 @@ import geometry.Sphere;
 public class Planet {
 	private Sphere sphere;
 	private Vector3f position;
-	public Matrix4f modelMatrix;
 	
 	public float getRadius() {
 		return sphere.getRadius();
@@ -26,7 +25,6 @@ public class Planet {
 	public Planet(float radius, Vector3f position) {
 		this.position = position;
 		this.sphere = new Sphere();
-		modelMatrix = new Matrix4f();
 	}
 
 	public void update(ICamera camera, int subdivisions) {

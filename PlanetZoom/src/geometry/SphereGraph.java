@@ -5,19 +5,23 @@ import java.util.ArrayList;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import engine.utils.GameUtils;
+import engine.Info;
 
 public class SphereGraph {
 
 	private int subdivisions;
-	private Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
+	//private Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
 	private ArrayList<TriangleNode> nodes;
-	private Matrix4f modelViewProjectionMatrix;
-		
-	public ArrayList<TriangleNode> createGraph(int subdivisions, Vector3f cameraAngle) {
+	private Matrix4f modelViewProjectionMatrix = new Matrix4f();
 
+	public ArrayList<TriangleNode> createGraph(int subdivisions, Vector3f cameraAngle) {
+		modelViewProjectionMatrix = Matrix4f.mul(engine.Info.projectionMatrix, engine.Info.camera.getViewMatrix(), modelViewProjectionMatrix);
+		Matrix4f.mul(modelViewProjectionMatrix, Info.planet.getMesh().getModelMatrix(), modelViewProjectionMatrix);
+		
+		System.out.println(modelViewProjectionMatrix);
+		
 		this.subdivisions = subdivisions;
-		this.cameraAngle = cameraAngle;
+		//this.cameraAngle = cameraAngle;
 
 		nodes = new ArrayList<TriangleNode>();
 
@@ -75,6 +79,7 @@ public class SphereGraph {
 		}
 
 		private boolean isVisible() {
+			boolean isInView = false;
 			return true;
 			/*
 			Vector3f lhs = new Vector3f();

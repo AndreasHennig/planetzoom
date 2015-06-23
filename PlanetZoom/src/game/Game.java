@@ -20,19 +20,15 @@ import engine.IGame;
 import engine.Info;
 import engine.Planet;
 import engine.Renderer;
-import engine.Timer;
 import engine.utils.GameUtils;
 import engine.utils.MatrixUtils;
 import engine.utils.Texture;
 
 public class Game implements IGame {
 	private static CoreEngine game;
-	private ICamera camera;
 	private Renderer renderer;
 
 	private float fovParam = 45.0f;
-
-	private Info info;
 
 	// GAMEOBJECTS
 
@@ -55,19 +51,18 @@ public class Game implements IGame {
 	public void init() {
 		printVersionInfo();
 
-		camera = new FreeCamera(0.0f, 0.0f, 5.0f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 5.0f);
+		
+		Info.projectionMatrix = engine.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
+		
 		renderer = new Renderer();
-
+		
 		initTextures();
 		initShaders();
 		initGameObjects();
 
 		planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
-		initInfoObject();
-	}
-
-	private void initInfoObject() {
-		info = new Info(planet, camera);
+		Info.planet = planet;
 	}
 
 	/**
@@ -87,40 +82,37 @@ public class Game implements IGame {
 
 	private void initGameObjects() {
 		planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", this.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0, 0);
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0, 0);
 	}
 
 	@Override
 	public void update(int deltaTime) {
 		// 3D Rendering.
-		ICameraControl cameraControl = camera.getCameraControl();
-		this.camera = cameraControl.handleInput(deltaTime);
+		ICameraControl cameraControl = Info.camera.getCameraControl();
+		Info.camera = cameraControl.handleInput(deltaTime);
 
-		float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), camera.getPosition()) - planet.getRadius();
-		;
+		float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
 
-		Matrix4f perspectiveProjectionMatrix = MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
-		Matrix4f viewMatrix = camera.getViewMatrix();
 		Matrix4f modelViewMatrix = new Matrix4f();
-		Matrix4f.mul(planet.getMesh().getModelMatrix(), viewMatrix, modelViewMatrix);
+		Matrix4f.mul(planet.getMesh().getModelMatrix(), Info.camera.getViewMatrix(), modelViewMatrix);
 		Matrix4f normalMatrix = new Matrix4f();
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 
-		planet.update(camera, planetCamDistance, false);
+		planet.update(Info.camera, planetCamDistance, false);
 
 		glUseProgram(toonShader.getId());
 
-		toonShader.loadUniformMat4f(perspectiveProjectionMatrix, "projectionMatrix", false);
-		toonShader.loadUniformMat4f(viewMatrix, "modelViewMatrix", false);
+		toonShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+		toonShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 		toonShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-		toonShader.loadUniformVec3f(camera.getPosition(), "cameraPosition");
+		toonShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 		toonShader.loadUniform1f(planet.getRadius(), "radius");
 		renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
 
 		glUseProgram(0);
 
 		// 2D Rendering.
-		hud.update(this.camera.getPosition(), camera.getLookAt(), planetCamDistance, game.timer.getFPS());
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, game.timer.getFPS());
 
 		glUseProgram(hudShader.getId());
 
@@ -137,9 +129,5 @@ public class Game implements IGame {
 		System.out.println("GPU Vendor: " + glGetString(GL_VENDOR));
 		System.out.println("OpenGL version: " + glGetString(GL_VERSION));
 		System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
-	}
-
-	public Info getInfo() {
-		return info;
 	}
 }
