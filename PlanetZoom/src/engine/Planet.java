@@ -44,8 +44,12 @@ public class Planet {
 		// TODO: adjust cam speed with subdivisionCoefficient if adjustCamSpeed
 		// is true
 	}
-
-	public int getTriangleCount() {
-		return sphere.getTriangleCount();
+	
+	public int getTotalTriangleCount() {
+		return sphere.getTotalTriangleCount();
+	}
+	
+	public int getActualTriangleCount() {
+		return sphere.getActualTriangleCount();
 	}
 }

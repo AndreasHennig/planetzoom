@@ -82,7 +82,7 @@ public class Game implements IGame {
 
 	private void initGameObjects() {
 		planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0, 0);
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class Game implements IGame {
 		glUseProgram(0);
 
 		// 2D Rendering.
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, game.timer.getFPS());
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 
 		glUseProgram(hudShader.getId());
 
