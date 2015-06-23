@@ -40,7 +40,9 @@ public class SphereGraph {
 		private int depth;
 		public Vector3f v1, v2, v3;
 		public Vector3f faceNormal = new Vector3f();
-
+		private static final int CHECK_INTERVAL = 4;
+		private static final int FIRST_CHECK = 2;
+		
 		public TriangleNode(int currentDepth, Vector3f point1, Vector3f point2, Vector3f point3) {
 			depth = currentDepth;
 			//counter-clockwise
@@ -78,13 +80,14 @@ public class SphereGraph {
 		}
 
 		private boolean isVisible() {
-			/*
-			if (depth % 4 == 2){
+			
+			
+			if (depth % CHECK_INTERVAL == FIRST_CHECK){
 				boolean isInViewFrustum = isInViewFrustum();
 				boolean isFacingTowardsCamera = isFacingTowardsCamera();
 				return isInViewFrustum && isFacingTowardsCamera;
 			}
-			else*/ return true;
+			else return true;
 		}
 
 		private boolean isInViewFrustum() {
@@ -95,7 +98,6 @@ public class SphereGraph {
 			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
 			 * jeden Punkt des Dreiecks
 			 * eventuell Rechnung vereinfachen
-			 * eventuell nur alle drei Tiefenstufen (%3)
 			 */
 		}
 		
@@ -108,15 +110,10 @@ public class SphereGraph {
 			Vector3f.sub(v3, v1, rhs);
 			Vector3f.cross(lhs, rhs, faceNormal);
 			
-			
-			//System.out.println("cam: " + Info.camera.getLookAt());
-			//System.out.println("normal: " + faceNormal);
-			
 			double angle = Vector3f.angle(Info.camera.getLookAt(), faceNormal) * 180 / Math.PI;
 			
-			//System.out.println(angle);
-			
-			float angleTolerance = -10;//90 / (depth + 2);
+			float angleTolerance = 90 / (depth + 2); //as we go deeper, we need less tolerance 
+			//float angleTolerance = 0; //everything behind 90 degrees gets cut off. problems with noise?
 
 			return angle > 90 - angleTolerance && angle < 270 + angleTolerance;
 		}
