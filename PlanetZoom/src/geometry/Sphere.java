@@ -12,7 +12,7 @@ import engine.GameObject3D;
 
 public class Sphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 1;
+	public final static int MAX_SUBDIVISIONS = 5;
 	public final static int MIN_SUBDIVISIONS = 1;
 
 	private int subdivisions;
@@ -64,6 +64,8 @@ public class Sphere extends GameObject3D
 		Vector2f uvDummy = new Vector2f(0, 0);
 		Vector4f colorDummy = new Vector4f(1,1,1,1);
 		
+		vertexData.clear();
+		
 		for(int i = 0; i < nodes.size(); i++)
 		{
 			SphereGraph.TriangleNode currentNode = nodes.get(i);
@@ -80,6 +82,7 @@ public class Sphere extends GameObject3D
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 		}
+		System.out.println(vertexData.size());
 	}
 	
 	public int getTriangleCount(){
