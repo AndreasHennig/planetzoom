@@ -79,7 +79,7 @@ public class SphereGraph {
 		}
 
 		private boolean isVisible() {
-			boolean isInView = false;
+			//boolean isInView = false;
 			return true;
 			/*
 			Vector3f lhs = new Vector3f();
