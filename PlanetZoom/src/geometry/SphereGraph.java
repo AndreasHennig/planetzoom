@@ -93,25 +93,25 @@ public class SphereGraph {
 		private boolean isInViewFrustum() {
 			// TODO Auto-generated method stub
 			return true;
-			
+
 			/*
 			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
 			 * jeden Punkt des Dreiecks
 			 * eventuell Rechnung vereinfachen
 			 */
 		}
-		
+
 		private boolean isFacingTowardsCamera() {
-		
+
 			Vector3f lhs = new Vector3f();
 			Vector3f rhs = new Vector3f();
 
 			Vector3f.sub(v2, v1, lhs);
 			Vector3f.sub(v3, v1, rhs);
 			Vector3f.cross(lhs, rhs, faceNormal);
-			
+
 			double angle = Vector3f.angle(Info.camera.getLookAt(), faceNormal) * 180 / Math.PI;
-			
+
 			float angleTolerance = 90 / (depth + 2); //as we go deeper, we need less tolerance 
 			//float angleTolerance = 0; //everything behind 90 degrees gets cut off. problems with noise?
 
