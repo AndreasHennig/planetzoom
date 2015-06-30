@@ -1,0 +1,79 @@
+#version 330
+#pragma debug(on)
+#pragma optimize(off)
+
+in DATA
+{
+	vec3 viewDir;
+	vec3 position;
+	vec3 lightDir;
+	vec3 normal;
+	vec2 uv;
+} pass_data;
+
+uniform sampler2D s;
+uniform float radius;
+
+out vec4 out_Color;
+
+void main(void)
+{
+	vec4 heightColor;
+	float shadeMultiplier;
+	float intensity;
+	float height = length(pass_data.position) - radius;
+	float colorMod = abs(sin(height));
+
+	intensity = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
+
+
+	if(height > 0.6)
+	{
+		heightColor = vec4(0.87, 0.90, 0.89, 1.0);	//Snow
+	}
+	else if(height > 0.5)
+	{
+		heightColor = vec4(0.6, 0.56, 0.39, 1.0);	//Stone
+	}
+	else if(height > 0.45)
+	{
+		heightColor = vec4(0.22, 0.58, 0.28, 1.0);  //Grass
+	}
+	else if(height > 0.4)
+	{
+		heightColor = vec4(0.89, 0.78, 0.41, 1.0);  //Sand
+	}
+	else
+	{
+		heightColor = vec4(0.18, 0.42, 0.57, 1.0);  //Water
+	}
+
+	if(intensity > 0.4)
+	{
+		shadeMultiplier = 1.0;
+	}
+	else if(intensity > 0.2)
+	{
+		shadeMultiplier = 0.75;
+	}
+	else if(intensity > 0.1)
+	{
+		shadeMultiplier = 0.5;
+	}
+	else
+	{
+		shadeMultiplier = 0.2;
+	}
+
+	//if(dot(pass_data.viewDir, pass_data.normal) < -2.0)
+	//{
+		out_Color = (heightColor + colorMod) / 2.0;
+		out_Color *= shadeMultiplier;
+		out_Color.w = 1.0;
+	//}
+	//else
+	//{
+	//	out_Color = vec4(0.0, 0.0, 0.0, 1.0);
+	//}
+
+}

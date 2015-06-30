@@ -1,0 +1,12 @@
+#version 330 
+
+uniform sampler2D s;
+
+in vec2 uv;
+
+out vec4 out_Color;
+
+void main(void)
+{
+	out_Color =  texture(s, uv);
+}

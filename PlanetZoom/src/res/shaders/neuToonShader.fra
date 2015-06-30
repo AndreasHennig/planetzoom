@@ -1,0 +1,62 @@
+#version 330
+#pragma debug(on)
+#pragma optimize(off)
+
+in DATA
+{
+	vec3 position;
+	vec3 normal;
+	vec2 uv;
+	vec3 viewDir;
+	vec3 lightDir;
+	float seaLevel;
+} pass_data;
+
+uniform sampler2D s;
+uniform float radius;
+uniform float time;
+
+out vec4 out_Color;
+
+void main(void)
+{
+	vec4 heightColor;
+	float lightDiffuse = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
+	float height = length(pass_data.position) - radius;
+ 
+	vec4 textureColors = texture(s, pass_data.uv);
+
+	if(height > pass_data.seaLevel+ 0.15)
+	{
+		heightColor = vec4(0.87, 0.90, 0.89, 1.0);	//Snow
+	}
+	else if(height > pass_data.seaLevel+ 0.09)
+	{
+		heightColor = vec4(0.6, 0.56, 0.39, 1.0);	//Stone
+	}
+	else if(height > pass_data.seaLevel+ 0.02)
+	{
+		heightColor = vec4(0.22, 0.58, 0.28, 1.0);  //Grass
+	}
+	else if(height > pass_data.seaLevel+ 0.01)
+	{
+		heightColor = vec4(0.89, 0.78, 0.41, 1.0);  //Sand
+	}
+	else
+	{
+		heightColor = vec4(0.18, 0.42, 0.57, 1.0);  //Water
+		//TODO: add specular term!
+	}
+	
+	
+	if(dot(pass_data.viewDir, pass_data.normal) < mix(0.5, 0.1, max(0.0, dot(pass_data.normal, pass_data.lightDir))))
+	{
+		out_Color = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+	else
+	{
+		out_Color = (heightColor + textureColors) / 2.0;
+		out_Color.xyz *= lightDiffuse;
+	}
+}
+
