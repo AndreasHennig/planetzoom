@@ -135,7 +135,7 @@ public class Game implements IGame
 		modelViewMatrix = new Matrix4f();
 		Matrix4f.mul(planet.getAtmosphere().getSphere().getModelMatrix(), Info.camera.getViewMatrix(), modelViewMatrix);
 		
-
+//		System.out.println(planet.getAtmosphere().getSphere().getRadius());
 		glFrontFace(GL_CW);
 		glUseProgram(atmosphereShader.getId());
 		planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);

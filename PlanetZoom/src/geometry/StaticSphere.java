@@ -8,9 +8,6 @@ import engine.GameObject3D;
 
 public class StaticSphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 5;
-	public final static int MIN_SUBDIVISIONS = 4;
-	private int subdivisions;
 	private float radius;
 	private Vector3f[] vertices;
 	private Vector3f[] normals;
@@ -31,25 +28,12 @@ public class StaticSphere extends GameObject3D
 	public StaticSphere(int subdivisions, float radius)
 	{
 		this.radius = radius;
-		update(subdivisions);
-	}
-
-	public void update(int subdivisions)
-	{
-		if (subdivisions == this.subdivisions)
-		{
-			return;
-		}
-		this.subdivisions = subdivisions > MAX_SUBDIVISIONS ? MAX_SUBDIVISIONS
-				: subdivisions;
-		int resolution = 1 << this.subdivisions;
-		vertices = new Vector3f[(resolution + 1) * (resolution + 1) * 4
-				- (resolution * 2 - 1) * 3];
+		int resolution = 1 << subdivisions;
+		vertices = new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
 		normals = new Vector3f[vertices.length];
 		uv = new Vector2f[vertices.length];
-		indices = new int[(1 << (this.subdivisions * 2 + 3)) * 3];
-		// very slow!! TO FIX
-		vertexData.clear();
+		indices = new int[(1 << (subdivisions * 2 + 3)) * 3];
+	
 		createOctahedron(resolution);
 		normalizeVerticesAndCreateNormals();
 		createUVs();
@@ -58,6 +42,12 @@ public class StaticSphere extends GameObject3D
 	
 		createVAO();
 	}
+	
+	private void init()
+	{
+		
+	}
+
 
 	public void normalizeVerticesAndCreateNormals()
 	{
@@ -71,17 +61,7 @@ public class StaticSphere extends GameObject3D
 	public void applyMeshModifications()
 	{
 		for(int i = 0; i < vertices.length; i++)
-		{
-			double x = vertices[i].x;
-			double y = vertices[i].y;
-			double z = vertices[i].z;
-			// Planetary stuff happens here.
-			float frequencyScale = 0.5f;
-			int octaves = 5;
-
-
 			vertices[i].scale((float) (radius));
-		}
 	}
 	
 	private void createOctahedron(int resolution)

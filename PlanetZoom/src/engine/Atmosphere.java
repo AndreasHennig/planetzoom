@@ -16,7 +16,7 @@ public class Atmosphere
 	private StaticSphere sphere;
 	private Vector3f position;
 	
-	private static final int ATMOSPHERE_SPHERE_SUBDIVISIONS = 4; 
+	private static final int ATMOSPHERE_SPHERE_SUBDIVISIONS = 6; 
 //	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.025f;
 	
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
