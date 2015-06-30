@@ -60,7 +60,7 @@ public class Game implements IGame {
 		initShaders();
 		initGameObjects();
 
-		planet = new Planet(12000, new Vector3f(0f, 0f, 0f));
+		planet = new Planet(6000, new Vector3f(0f, 0f, 0f));
 		Info.planet = planet;
 	}
 
