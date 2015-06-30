@@ -8,7 +8,7 @@ import engine.GameObject3D;
 
 public class StaticSphere extends GameObject3D
 {
-	public final static int MAX_SUBDIVISIONS = 4;
+	public final static int MAX_SUBDIVISIONS = 5;
 	public final static int MIN_SUBDIVISIONS = 4;
 	private int subdivisions;
 	private float radius;
@@ -18,10 +18,6 @@ public class StaticSphere extends GameObject3D
 
 	private final static Vector4f vertexColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 	
-	public float getRadius()
-	{
-		return radius;
-	}
 
 	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
 			Vertex3D.right(), Vertex3D.front() };
@@ -57,7 +53,9 @@ public class StaticSphere extends GameObject3D
 		createOctahedron(resolution);
 		normalizeVerticesAndCreateNormals();
 		createUVs();
+		applyMeshModifications();
 		addVertexDataToGameObject();
+	
 		createVAO();
 	}
 
@@ -70,6 +68,22 @@ public class StaticSphere extends GameObject3D
 		}
 	}
 
+	public void applyMeshModifications()
+	{
+		for(int i = 0; i < vertices.length; i++)
+		{
+			double x = vertices[i].x;
+			double y = vertices[i].y;
+			double z = vertices[i].z;
+			// Planetary stuff happens here.
+			float frequencyScale = 0.5f;
+			int octaves = 5;
+
+
+			vertices[i].scale((float) (radius));
+		}
+	}
+	
 	private void createOctahedron(int resolution)
 	{
 		int v = 0;
@@ -200,5 +214,10 @@ public class StaticSphere extends GameObject3D
 		{
 			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i],	vertexColor));
 		}
+	}
+	
+	public float getRadius()
+	{
+		return radius;
 	}
 }

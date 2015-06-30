@@ -67,7 +67,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 5.0f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 20000f);
 		
 		Info.projectionMatrix = engine.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), -game.getWindowHeight(), 0.0f, -1.0f, 1.0f);
@@ -77,7 +77,6 @@ public class Game implements IGame
 		initTextures();
 		initShaders();
 		initGameObjects();
-
 
 		Info.planet = planet;
 	}
@@ -102,9 +101,9 @@ public class Game implements IGame
 
 	private void initGameObjects() 
 	{
-		planet = new Planet(10f, new Vector3f(0f, 0f, 0f));
+		planet = new Planet(6000.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
-		sun = new Sun(new Vector3f(-100.0f, 0.0f, 00.0f));
+		sun = new Sun(new Vector3f(-100000.0f, 0.0f, 0.0f));
 	}
 
 	@Override
@@ -133,10 +132,10 @@ public class Game implements IGame
 		renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
 		glUseProgram(0);
 		
+		modelViewMatrix = new Matrix4f();
 		Matrix4f.mul(planet.getAtmosphere().getSphere().getModelMatrix(), Info.camera.getViewMatrix(), modelViewMatrix);
 		
-		System.out.println("PlanetRadius: " + planet.getRadius());
-		System.out.println("AtmosphereRadius: " + planet.getAtmosphere().getSphere().getRadius());
+
 		glFrontFace(GL_CW);
 		glUseProgram(atmosphereShader.getId());
 		planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
@@ -150,7 +149,7 @@ public class Game implements IGame
 		atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
 		atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 		atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
-		renderer.renderGameObject(planet.getAtmosphere().getSphere(), planetTexture, GL_TRIANGLES);
+		renderer.renderGameObject(planet.getAtmosphere().getSphere(), null, GL_TRIANGLES);
 		glUseProgram(0);
 		glFrontFace(GL_CCW);
 		

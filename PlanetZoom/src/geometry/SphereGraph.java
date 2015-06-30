@@ -17,9 +17,9 @@ public class SphereGraph {
 	public ArrayList<TriangleNode> createGraph(int subdivisions, Vector3f cameraAngle) {
 		modelViewProjectionMatrix = Matrix4f.mul(engine.Info.projectionMatrix, engine.Info.camera.getViewMatrix(), modelViewProjectionMatrix);
 		Matrix4f.mul(modelViewProjectionMatrix, Info.planet.getMesh().getModelMatrix(), modelViewProjectionMatrix);
-		
+
 //		System.out.println(modelViewProjectionMatrix);
-		
+
 		this.subdivisions = subdivisions;
 
 		nodes = new ArrayList<TriangleNode>();

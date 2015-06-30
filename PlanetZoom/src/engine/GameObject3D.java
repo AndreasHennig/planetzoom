@@ -1,5 +1,6 @@
 package engine;
 
+import geometry.Vertex;
 import geometry.Vertex3D;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class GameObject3D extends GameObject
 	public GameObject3D()
 	{
 		super();
-		this.vertexData= new ArrayList<Vertex3D>();
+		this.vertexData = new ArrayList<Vertex3D>();
 	}
 	
 	public GameObject3D(ArrayList<Vertex3D> vertices, int[] indices)
@@ -38,5 +39,4 @@ public class GameObject3D extends GameObject
 	{
 		this.vao = new VertexArrayObject(this);
 	}	
-	
 }

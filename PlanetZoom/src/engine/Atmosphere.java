@@ -17,7 +17,7 @@ public class Atmosphere
 	private Vector3f position;
 	
 	private static final int ATMOSPHERE_SPHERE_SUBDIVISIONS = 4; 
-	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.025f;
+//	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.025f;
 	
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
 	private static final float RAYLEIGH_SCATTERING = 0.0025f;		// Rayleigh scattering constant (Kr)
@@ -43,7 +43,7 @@ public class Atmosphere
 	
 	public Atmosphere(Planet planet)
 	{
-		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() + ATMOSPHERE_PLANET_DISTANCE);
+		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() * 1.025f);
 		position = planet.getPosition();	
 		setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 	}

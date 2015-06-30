@@ -9,10 +9,12 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
+import engine.IGameObjectListener;
+import engine.utils.CustomNoise;
 
 public class Sphere extends GameObject3D {
-	public final static int MAX_SUBDIVISIONS = 8;
-	public final static int MIN_SUBDIVISIONS = 1;
+	public final static int MAX_SUBDIVISIONS = 5;
+	public final static int MIN_SUBDIVISIONS = 5;
 
 	private int subdivisions;
 	private float radius;
@@ -41,8 +43,9 @@ public class Sphere extends GameObject3D {
 
 	public void update(int subdivisions, Vector3f cameraAngle)
 	{
-		this.subdivisions = subdivisions > MAX_SUBDIVISIONS ? MAX_SUBDIVISIONS : subdivisions;
-		this.subdivisions = subdivisions < MIN_SUBDIVISIONS ? MIN_SUBDIVISIONS : subdivisions;
+		if(subdivisions > MAX_SUBDIVISIONS) this.subdivisions = MAX_SUBDIVISIONS;
+		else if (subdivisions < MIN_SUBDIVISIONS) this.subdivisions = MIN_SUBDIVISIONS;
+		else this.subdivisions = subdivisions;
 
 		nodes = graph.createGraph(this.subdivisions, cameraAngle);
 		
@@ -51,6 +54,7 @@ public class Sphere extends GameObject3D {
 		indices = new int[vertices.length];
 
 		addNodeDataToGameObject();
+		
 		createVAO();
 	}
 		
@@ -63,19 +67,30 @@ public class Sphere extends GameObject3D {
 		
 		vertexData.clear();
 		
+		Vertex3D v1, v2, v3;
+		
 		for(int i = 0; i < nodes.size(); i++)
 		{
 			SphereGraph.TriangleNode currentNode = nodes.get(i);
-			
-			vertexData.add(new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy));
+
+			v1 = new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy);
+			v1.getPosition().scale(radius);
+			notifyListeners(v1);
+			vertexData.add(v1);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 			
-			vertexData.add(new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal, colorDummy));
+			v2 = new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal, colorDummy);
+			v2.getPosition().scale(radius);
+			notifyListeners(v2);
+			vertexData.add(v2);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 			
-			vertexData.add(new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal, colorDummy));
+			v3 = new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal, colorDummy);
+			v3.getPosition().scale(radius);
+			notifyListeners(v3);
+			vertexData.add(v3);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 		}
