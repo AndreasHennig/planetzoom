@@ -88,7 +88,7 @@ public class Game implements IGame {
 
 	private void initGameObjects() {
 		planet = new Planet(3f, new Vector3f(0f, 0f, 0f));
-		sun = new Sun(new Vector3f(10.0f, 0.0f, 0.0f));
+		sun = new Sun(new Vector3f(-100.0f, 0.0f, 0.0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 	}
 
@@ -102,7 +102,7 @@ public class Game implements IGame {
 
 		float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
 
-		Matrix4f.mul(planet.getMesh().getModelMatrix(), Info.camera.getViewMatrix(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 
 		planet.update(Info.camera, planetCamDistance, false);
@@ -116,14 +116,14 @@ public class Game implements IGame {
 			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
 		glUseProgram(0);
 
-		Matrix4f.mul(sun.getModelMatrix(), Info.camera.getViewMatrix(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
 		
 		glUseProgram(sunShader.getId());
 			sunShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
 		glUseProgram(0);
-
+		
 		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 
 		glUseProgram(hudShader.getId());
