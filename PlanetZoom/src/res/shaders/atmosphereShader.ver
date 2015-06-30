@@ -1,7 +1,7 @@
 #version 330
 
 
-uniform vec3 lightPosition;
+uniform vec3 lightDirection;
 uniform vec3 cameraPosition;
 uniform vec3 inverseWavelength;
 
@@ -67,7 +67,7 @@ void main(void)
 	{
 		height = length(samplePoint);
 		depth = exp((fScale/scaleDepth) * (planetRadius - height));
-		lightAngle = dot(lightPosition, samplePoint) / height;
+		lightAngle = dot(lightDirection, samplePoint) / height;
 		cameraAngle = dot(ray, samplePoint) / height;
 		scatter = (startOffset + depth * (scale(lightAngle) - scale(cameraAngle))); 
 		attenuate = exp(-scatter * (inverseWavelength * rayleighScattering4Pi * mieScattering4Pi));

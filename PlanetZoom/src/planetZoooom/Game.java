@@ -49,6 +49,10 @@ public class Game implements IGame
 	private Matrix4f normalMatrix;
 	private Matrix4f orthographicProjectionMatrix;
 	
+	
+	private Vector3f lightDirection;
+	private float planetCamDistance;
+	
 	public static void main(String[] args) 
 	{
 		game = new CoreEngine(new Game());
@@ -68,7 +72,8 @@ public class Game implements IGame
 		orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), -game.getWindowHeight(), 0.0f, -1.0f, 1.0f);
 
 		renderer = new Renderer();		
-	
+		lightDirection = new Vector3f();
+		
 		initTextures();
 		initShaders();
 		initGameObjects();
@@ -105,7 +110,7 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 
-		float planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
+		planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
 
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
@@ -134,12 +139,14 @@ public class Game implements IGame
 		
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getSphere().getModelMatrix(), modelViewMatrix);
 		
+		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+		lightDirection.normalise();
 		glFrontFace(GL_CW);
 		glUseProgram(atmosphereShader.getId());
 		{
 			planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
 			atmosphereShader.loadUniform1f(GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()), "cameraHeight");
-			atmosphereShader.loadUniformVec3f((Vector3f) sun.getPosition().normalise(), "lightPosition");
+			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
 	//		atmosphereShader.loadUniform1f(planet.getAtmosphere().getSphere().getRadius() * 0.25f, "fScale");
