@@ -8,30 +8,22 @@ import engine.utils.GameUtils;
 import geometry.Sphere;
 import geometry.Vertex3D;
 
-public class Planet {
+public class Planet 
+{
 	private Sphere sphere;
 	private Vector3f position;
+	private Atmosphere atmosphere;
 	
-	public float getRadius() {
-		return sphere.getRadius();
-	}
-
-	public Vector3f getPosition() {
-		return position;
-	}
-
-	public GameObject3D getMesh() {
-		return sphere;
-	}
-
-	public Planet(float radius, Vector3f position) {
+	public Planet(float radius, Vector3f position) 
+	{
 		this.position = position;
 		this.sphere = new Sphere();
+		this.atmosphere = new Atmosphere(this);
 	}
-
-	public void update(ICamera camera, int subdivisions)
+	
+	public void update(int subdivisions)
 	{
-		sphere.update(subdivisions, camera.getLookAt());
+		sphere.update(subdivisions, Info.camera.getLookAt());
 		// where to apply cam?
 		
 		// TODO apply noise to sphere
@@ -52,24 +44,47 @@ public class Planet {
 		sphere.createVAO();
 	}
 
-	public void update(ICamera camera, float planetCamDistance, boolean adjustCamSpeed) {
+	public void update(float planetCamDistance, boolean adjustCamSpeed) 
+	{
 		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
 
 		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
 
 		// clamp
 		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
-		this.update(camera, subdivisions);
+		this.update(subdivisions);
 
 		// TODO: adjust cam speed with subdivisionCoefficient if adjustCamSpeed
 		// is true
 	}
 	
-	public int getTotalTriangleCount() {
+	public float getRadius() 
+	{
+		return sphere.getRadius();
+	}
+
+	public Vector3f getPosition() 
+	{
+		return position;
+	}
+
+	public Sphere getMesh() 
+	{
+		return sphere;
+	}
+	
+	public int getTotalTriangleCount() 
+	{
 		return sphere.getTotalTriangleCount();
 	}
 	
-	public int getActualTriangleCount() {
+	public int getActualTriangleCount() 
+	{
 		return sphere.getActualTriangleCount();
+	}
+	
+	public Atmosphere getAtmosphere()
+	{
+		return atmosphere;
 	}
 }

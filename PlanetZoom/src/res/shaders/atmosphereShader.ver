@@ -1,0 +1,90 @@
+#version 330
+
+
+uniform vec3 lightPosition;
+uniform vec3 cameraPosition;
+uniform vec3 inverseWavelength;
+
+uniform float mieScattering;
+uniform float mieScattering4Pi;
+uniform float rayleighScattering; 
+uniform float rayleighScattering4Pi;
+uniform float sampleRays;
+
+uniform float planetRadius;
+uniform float atmosphereRadius;
+uniform float cameraHeight;
+
+uniform float fScale;
+uniform float scaleDepth;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+layout (location = 0) in vec3 position; 
+layout (location = 1) in vec2 uv; 
+layout (location = 2) in vec3 normal; 
+layout (location = 3) in vec4 color; 
+
+out vec3 pass_color; 
+out vec3 pass_color2;
+out vec3 direction;
+
+// The scale equation calculated by Vernier's Graphical Analysis
+float scale(float fCos)
+{
+	float x = 1.0 - fCos;
+	return scaleDepth * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
+}
+
+void main(void)
+{						  
+	vec3 position = position.xyz;
+	vec3 ray = position - cameraPosition; //ray from camera to vertex
+	float rayLength = length(ray);
+	ray /= rayLength;
+	
+	
+	// Calculate the ray's starting position, then calculate its scattering offset
+	vec3 rayStart = cameraPosition;
+	float height = length(rayStart);
+	float depth = exp((fScale/scaleDepth) * (planetRadius - cameraHeight));
+	float startAngle = dot(ray, rayStart) / height;
+	float startOffset = depth * scale(startAngle);
+		
+	//loop variables
+	float sampleLength = rayLength / sampleRays;
+	float scaledLength = sampleLength * fScale;
+	vec3 sampleRay = ray * sampleLength;
+	vec3 samplePoint = rayStart + sampleRay * 0.5f;
+	
+	//loop through sample rays
+	vec3 frontColor = vec3(0.0, 0.0, 0.0);	
+	float scatter, lightAngle, cameraAngle;
+	vec3 attenuate;
+	
+	for(float i = 0; i < 3; i++)
+	{
+		height = length(samplePoint);
+		depth = exp((fScale/scaleDepth) * (planetRadius - height));
+		lightAngle = dot(lightPosition, samplePoint) / height;
+		cameraAngle = dot(ray, samplePoint) / height;
+		scatter = (startOffset + depth * (scale(lightAngle) - scale(cameraAngle))); 
+		attenuate = exp(-scatter * (inverseWavelength * rayleighScattering4Pi * mieScattering4Pi));
+		
+
+		
+		frontColor += attenuate * (depth * scaledLength);
+		samplePoint += sampleRay;
+
+	}
+	
+
+	
+	pass_color = frontColor * (inverseWavelength * rayleighScattering);
+	//pass_color = vec3(0.25, 0.4, 1);
+	pass_color2 = frontColor * mieScattering;
+	direction = cameraPosition - position;
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);	
+
+}

@@ -13,7 +13,7 @@ import engine.FreeCamera;
 public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
-	private float inputSensitivity = 0.01f;
+	private float inputSensitivity = 0.0025f;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{

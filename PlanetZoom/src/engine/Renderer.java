@@ -13,7 +13,7 @@ public class Renderer
 	
 	public void renderGameObject(GameObject gameObject, Texture texture, int renderMode)
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		
 		
 		if(texture != null)
@@ -30,7 +30,7 @@ public class Renderer
     {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }    
