@@ -79,7 +79,6 @@ public class Sphere extends GameObject3D {
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 		}
-		System.out.println(vertexData.size());
 	}
 	
 	public int getTriangleCount(){
