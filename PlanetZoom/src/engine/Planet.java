@@ -8,44 +8,36 @@ import geometry.Sphere;
 import geometry.Vertex;
 import geometry.Vertex3D;
 
-public class Planet
-{
+public class Planet {
 	private Sphere sphere;
 	private Vector3f position;
 	private int lastNoisedSubdivion;
-	
-	public float getRadius()
-	{
+
+	public float getRadius() {
 		return sphere.getRadius();
 	}
 
-	public Vector3f getPosition()
-	{
+	public Vector3f getPosition() {
 		return position;
 	}
 
-	public GameObject3D getMesh()
-	{
+	public GameObject3D getMesh() {
 		return sphere;
 	}
 
-	public Planet(float radius, Vector3f position)
-	{
+	public Planet(float radius, Vector3f position) {
 		this.position = position;
-		this.sphere = new Sphere(3, new Vector4f(1f, 1f, 1f, 1f), radius);
+		this.sphere = new Sphere();
+
 	}
 
-	public void update(int subdivisions)
+	public void update(ICamera camera, int subdivisions)
 	{
-		if(subdivisions == sphere.getSubdivision())
-			return;
-		
-		sphere.update(subdivisions);
+		sphere.update(subdivisions, camera.getLookAt()); // where to apply cam?
 			
 		int octaves = 4;
 		float lambda = 0.5f;
 		float amplitude = 2.07f;
-		Vector4f[] vertexColors = sphere.getColors();
 			
 		// TODO apply noise to sphere
 		for(Vertex3D v : sphere.getVertices()) {
@@ -55,23 +47,26 @@ public class Planet
 																octaves, lambda, amplitude);
 				
 			double color = (float) ((noise + 1) / 2.0);
-			v.setColorRGBA(new Vector4f((float)color, (float)color, (float) color, 1f));
+			v.setColorRGBA(new Vector4f((float) color, (float) color, (float) color, 1f));
 		}
+		
+		sphere.createVAO();
 	}
 
-	public void update(float planetCamDistance, boolean adjustCamSpeed)
-	{
+	public void update(ICamera camera, float planetCamDistance, boolean adjustCamSpeed) {
 		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
 
 		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
 
 		// clamp
-		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS
-				: subdivisions;
-		
-		this.update(subdivisions);
+		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
+		this.update(camera, subdivisions);
 
 		// TODO: adjust cam speed with subdivisionCoefficient if adjustCamSpeed
 		// is true
+	}
+
+	public int getTriangleCount() {
+		return sphere.getTriangleCount();
 	}
 }
