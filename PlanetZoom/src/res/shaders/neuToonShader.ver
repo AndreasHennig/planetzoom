@@ -1,0 +1,51 @@
+#version 330 
+#pragma debug(on)
+#pragma optimize(off)
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 uvCoords;
+layout (location = 2) in vec3 normal;
+layout (location = 3) in vec4 color;
+
+out DATA
+{
+	vec3 position;
+	vec3 normal;
+	vec2 uv;
+	vec3 viewDir;
+	vec3 lightDir;
+	float seaLevel;
+} pass_data;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 normalMatrix;
+uniform vec3 cameraPosition;
+uniform vec3 lightPosition;
+uniform float radius;
+
+float seaLevel = 0.35;
+
+void main(void)
+{
+	vec3 newPosition;
+
+	if(length(position) < radius + seaLevel)
+	{
+		
+		newPosition = normalize(position) * 10.35;						
+	}
+	else
+	{
+		newPosition = position;
+	}
+	
+	pass_data.seaLevel = seaLevel;
+	pass_data.viewDir = cameraPosition - position;
+	pass_data.uv = uvCoords;
+	pass_data.normal = normal;
+	pass_data.position = newPosition;
+	pass_data.lightDir = normalize(lightPosition);
+
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(newPosition, 1.0);
+}
