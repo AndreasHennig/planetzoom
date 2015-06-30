@@ -50,7 +50,7 @@ public class Game implements IGame {
 	public void init() {
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 1300f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 20000f);
 		
 		Info.projectionMatrix = engine.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
@@ -60,7 +60,7 @@ public class Game implements IGame {
 		initShaders();
 		initGameObjects();
 
-		planet = new Planet(1000, new Vector3f(0f, 0f, 0f));
+		planet = new Planet(12000, new Vector3f(0f, 0f, 0f));
 		Info.planet = planet;
 	}
 
