@@ -97,7 +97,6 @@ public class SphereGraph {
 			/*
 			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
 			 * jeden Punkt des Dreiecks
-			 * eventuell Rechnung vereinfachen
 			 */
 		}
 
