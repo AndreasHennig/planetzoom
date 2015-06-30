@@ -81,7 +81,11 @@ public class Sphere extends GameObject3D {
 		}
 	}
 	
-	public int getTriangleCount(){
+	public int getTotalTriangleCount(){
+		return (int) (8 * Math.pow(4, subdivisions));
+	}
+	
+	public int getActualTriangleCount(){
 		return indices.length / 3;
 	}
 }

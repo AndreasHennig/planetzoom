@@ -7,6 +7,9 @@ public class HeadsUpDisplay
 	private Vector3f cameraPosition;
 	private Vector3f cameraLookAt;
 	private float distanceToPlanetSurface;
+	private int totalTriangles;
+	private int	actualTriangles;
+	private float trianglePercentage;
 	private int fps;
 	
 	private static final int STANDARD_POSITION_X = 0;
@@ -32,23 +35,29 @@ public class HeadsUpDisplay
 		this.font = font;
 	}
 	
-	public HeadsUpDisplay(int x, int y, String font, Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int fps)
+	public HeadsUpDisplay(int x, int y, String font, Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int actualTriangles, int totalTriangles, int fps)
 	{
-	    	this(x, y, font);
+	    this(x, y, font);
 		this.cameraPosition = cameraPosition;
 		this.cameraLookAt = cameraLookAt;
 		this.distanceToPlanetSurface = distanceToPlanet;
+		this.actualTriangles = 0;
+		this.totalTriangles = 0;
+		this.trianglePercentage = 0f;
 		this.fps = fps;  
 		
 		text = new Text2D(getHUDText(), font, position_x, position_y, 16);
 	
 	}
 	
-	public void update(Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int fps)
+	public void update(Vector3f cameraPosition, Vector3f cameraLookAt, float distanceToPlanet, int actualTriangles, int totalTriangles, int fps)
 	{
 		this.cameraPosition = cameraPosition;
 		this.cameraLookAt = cameraLookAt;
 		this.distanceToPlanetSurface = distanceToPlanet;
+		this.actualTriangles = actualTriangles;
+		this.totalTriangles = totalTriangles;
+		this.trianglePercentage = actualTriangles * 100f / totalTriangles;
 		this.fps = fps;  
 		
 		text.update(getHUDText());
@@ -56,12 +65,17 @@ public class HeadsUpDisplay
 	
 	private String getHUDText()
 	{
-		return String.format("Position: %.2f / %.2f / %.2f\nLook at: %.2f / %.2f / %.2f\nDistance: %.2f\nFPS: %d",
+		return String.format("Position: %.2f / %.2f / %.2f\n"
+							+ "Look at: %.2f / %.2f / %.2f\n"
+							+ "Distance: %.2f\n"
+							+ "Triangles: %d / %d (%.2f%%)\n"
+							+ "FPS: %d",
 			cameraPosition.x, cameraPosition.y, cameraPosition.z, 
 			cameraLookAt.x, cameraLookAt.y, cameraLookAt.z,
 			distanceToPlanetSurface,
+			actualTriangles, totalTriangles, trianglePercentage,
 			fps
-			);
+		);
 	}
 	public Text2D getMesh()
 	{

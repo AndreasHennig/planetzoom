@@ -10,7 +10,7 @@ import engine.Info;
 public class SphereGraph {
 
 	private int subdivisions;
-	//private Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
+
 	private ArrayList<TriangleNode> nodes;
 	private Matrix4f modelViewProjectionMatrix = new Matrix4f();
 
@@ -21,7 +21,6 @@ public class SphereGraph {
 //		System.out.println(modelViewProjectionMatrix);
 		
 		this.subdivisions = subdivisions;
-		//this.cameraAngle = cameraAngle;
 
 		nodes = new ArrayList<TriangleNode>();
 
@@ -41,7 +40,9 @@ public class SphereGraph {
 		private int depth;
 		public Vector3f v1, v2, v3;
 		public Vector3f faceNormal = new Vector3f();
-
+		private static final int CHECK_INTERVAL = 4;
+		private static final int FIRST_CHECK = 2;
+		
 		public TriangleNode(int currentDepth, Vector3f point1, Vector3f point2, Vector3f point3) {
 			depth = currentDepth;
 			//counter-clockwise
@@ -79,34 +80,42 @@ public class SphereGraph {
 		}
 
 		private boolean isVisible() {
-			boolean isInView = false;
+			
+			
+			if (depth % CHECK_INTERVAL == FIRST_CHECK){
+				boolean isInViewFrustum = isInViewFrustum();
+				boolean isFacingTowardsCamera = isFacingTowardsCamera();
+				return isInViewFrustum && isFacingTowardsCamera;
+			}
+			else return true;
+		}
+
+		private boolean isInViewFrustum() {
+			// TODO Auto-generated method stub
 			return true;
+
 			/*
+			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
+			 * jeden Punkt des Dreiecks
+			 * eventuell Rechnung vereinfachen
+			 */
+		}
+
+		private boolean isFacingTowardsCamera() {
+
 			Vector3f lhs = new Vector3f();
 			Vector3f rhs = new Vector3f();
 
 			Vector3f.sub(v2, v1, lhs);
 			Vector3f.sub(v3, v1, rhs);
 			Vector3f.cross(lhs, rhs, faceNormal);
-			
-			
-			System.out.println("cam: " + cameraAngle);
-			System.out.println("normal: " + faceNormal);
-			
-			double angle = Vector3f.angle(cameraAngle, faceNormal) * 180 / Math.PI;
-			
-			System.out.println(angle);
-			
-			float angleTolerance = 0;//90 / (depth + 2);
+
+			double angle = Vector3f.angle(Info.camera.getLookAt(), faceNormal) * 180 / Math.PI;
+
+			float angleTolerance = 90 / (depth + 2); //as we go deeper, we need less tolerance 
+			//float angleTolerance = 0; //everything behind 90 degrees gets cut off. problems with noise?
 
 			return angle > 90 - angleTolerance && angle < 270 + angleTolerance;
-			
-			/*
-			 * Frustum: mit Projektionsmatrix -1<x<1; -1<y<1
-			 * jeden Punkt des Dreiecks
-			 * eventuell Rechnung vereinfachen
-			 * eventuell nur alle drei Tiefenstufen (%3)
-			 */
 		}
 	}
 }
