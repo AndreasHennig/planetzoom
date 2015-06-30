@@ -1,24 +1,13 @@
 package engine;
 
+import org.lwjgl.util.vector.Matrix4f;
 
 public class Info
 {
-	private Planet planet;
-	private ICamera camera;
+	public static Planet planet; //where is this needed - only one instance?
 	
-	public Info(Planet planet, ICamera camera)
-	{
-		this.camera = camera;
-		this.planet = planet;
-	}
-	public Planet getPlanet()
-	{
-		return planet;
-	}
-	public ICamera getCamera()
-	{
-		return camera;
-	}
+	public static ICamera camera;
+	//public static Matrix4f viewMatrix;
 	
-
+	public static Matrix4f projectionMatrix;
 }

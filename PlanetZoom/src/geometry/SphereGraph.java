@@ -2,23 +2,29 @@ package geometry;
 
 import java.util.ArrayList;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import engine.utils.GameUtils;
+import engine.Info;
 
 public class SphereGraph {
 
 	private int subdivisions;
-	private Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
+	//private Vector3f cameraAngle; // is this enough or should we consider the planet being behind the camera?
 	private ArrayList<TriangleNode> nodes;
-		
+	private Matrix4f modelViewProjectionMatrix = new Matrix4f();
+
 	public ArrayList<TriangleNode> createGraph(int subdivisions, Vector3f cameraAngle) {
-	
+		modelViewProjectionMatrix = Matrix4f.mul(engine.Info.projectionMatrix, engine.Info.camera.getViewMatrix(), modelViewProjectionMatrix);
+		Matrix4f.mul(modelViewProjectionMatrix, Info.planet.getMesh().getModelMatrix(), modelViewProjectionMatrix);
+		
+		System.out.println(modelViewProjectionMatrix);
+		
 		this.subdivisions = subdivisions;
-		this.cameraAngle = cameraAngle;
-		
+		//this.cameraAngle = cameraAngle;
+
 		nodes = new ArrayList<TriangleNode>();
-		
+
 		new TriangleNode(0, Vertex3D.up(), Vertex3D.front(), Vertex3D.right()); 	// front, up, right
 		new TriangleNode(0, Vertex3D.up(), Vertex3D.left(), Vertex3D.front()); 		// front, up, left
 		new TriangleNode(0, Vertex3D.front(), Vertex3D.down(), Vertex3D.right()); 	// front, down, right
@@ -27,7 +33,7 @@ public class SphereGraph {
 		new TriangleNode(0, Vertex3D.back(), Vertex3D.left(), Vertex3D.up()); 		// back, up, left
 		new TriangleNode(0, Vertex3D.down(), Vertex3D.back(), Vertex3D.right()); 	// back, down, right
 		new TriangleNode(0, Vertex3D.down(), Vertex3D.left(), Vertex3D.back()); 	// back, down, left
-		
+
 		return nodes;
 	}
 
@@ -73,6 +79,7 @@ public class SphereGraph {
 		}
 
 		private boolean isVisible() {
+			boolean isInView = false;
 			return true;
 			/*
 			Vector3f lhs = new Vector3f();

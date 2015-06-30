@@ -10,9 +10,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import engine.GameObject3D;
 
-public class Sphere extends GameObject3D
-{
-	public final static int MAX_SUBDIVISIONS = 5;
+public class Sphere extends GameObject3D {
+	public final static int MAX_SUBDIVISIONS = 8;
 	public final static int MIN_SUBDIVISIONS = 1;
 
 	private int subdivisions;
@@ -28,7 +27,7 @@ public class Sphere extends GameObject3D
 	{
 		this(1);
 	}
-	
+
 	public Sphere(float radius)
 	{
 		this.radius = radius;
