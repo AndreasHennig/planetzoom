@@ -27,13 +27,12 @@ public class Sun extends GameObject3D
 	{		
 		float localSize = SIZE / 2;
 		Vector3f normal = new Vector3f(0.0f, 0.0f, 1.0f);
-		Vector4f color = new Vector4f(0.0f, 1.0f, 1.0f, 1.0f);
+		Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 		vertexData.add(new Vertex3D(new Vector3f(-localSize, -localSize, 0), new Vector2f(0.0f, 1.0f), normal, color));
 		vertexData.add(new Vertex3D(new Vector3f(-localSize, localSize, 0), new Vector2f(0.0f, 0.0f), normal, color));
 		vertexData.add(new Vertex3D(new Vector3f(localSize, localSize, 0), new Vector2f(1.0f, 0.0f), normal, color));
 		vertexData.add(new Vertex3D(new Vector3f(localSize, -localSize, 0), new Vector2f(1.0f, 1.0f), normal, color));
 		indices = new int[]{2, 1, 0, 0, 3, 2};	
-		
 		
 		modelMatrix.translate(position);
 		createVAO();
