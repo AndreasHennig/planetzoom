@@ -18,7 +18,7 @@ public class SphereGraph {
 		modelViewProjectionMatrix = Matrix4f.mul(engine.Info.projectionMatrix, engine.Info.camera.getViewMatrix(), modelViewProjectionMatrix);
 		Matrix4f.mul(modelViewProjectionMatrix, Info.planet.getMesh().getModelMatrix(), modelViewProjectionMatrix);
 		
-		System.out.println(modelViewProjectionMatrix);
+//		System.out.println(modelViewProjectionMatrix);
 		
 		this.subdivisions = subdivisions;
 		//this.cameraAngle = cameraAngle;
