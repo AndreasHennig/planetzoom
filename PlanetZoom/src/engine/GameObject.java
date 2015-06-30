@@ -1,24 +1,34 @@
 package engine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 
-import engine.utils.Texture;
+import geometry.Vertex;
 
 public abstract class GameObject
 {
 	protected int[] indices;
 	protected Matrix4f modelMatrix;
 	protected VertexArrayObject vao;
+	protected List<IGameObjectListener> listeners;
 	
 	public GameObject()
 	{
+		listeners = new ArrayList<>();
+		
 		modelMatrix = new Matrix4f();
 		modelMatrix.setIdentity();
 	}
-		
+	
+	public void addListener(IGameObjectListener listener) {
+		listeners.add(listener);
+	}
+	
 	public void draw(int mode)
 	{
     	vao.bind();
@@ -69,5 +79,10 @@ public abstract class GameObject
 	public void setModelMatrix(Matrix4f modelMatrix)
 	{
 		this.modelMatrix = modelMatrix;
-	}	
+	}
+	
+	public void notifyListeners(Vertex v) {
+		for(IGameObjectListener listener : listeners)
+			listener.vertexCreated(v);
+	}
 }

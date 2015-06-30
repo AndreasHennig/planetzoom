@@ -34,6 +34,5 @@ public class GameObject2D extends GameObject
 	{
 		this.vao = new VertexArrayObject(this);
 	}
-	
 
 }

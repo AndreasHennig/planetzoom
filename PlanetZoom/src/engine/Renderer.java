@@ -1,7 +1,6 @@
 package engine;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
 import engine.utils.Texture;
 
 public class Renderer 
