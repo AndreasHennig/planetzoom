@@ -121,7 +121,7 @@ public class Game implements IGame
 			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			planetShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			planetShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-			planetShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
+			planetShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
 			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			planetShader.loadUniform1f(planet.getRadius(), "radius");
 			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
@@ -134,7 +134,7 @@ public class Game implements IGame
 		{
 			sunShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			sunShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+			sunShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");			
 			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
