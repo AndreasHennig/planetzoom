@@ -172,6 +172,16 @@ public class FreeCamera implements ICamera
 		Vector3f.add(position, movement, position);
 	}
 
+	public Vector3f getLocalUpVector()
+	{
+		return calculateMovementVector(new Vector3f(0.0f, 1.0f, 0.0f));
+	}
+	
+	public Vector3f getLocalRightVector()
+	{
+		return calculateMovementVector(new Vector3f(1.0f, 0.0f, 0.0f));	
+	}
+	
 	public boolean isInvertedYAxis()
 	{
 		return invertedYAxis;

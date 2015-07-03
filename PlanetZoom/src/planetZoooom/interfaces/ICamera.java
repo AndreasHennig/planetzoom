@@ -9,4 +9,6 @@ public interface ICamera
 	public ICameraControl getCameraControl();
 	public Vector3f getPosition();
 	public Vector3f getLookAt();
+	public Vector3f getLocalRightVector();
+	public Vector3f getLocalUpVector();
 }

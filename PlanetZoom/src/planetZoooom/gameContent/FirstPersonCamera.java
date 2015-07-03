@@ -158,4 +158,16 @@ public class FirstPersonCamera implements ICamera
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Vector3f getLocalRightVector() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Vector3f getLocalUpVector() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

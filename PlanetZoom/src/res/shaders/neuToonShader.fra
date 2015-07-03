@@ -21,7 +21,7 @@ out vec4 out_Color;
 void main(void)
 {
 	vec4 heightColor;
-	float lightDiffuse = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
+	//float lightDiffuse = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
 	float height = length(pass_data.position) - radius;
  
 	vec4 textureColors = texture(s, pass_data.uv);
@@ -49,14 +49,14 @@ void main(void)
 	}
 	
 	
-	if(dot(pass_data.viewDir, pass_data.normal) < mix(0.5, 0.1, max(0.0, dot(pass_data.normal, pass_data.lightDir))))
-	{
-		out_Color = vec4(0.0, 0.0, 0.0, 1.0);
-	}
-	else
-	{
+	//if(dot(pass_data.viewDir, pass_data.normal) < mix(0.5, 0.1, max(0.0, dot(pass_data.normal, pass_data.lightDir))))
+	//{
+	//	out_Color = vec4(0.0, 0.0, 0.0, 1.0);
+	//}
+	//else
+	//{
 		out_Color = (heightColor + textureColors) / 2.0;
-		out_Color.xyz *= lightDiffuse;
-	}
+	//	out_Color.xyz *= lightDiffuse;
+	//}
 }
 
