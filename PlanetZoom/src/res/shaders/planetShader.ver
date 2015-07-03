@@ -32,7 +32,6 @@ void main(void)
 
 	if(length(position) < radius + seaLevel)
 	{
-		
 		newPosition = normalize(position) * radius;						
 	}
 	else
@@ -43,7 +42,7 @@ void main(void)
 	pass_data.seaLevel = seaLevel;
 	pass_data.viewDir = cameraPosition - position;
 	pass_data.uv = uvCoords;
-	pass_data.normal = normal;
+	pass_data.normal = normalize(normal);
 	pass_data.position = newPosition;
 	pass_data.lightDir = normalize(lightPosition);
 

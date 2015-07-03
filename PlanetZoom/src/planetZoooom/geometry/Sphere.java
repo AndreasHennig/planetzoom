@@ -68,7 +68,7 @@ public class Sphere extends GameObject3D {
 		for(int i = 0; i < nodes.size(); i++)
 		{
 			SphereGraph.TriangleNode currentNode = nodes.get(i);
-
+			
 			v1 = new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy);
 			v1.getPosition().scale(radius);
 			notifyListeners(v1);
