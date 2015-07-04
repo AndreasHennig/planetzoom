@@ -1,12 +1,28 @@
 #version 330 
 
-uniform sampler2D s;
-
 in vec2 uv;
-
 out vec4 out_Color;
+
+uniform sampler2D s;
+uniform float time;
 
 void main(void)
 {
-	out_Color = texture(s, uv);	
+	/*	
+	float alpha = texture(s, uv ).w;		//middle
+    alpha += texture(s, uv + vec2(  0.01f, 0.0f ) ).w;	//RIGHT
+    alpha += texture(s, uv + vec2( -0.01f, 0.0f ) ).w;	//LEFT
+    alpha += texture(s, uv + vec2(  0.0f,  0.01f ) ).w;	//UP
+    alpha += texture(s, uv + vec2(  0.0f, -0.01f ) ).w;	//DOWN
+
+    alpha += texture(s, uv + vec2(  0.01f,  0.01f ) ).w;	//RIGHT UP
+    alpha += texture(s, uv + vec2(  0.01f, -0.01f ) ).w;	//RIGHT UP
+    alpha += texture(s, uv + vec2( -0.01f,  0.01f ) ).w;	//LEFT UP
+    alpha += texture(s, uv + vec2( -0.01f, -0.01f ) ).w;	//LEFT DOWN
+	
+	alpha /= 9.0;
+	*/
+	
+	out_Color = texture(s,uv);
+	
 }
