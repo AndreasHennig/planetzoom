@@ -1,3 +1,5 @@
+//http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/billboards/
+
 #version 330 
 
 layout (location = 0) in vec3 position; 
@@ -13,10 +15,11 @@ uniform vec3 cameraRight;
 
 out	vec2 uv;
 
+//SUNSIZE IS CHANGING
 void main(void)
 {	
-	vec3 facingPosition = billboardCenter + cameraRight * position.x + cameraUp * position.y;
-	
-	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(facingPosition, 1.0);	
 	uv = uvCoords;
+	vec3 newPosition = billboardCenter + cameraRight * position.x + cameraUp * position.y;
+	
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(newPosition, 1.0);	
 }

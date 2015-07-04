@@ -52,6 +52,7 @@ public class Game implements IGame
 	
 	private Vector3f lightDirection;
 	private float planetCamDistance;
+	private float time = 0.0f;
 	
 	public static void main(String[] args) 
 	{
@@ -84,7 +85,7 @@ public class Game implements IGame
 	private void initTextures() 
 	{
 		planetTexture = new Texture("src/res/textures/uv_test.png");
-		sunTexture = new Texture("src/res/textures/sun.png");
+		sunTexture = new Texture("src/res/textures/sun2.png");
 	}
 
 	private void initShaders() 
@@ -107,6 +108,7 @@ public class Game implements IGame
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //DO NOT MOVE THIS LINE! ....THERE IS A REASON THAT IT IS NOT IN RENDERER;
 	
+		time += 0.005f;
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
@@ -136,7 +138,8 @@ public class Game implements IGame
 			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			sunShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
-			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");			
+			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
+			sunShader.loadUniform1f(time, "time");
 			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
 		}
 		glUseProgram(0);
