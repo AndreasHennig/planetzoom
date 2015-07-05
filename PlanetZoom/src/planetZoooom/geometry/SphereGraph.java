@@ -39,7 +39,7 @@ public class SphereGraph {
 	class TriangleNode {
 		private int depth;
 		public Vector3f v1, v2, v3;
-		public Vector3f faceNormal = new Vector3f();
+		public Vector3f faceNormal;
 		private static final int CHECK_INTERVAL = 4;
 		private static final int FIRST_CHECK = 2;
 		
@@ -50,6 +50,8 @@ public class SphereGraph {
 			v2 = point2;
 			v3 = point3;
 
+			faceNormal = getSurfaceNormal();
+			
 			normalize();
 			//noise();
 			if (isVisible()) {
@@ -100,15 +102,20 @@ public class SphereGraph {
 			 */
 		}
 
-		private boolean isFacingTowardsCamera() {
-
+		private Vector3f getSurfaceNormal()
+		{
 			Vector3f lhs = new Vector3f();
 			Vector3f rhs = new Vector3f();
+			Vector3f result = new Vector3f();
 
 			Vector3f.sub(v2, v1, lhs);
 			Vector3f.sub(v3, v1, rhs);
-			Vector3f.cross(lhs, rhs, faceNormal);
-
+			Vector3f.cross(lhs, rhs, result);
+			
+			return result;
+		}
+		
+		private boolean isFacingTowardsCamera() {
 			double angle = Vector3f.angle(Info.camera.getLookAt(), faceNormal) * 180 / Math.PI;
 
 			float angleTolerance = 90 / (depth + 2); //as we go deeper, we need less tolerance 

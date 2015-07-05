@@ -93,7 +93,7 @@ public class Game implements IGame
 	private void initShaders() 
 	{
 		hudShader = new ShaderProgram("HUDShader");
-		planetShader = new ShaderProgram("neuToonShader");
+		planetShader = new ShaderProgram("planetShader");
 		sunShader = new ShaderProgram("sunShader");
 		sunGlowShader = new ShaderProgram("sunGlowShader");
 		atmosphereShader = new ShaderProgram("atmosphereShader");
