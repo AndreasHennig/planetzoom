@@ -1,4 +1,4 @@
-#version 410 
+#version 330
 #pragma debug(on)
 #pragma optimize(off)
 
@@ -11,7 +11,7 @@ in DATA
 } pass_data;
 
 out vec4 out_Color;
- 
+
 void main(void)
 {
 	out_Color = vec4(1.0, 1.0, 1.0, 1.0);

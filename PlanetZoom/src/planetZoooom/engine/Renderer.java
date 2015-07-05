@@ -1,6 +1,7 @@
 package planetZoooom.engine;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL40.*;
 import planetZoooom.geometry.GameObject;
 import planetZoooom.graphics.Texture;
 
@@ -29,6 +30,5 @@ public class Renderer
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }    
 }

@@ -13,7 +13,7 @@ import planetZoooom.engine.Renderer;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
 import planetZoooom.gameContent.Planet;
-import planetZoooom.gameContent.Sun;
+import planetZoooom.gameContent.BillBoard;
 import planetZoooom.graphics.ShaderProgram;
 import planetZoooom.graphics.Texture;
 import planetZoooom.interfaces.ICameraControl;
@@ -32,16 +32,19 @@ public class Game implements IGame
 	// GAMEOBJECTS
 	private Planet planet;
 	private HeadsUpDisplay hud;
-	private Sun sun;
+	private BillBoard sun;
+	private BillBoard sunGlow;
 
 	// TEXTURES
 	private Texture planetTexture;
 	private Texture sunTexture;
+	private Texture sunGlowTexture;
 
 	// SHADERS
 	private ShaderProgram planetShader;
 	private ShaderProgram hudShader;
 	private ShaderProgram sunShader;
+	private ShaderProgram sunGlowShader;
 	private ShaderProgram atmosphereShader;
 
 	//Matrices
@@ -49,10 +52,8 @@ public class Game implements IGame
 	private Matrix4f normalMatrix;
 	private Matrix4f orthographicProjectionMatrix;
 	
-	
 	private Vector3f lightDirection;
 	private float planetCamDistance;
-	private float time = 0.0f;
 	
 	public static void main(String[] args) 
 	{
@@ -85,7 +86,8 @@ public class Game implements IGame
 	private void initTextures() 
 	{
 		planetTexture = new Texture("src/res/textures/uv_test.png");
-		sunTexture = new Texture("src/res/textures/sun2.png");
+		sunTexture = new Texture("src/res/textures/sun.png");
+		sunGlowTexture = new Texture("src/res/textures/sunGlow.png");
 	}
 
 	private void initShaders() 
@@ -93,6 +95,7 @@ public class Game implements IGame
 		hudShader = new ShaderProgram("HUDShader");
 		planetShader = new ShaderProgram("neuToonShader");
 		sunShader = new ShaderProgram("sunShader");
+		sunGlowShader = new ShaderProgram("sunGlowShader");
 		atmosphereShader = new ShaderProgram("atmosphereShader");
 	}
 
@@ -100,17 +103,68 @@ public class Game implements IGame
 	{
 		planet = new Planet(6000.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
-		sun = new Sun(new Vector3f(-100000.0f, 0.0f, 0.0f));
+		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
+		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
 	}
 
 	@Override
 	public void update(int deltaTime) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //DO NOT MOVE THIS LINE! ....THERE IS A REASON THAT IT IS NOT IN RENDERER;
-	
-		time += 0.005f;
+		
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
+		
+		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
+		
+		glDisable(GL_DEPTH_TEST);
+	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+		
+		glUseProgram(sunGlowShader.getId());
+		{
+			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
+			renderer.renderGameObject(sunGlow, sunGlowTexture, GL_TRIANGLES);
+		}
+		glUseProgram(0);
+
+		glUseProgram(sunShader.getId());
+		{
+			sunShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			sunShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
+			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
+			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
+			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
+		}
+		glUseProgram(0);
+		
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getSphere().getModelMatrix(), modelViewMatrix);
+		
+		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+		lightDirection.normalise();
+		glFrontFace(GL_CW);
+		glUseProgram(atmosphereShader.getId());
+		{
+			planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
+			atmosphereShader.loadUniform1f(GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()), "cameraHeight");
+			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
+			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
+			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
+			//		atmosphereShader.loadUniform1f(planet.getAtmosphere().getSphere().getRadius() * 0.25f, "fScale");
+			atmosphereShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			atmosphereShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
+			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
+			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
+			renderer.renderGameObject(planet.getAtmosphere().getSphere(), null, GL_TRIANGLES);
+		}
+		glUseProgram(0);
+		glFrontFace(GL_CCW);
+		
+		glEnable(GL_DEPTH_TEST);
 		
 		planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
 
@@ -130,42 +184,6 @@ public class Game implements IGame
 		}
 		glUseProgram(0);
 
-		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
-		
-		glUseProgram(sunShader.getId());
-		{
-			sunShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			sunShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
-			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
-			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
-			sunShader.loadUniform1f(time, "time");
-			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
-		}
-		glUseProgram(0);
-		
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getSphere().getModelMatrix(), modelViewMatrix);
-		
-		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
-		lightDirection.normalise();
-		glFrontFace(GL_CW);
-		glUseProgram(atmosphereShader.getId());
-		{
-			planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
-			atmosphereShader.loadUniform1f(GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()), "cameraHeight");
-			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
-			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
-	//		atmosphereShader.loadUniform1f(planet.getAtmosphere().getSphere().getRadius() * 0.25f, "fScale");
-			atmosphereShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			atmosphereShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
-			renderer.renderGameObject(planet.getAtmosphere().getSphere(), null, GL_TRIANGLES);
-		}
-		glUseProgram(0);
-		glFrontFace(GL_CCW);
 		
 		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 		glUseProgram(hudShader.getId());
