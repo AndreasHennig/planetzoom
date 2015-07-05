@@ -87,7 +87,7 @@ public class Game implements IGame
 	{
 		planetTexture = new Texture("src/res/textures/uv_test.png");
 		sunTexture = new Texture("src/res/textures/sun.png");
-		sunGlowTexture = new Texture("src/res/textures/sunGlow.png");
+		sunGlowTexture = new Texture("src/res/textures/sunGlow2.png");
 	}
 
 	private void initShaders() 
