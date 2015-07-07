@@ -30,5 +30,8 @@ public class Renderer
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(4.0f);
     }    
 }

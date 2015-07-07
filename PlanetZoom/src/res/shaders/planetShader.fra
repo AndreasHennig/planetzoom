@@ -1,3 +1,5 @@
+//https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
+
 #version 330
 #pragma debug(on)
 #pragma optimize(off)

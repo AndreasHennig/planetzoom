@@ -1,3 +1,5 @@
+//https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
+
 #version 330 
 #pragma debug(on)
 #pragma optimize(off)
@@ -24,14 +26,16 @@ uniform mat4 normalMatrix;
 uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform float radius;
+uniform float flatShading;
 
-float seaLevel = 0.5;
+float maxHeight = radius * 0.014;
+float seaLevel = 0.43;
 
 void main(void)
 {
 	vec3 newPosition;
 
-	if(length(position) < radius + seaLevel)
+	if(length(position) < radius + seaLevel * 5)
 	{
 		newPosition = normalize(position) * radius;						
 	}
@@ -42,7 +46,16 @@ void main(void)
 	
 	pass_data.positionVector = position;
 	pass_data.position = vec3(modelViewMatrix * vec4(newPosition, 1.0));
-	pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
+	
+	if(flatShading > 0.5)
+	{	
+		pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
+	}
+	else
+	{
+		pass_data.normal = normalize(vec3(normalMatrix * vec4(position, 1.0)));
+	}
+	
 	pass_data.uv = uvCoords;
 	pass_data.seaLevel = seaLevel;
 	pass_data.viewDir = cameraPosition - position;

@@ -28,7 +28,6 @@ public class Planet implements IGameObjectListener
 	public void update(int subdivisions)
 	{
 		sphere.update(subdivisions, Info.camera.getLookAt());
-		sphere.createVAO();
 	}
 
 	public void update(float planetCamDistance, boolean adjustCamSpeed) 

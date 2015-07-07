@@ -12,15 +12,7 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 normalMatrix;
 
-out DATA
-{
-	vec4 color;
-	vec2 uv;
-} pass_data;
-
 void main(void)
 {		
-	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);	
-	pass_data.color = color;
-	pass_data.uv = uvCoords;
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4((position * 1.002), 1.0);	
 }
