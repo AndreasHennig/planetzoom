@@ -21,7 +21,7 @@ out vec4 out_Color;
 void main(void)
 {
 	vec4 heightColor;
-	float lightDiffuse = dot(normalize(pass_data.lightDir), normalize(pass_data.normal));
+	float lightDiffuse = dot(pass_data.lightDir, pass_data.normal);
 	float height = length(pass_data.position) - radius;
  
 	vec4 textureColors = texture(s, pass_data.uv);

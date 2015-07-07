@@ -2,8 +2,6 @@ package planetZoooom.utils;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import planetZoooom.interfaces.ICamera;
-
 public class GameUtils 
 {
 	//public static ICamera currentCam;

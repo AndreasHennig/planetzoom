@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import planetZoooom.geometry.Sphere;
 import planetZoooom.geometry.StaticSphere;
 import planetZoooom.geometry.Vertex3D;
 import planetZoooom.graphics.ShaderProgram;
