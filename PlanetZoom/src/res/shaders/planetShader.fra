@@ -19,35 +19,37 @@ uniform float time;
 out vec4 out_Color;
 
 void main(void)
-{
+{	
 	vec4 heightColor;
 	float lightDiffuse = dot(pass_data.lightDir, pass_data.normal);
 	float height = length(pass_data.position) - radius;
+	float maxHeight = radius * 0.0014;
+	float heightGradientValue = height / maxHeight;
  
 	vec4 textureColors = texture(s, pass_data.uv);
-
-	if(height > pass_data.seaLevel+ 0.15)
+	
+	//TODO: add specular term!
+	
+	if(heightGradientValue > 0.97)
 	{
-		heightColor = vec4(0.87, 0.90, 0.89, 1.0);	//Snow
+		heightColor = vec4(0.87, 0.90, 0.89, 1.0);  //Snow
 	}
-	else if(height > pass_data.seaLevel+ 0.09)
+	else if(heightGradientValue > 0.7) 
 	{
-		heightColor = vec4(0.6, 0.56, 0.39, 1.0);	//Stone
+		heightColor = vec4(0.6, 0.56, 0.39, 1.0);   //Stone
 	}
-	else if(height > pass_data.seaLevel+ 0.02)
+	else if(heightGradientValue > 0.45) 
 	{
 		heightColor = vec4(0.22, 0.58, 0.28, 1.0);  //Grass
 	}
-	else if(height > pass_data.seaLevel+ 0.01)
+	else if(heightGradientValue > pass_data.seaLevel)
 	{
 		heightColor = vec4(0.89, 0.78, 0.41, 1.0);  //Sand
 	}
 	else
 	{
 		heightColor = vec4(0.18, 0.42, 0.57, 1.0);  //Water
-		//TODO: add specular term!
 	}
-	
 	
 	if(dot(pass_data.viewDir, pass_data.normal) < mix(0.5, 0.1, max(0.0, dot(pass_data.normal, pass_data.lightDir))))
 	{
@@ -55,8 +57,7 @@ void main(void)
 	}
 	else
 	{
-		out_Color = (heightColor + textureColors) / 2.0;
+		out_Color = heightColor;
 		out_Color.xyz *= lightDiffuse;
 	}
 }
-

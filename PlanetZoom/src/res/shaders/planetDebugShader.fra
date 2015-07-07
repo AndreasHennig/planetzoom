@@ -12,12 +12,20 @@ in DATA
 	vec3 position;
 } pass_data;
 
+struct GradientColor
+{
+  float position;
+  vec3 color;
+};
+
+vec3 getGradientColor(float myPosition, bool interpolate);
+
 out vec4 out_Color;
  
 void main(void)
 {
-	// Der Hoechste Berg ist 0.000014 % vom Radius.
-	float maxHeight = radius * 0.0002;
+	// Der Hoechste Berg ist 0.14 % vom Radius.
+	float maxHeight = radius * 0.0014;
 	float height = (length(pass_data.position) - radius);
 	float heightColorValue = height / maxHeight;
 	vec4 heightColor = vec4(heightColorValue, heightColorValue, heightColorValue, 1.0);
@@ -39,4 +47,34 @@ void main(void)
 	out_Color = heightColor;
 	
 	//out_Color =  (pass_data.color + texture(s, pass_data.uv)) / 2.0;
+}
+
+vec3 getGradientColor(float myPosition, bool interpolate) {
+	GradientColor colors[] = GradientColor[5](
+		GradientColor(0, vec3(pass_data.seaLevel, 0.42, 0.57)),   	// Water
+		GradientColor(0.6, vec3(0.89, 0.78, 0.41)), 				// Sand
+		GradientColor(0.65, vec3(0.22, 0.58, 0.28)), 				// Grass
+		GradientColor(0.7, vec3(0.6, 0.56, 0.39)), 					// Stone
+		GradientColor(0.97, vec3(0.87, 0.90, 0.89)) 				// Snow
+		);
+	
+	int leftGradientColor;
+	int rightGradientColor;
+	
+	// Abschnitt ermitteln
+	for(int i = 0; i < colors.length(); i++) {
+		float colorPosition = colors[i].position;
+		
+		if(myPosition <= colorPosition) {
+			if(!interpolate) {
+				return colors[i].color;
+			}
+			
+			// TODO rightGradientColor = i;
+		}
+	}
+	
+	// Wert berechnen
+
+	return vec3(1,1,1);
 }

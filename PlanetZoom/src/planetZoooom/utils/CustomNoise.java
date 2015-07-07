@@ -62,21 +62,28 @@ public class CustomNoise {
 			// Perlin Noise Multi Fractal
 			add = (planetZoooom.utils.SimplexNoise.noise(x / octaveLambda, y / octaveLambda, z / octaveLambda) * octaveAmplitude);
 
-//			if (octave > 1) {
-//				// Add *= [constant] * Sum;
-//				// Konstante wird verwendet um den Bereich der Anhebung zu steuern
-//				add = add * 1.75 * sum;
-////				
-//
-////				maxAmp += octaveAmplitude * 1 * (sum != 0 ? sum : 1);
-//			} else {
-//				maxAmp += octaveAmplitude;
-//			}
+			if (octave > 1) {
+				// Add *= [constant] * Sum;
+				// Konstante wird verwendet um den Bereich der Anhebung zu steuern
+				add = add * 1.75 * sum;
+				
+
+				maxAmp += octaveAmplitude * 1 * (sum != 0 ? sum : 1);
+			} else {
+				maxAmp += octaveAmplitude;
+			}
 			
 			sum += add;
 			
-//			sum += (add * octaveAmplitude);
+			//sum += (add);
 		}
+		
+		// TODO: Aus irgend einem Grund ist der Berechnete Wert nicht genau zwischen -1 und 1
+		// Workarround -> Clamp
+		if(sum > 1)
+			sum = 1;
+		else if(sum < -1)
+			sum = -1;
 		
 		return sum;
 	}

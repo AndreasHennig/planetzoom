@@ -83,17 +83,16 @@ public class Planet implements IGameObjectListener
 		Vector3f position = v3d.getPosition();
 		float planetRadius = this.getRadius();
 		
-		// TODO apply noise to sphere
-		final int octaves = 1;
-		final float lambda = 1f * planetRadius;
-		final float amplitude = 4.07f;
+		final int octaves = 3;
+		final float lambda = 0.75f * planetRadius;
+		final float amplitude = 3.07f;
 		
 		float noise = (float) CustomNoise.perlinNoise(position.x, position.y, position.z, octaves, lambda, amplitude);
 
 		noise = (noise + 1) / 2;
 		
-		// 0.000014 = 0.0014 % = 8.850 km vs. 6000 km
-		position.scale(1 + noise * 0.0002f);
+		// 0.14 % = 8 km von 6000 km
+		position.scale(1 + noise * 0.0014f);
 		v3d.setColorRGBA(new Vector4f(noise, noise, noise, 1));
 	}
 }

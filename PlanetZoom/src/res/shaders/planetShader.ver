@@ -24,7 +24,7 @@ uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform float radius;
 
-float seaLevel = 0.35;
+float seaLevel = 0.5;
 
 void main(void)
 {
