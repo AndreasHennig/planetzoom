@@ -85,14 +85,15 @@ public class Game implements IGame
 	private void initShaders() 
 	{
 		hudShader = new ShaderProgram("HUDShader");
-		toonShader = new ShaderProgram("toonShader");
+//		toonShader = new ShaderProgram("toonShader");
+		toonShader = new ShaderProgram("planetDebugShader");
 		sunShader = new ShaderProgram("sunShader");
 		atmosphereShader = new ShaderProgram("atmosphereShader");
 	}
 
 	private void initGameObjects() 
 	{
-		planet = new Planet(6000.0f, new Vector3f(0f, 0f, 0f));
+		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 		sun = new Sun(new Vector3f(-100000.0f, 0.0f, 0.0f));
 	}

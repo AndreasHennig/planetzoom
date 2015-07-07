@@ -8,12 +8,9 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import planetZoooom.interfaces.IGameObjectListener;
-import planetZoooom.utils.CustomNoise;
-
 public class Sphere extends GameObject3D {
-	public final static int MAX_SUBDIVISIONS = 5;
-	public final static int MIN_SUBDIVISIONS = 5;
+	public final static int MAX_SUBDIVISIONS = 7;
+	public final static int MIN_SUBDIVISIONS = 7;
 
 	private int subdivisions;
 	private float radius;

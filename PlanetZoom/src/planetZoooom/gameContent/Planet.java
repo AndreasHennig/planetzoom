@@ -11,7 +11,6 @@ import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.GameUtils;
 import planetZoooom.utils.Info;
 
-
 public class Planet implements IGameObjectListener 
 {
 	private Sphere sphere;
@@ -28,23 +27,6 @@ public class Planet implements IGameObjectListener
 	
 	public void update(int subdivisions)
 	{
-		sphere.update(subdivisions, Info.camera.getLookAt());
-		// where to apply cam?
-		
-		// TODO apply noise to sphere
-		int octaves = 4;
-		float lambda = 0.5f;
-		float amplitude = 2.07f;
-
-		for(Vertex3D v : sphere.getVertices()) {
-			double noise = planetZoooom.utils.CustomNoise.perlinNoise(v.getPosition().getX(),
-																v.getPosition().getY(),
-																v.getPosition().getZ(),
-																octaves, lambda, amplitude);
-			double color = (float) ((noise + 1) / 2.0);
-			v.setColorRGBA(new Vector4f((float) color, (float) color, (float) color, 1f));
-		}
-
 		sphere.update(subdivisions, Info.camera.getLookAt());
 		sphere.createVAO();
 	}
@@ -99,14 +81,19 @@ public class Planet implements IGameObjectListener
 	{
 		Vertex3D v3d = (Vertex3D) v;
 		Vector3f position = v3d.getPosition();
+		float planetRadius = this.getRadius();
 		
 		// TODO apply noise to sphere
-		final int octaves = 4;
-		final float lambda = 0.5f;
-		final float amplitude = 2.07f;
+		final int octaves = 1;
+		final float lambda = 1f * planetRadius;
+		final float amplitude = 4.07f;
 		
 		float noise = (float) CustomNoise.perlinNoise(position.x, position.y, position.z, octaves, lambda, amplitude);
 
-//		position.scale(1 + noise/200);
+		noise = (noise + 1) / 2;
+		
+		// 0.000014 = 0.0014 % = 8.850 km vs. 6000 km
+		position.scale(1 + noise * 0.05f);
+		v3d.setColorRGBA(new Vector4f(noise, noise, noise, 1));
 	}
 }

@@ -1,4 +1,4 @@
-#version 410 
+#version 330 
 #pragma debug(on)
 #pragma optimize(off)
 
@@ -16,6 +16,7 @@ out DATA
 {
 	vec4 color;
 	vec2 uv;
+	vec3 position;
 } pass_data;
 
 void main(void)
@@ -23,4 +24,5 @@ void main(void)
 	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);	
 	pass_data.color = color;
 	pass_data.uv = uvCoords;
+	pass_data.position = position;
 }
