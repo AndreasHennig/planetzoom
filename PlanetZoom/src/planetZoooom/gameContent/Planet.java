@@ -93,7 +93,7 @@ public class Planet implements IGameObjectListener
 		noise = (noise + 1) / 2;
 		
 		// 0.000014 = 0.0014 % = 8.850 km vs. 6000 km
-		position.scale(1 + noise * 0.05f);
+		position.scale(1 + noise * 0.0002f);
 		v3d.setColorRGBA(new Vector4f(noise, noise, noise, 1));
 	}
 }
