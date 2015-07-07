@@ -55,6 +55,8 @@ public class Game implements IGame
 	private Vector3f lightDirection;
 	private float planetCamDistance;
 	
+	private int updates = 0;
+	
 	public static void main(String[] args) 
 	{
 		game = new CoreEngine(new Game());
@@ -172,8 +174,13 @@ public class Game implements IGame
 
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
-		planet.update(planetCamDistance, false);
-
+		
+		if(updates % 300 == 0)
+		{
+			planet.update(planetCamDistance, false);
+		}
+		updates++;
+		
 		glUseProgram(planetShader.getId());
 		{
 			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
