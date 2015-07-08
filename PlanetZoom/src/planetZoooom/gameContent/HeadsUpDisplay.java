@@ -2,7 +2,7 @@ package planetZoooom.gameContent;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import planetZoooom.graphics.Text2D;
+import planetZoooom.geometry.HUDText;
 
 public class HeadsUpDisplay
 {
@@ -21,7 +21,7 @@ public class HeadsUpDisplay
 	private int position_x;
 	private int position_y;
 	private String font;
-	private Text2D text;
+	private HUDText text;
 	
 	public HeadsUpDisplay()
 	{
@@ -48,7 +48,7 @@ public class HeadsUpDisplay
 		this.trianglePercentage = 0f;
 		this.fps = fps;  
 		
-		text = new Text2D(getHUDText(), font, position_x, position_y, 16);
+		text = new HUDText(getHUDText(), font, position_x, position_y, 16);
 	
 	}
 	
@@ -79,7 +79,7 @@ public class HeadsUpDisplay
 			fps
 		);
 	}
-	public Text2D getMesh()
+	public HUDText getMesh()
 	{
 	    return text;
 	}

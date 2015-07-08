@@ -13,9 +13,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.GameObject;
-import planetZoooom.geometry.GameObject2D;
 import planetZoooom.geometry.GameObject3D;
-import planetZoooom.geometry.Vertex2D;
 import planetZoooom.geometry.Vertex3D;
 //TODO get rid of toFloat methods!!
 public class VertexArrayObject
@@ -33,29 +31,22 @@ public class VertexArrayObject
 	private IntBuffer indexBuffer;
 	
 	private int indexCount;
-	private boolean is3D;
 	
 	public static final int POSITION_LOCATION = 0;
 	public static final int UV_LOCATION = 1;
 	public static final int NORMAL_LOCATION = 2;
 	
-	private VertexArrayObject(GameObject gameObject)
+	public VertexArrayObject(GameObject gameObject)
 	{
 		id = GL30.glGenVertexArrays();	
 		indexCount = gameObject.getIndices().length;
 		createHandles();
 	}
 	
-	public VertexArrayObject(GameObject2D object2D)
-	{
-		this((GameObject)object2D);
-		initBuffers2D(object2D.getVertices(), object2D.getIndices());
-	}
-	
 	public VertexArrayObject(GameObject3D object3D)
 	{
 		this((GameObject)object3D);
-		is3D = true;
+		//is3D = true;
 		initBuffers3D(object3D.getVertices(), object3D.getIndices());
 	}
 	
@@ -66,17 +57,12 @@ public class VertexArrayObject
 	{
 		GL30.glBindVertexArray(id); 
 		
-		if(is3D)
-			bindArrayBuffer(POSITION_LOCATION, 3, positionHandle, positionBuffer);
-		else
-			bindArrayBuffer(POSITION_LOCATION, 2, positionHandle, positionBuffer);
-		
+		bindArrayBuffer(POSITION_LOCATION, 3, positionHandle, positionBuffer);
 		bindArrayBuffer(UV_LOCATION, 2, uvHandle, uvBuffer);
 		bindArrayBuffer(NORMAL_LOCATION, 3, normalHandle, normalBuffer);
 		
 		bindIndexBuffer(indexHandle, indexBuffer);
 	}
-	
 
 	public void unbind()
 	{
@@ -84,6 +70,7 @@ public class VertexArrayObject
 	        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 	        GL30.glBindVertexArray(0);
 	}
+	
 	public void delete()
 	{         
 		//Delete handles
@@ -141,21 +128,21 @@ public class VertexArrayObject
 		flipBuffers();
 	}
 	
-	private void initBuffers2D(ArrayList<Vertex2D> vertices, int[] indices)
-	{		
-		createBuffers(vertices.size(), false, indices.length);
-		
-		indexBuffer.put(indices);
-
-		for (int i = 0; i < vertices.size(); i++)
-		{
-			positionBuffer.put(asFloats(vertices.get(i).getPosition()));
-			uvBuffer.put(asFloats(vertices.get(i).getUv()));
-			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
-		}
-		
-		flipBuffers();	
-	}
+//	private void initBuffers2D(ArrayList<Vertex2D> vertices, int[] indices)
+//	{		
+//		createBuffers(vertices.size(), false, indices.length);
+//		
+//		indexBuffer.put(indices);
+//
+//		for (int i = 0; i < vertices.size(); i++)
+//		{
+//			positionBuffer.put(asFloats(vertices.get(i).getPosition()));
+//			uvBuffer.put(asFloats(vertices.get(i).getUv()));
+//			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
+//		}
+//		
+//		flipBuffers();	
+//	}
 	
 	private void createHandles()
 	{
