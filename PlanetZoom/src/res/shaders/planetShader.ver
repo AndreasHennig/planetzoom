@@ -28,7 +28,7 @@ uniform vec3 lightPosition;
 uniform float radius;
 uniform float flatShading;
 
-float maxHeight = radius * 0.014;
+float maxHeight = radius * 0.03;
 float seaLevel = 0.43;
 
 void main(void)

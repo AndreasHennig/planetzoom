@@ -38,7 +38,7 @@ void main(void)
 	float lightSpecular = 1.0 * pow(max(dot(R,E),0.0),exponent);
 	lightSpecular = clamp(lightSpecular, 0.0, 1.0); 
 	
-	if(heightGradientValue > 0.97)
+	if(heightGradientValue > 0.99)
 	{
 		heightColor = vec4(0.87, 0.90, 0.89, 1.0);  //Snow
 	}

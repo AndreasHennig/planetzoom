@@ -40,7 +40,7 @@ public abstract class GameObject
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
       
-		disableVertexAttributeArrays();
+		//disableVertexAttributeArrays();
         vao.unbind();
 	}
 	

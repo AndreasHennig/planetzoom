@@ -177,7 +177,7 @@ public class Game implements IGame
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
-		if(updates % 300 == 0)
+		if(updates % 30 == 0)
 		{
 			planet.update(planetCamDistance, false);
 		}
