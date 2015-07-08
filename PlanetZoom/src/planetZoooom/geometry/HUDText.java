@@ -5,7 +5,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.graphics.Texture;
 
-public class HUDText extends GameObject3D
+public class HUDText extends GameObject
 {
 	
 	private static final int ROWCOUNT_STANDARD = 16;

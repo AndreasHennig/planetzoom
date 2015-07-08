@@ -11,11 +11,12 @@ import org.lwjgl.util.vector.Matrix4f;
 import planetZoooom.engine.VertexArrayObject;
 import planetZoooom.interfaces.IGameObjectListener;
 
-public abstract class GameObject
+public class GameObject
 {
 	protected int[] indices;
 	protected Matrix4f modelMatrix;
 	protected VertexArrayObject vao;
+	protected ArrayList<Vertex> vertexData;
 	protected List<IGameObjectListener> listeners;
 	
 	public GameObject()
@@ -24,6 +25,7 @@ public abstract class GameObject
 		
 		modelMatrix = new Matrix4f();
 		modelMatrix.setIdentity();
+		this.vertexData = new ArrayList<Vertex>();
 	}
 	
 	public void addListener(IGameObjectListener listener) {
@@ -44,7 +46,20 @@ public abstract class GameObject
         vao.unbind();
 	}
 	
-	public abstract void createVAO();
+	public ArrayList<Vertex> getVertices()
+	{
+		return vertexData;
+	}
+	
+	public void setVertices(ArrayList<Vertex> vertices)
+	{
+		this.vertexData = vertices;
+	}
+	
+	public void createVAO()
+	{
+		this.vao = new VertexArrayObject(this);
+	}	
 	
 	private void enableVertexAttributeArrays()
 	{

@@ -3,7 +3,7 @@ package planetZoooom.geometry;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class StaticSphere extends GameObject3D
+public class StaticSphere extends GameObject
 {
 	private float radius;
 	private Vector3f[] vertices;

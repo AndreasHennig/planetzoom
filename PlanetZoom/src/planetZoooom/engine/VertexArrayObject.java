@@ -13,7 +13,6 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.GameObject;
-import planetZoooom.geometry.GameObject3D;
 import planetZoooom.geometry.Vertex;
 
 //TODO get rid of toFloat methods!!
@@ -42,13 +41,7 @@ public class VertexArrayObject
 		id = GL30.glGenVertexArrays();	
 		indexCount = gameObject.getIndices().length;
 		createHandles();
-	}
-	
-	public VertexArrayObject(GameObject3D object3D)
-	{
-		this((GameObject)object3D);
-		//is3D = true;
-		initBuffers3D(object3D.getVertices(), object3D.getIndices());
+		initBuffers3D(gameObject.getVertices(), gameObject.getIndices());
 	}
 	
 	/**

@@ -2,12 +2,11 @@ package planetZoooom.gameContent;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
-import planetZoooom.geometry.GameObject3D;
+import planetZoooom.geometry.GameObject;
 import planetZoooom.geometry.Vertex;
 
-public class BillBoard extends GameObject3D
+public class BillBoard extends GameObject
 {
 	private Vector3f position;
 	private float size = 1.0f;

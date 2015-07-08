@@ -8,7 +8,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-public class Sphere extends GameObject3D {
+public class Sphere extends GameObject
+{
 	public final static int MAX_SUBDIVISIONS = 7;
 	public final static int MIN_SUBDIVISIONS = 7;
 
