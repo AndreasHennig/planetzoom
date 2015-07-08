@@ -14,7 +14,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.GameObject;
 import planetZoooom.geometry.GameObject3D;
-import planetZoooom.geometry.Vertex3D;
+import planetZoooom.geometry.Vertex;
+
 //TODO get rid of toFloat methods!!
 public class VertexArrayObject
 {
@@ -113,7 +114,7 @@ public class VertexArrayObject
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
-	private void initBuffers3D(ArrayList<Vertex3D> vertices, int[] indices)
+	private void initBuffers3D(ArrayList<Vertex> vertices, int[] indices)
 	{		
 		createBuffers(vertices.size(), true, indices.length);	
 		indexBuffer.put(indices);

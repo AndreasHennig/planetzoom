@@ -24,14 +24,14 @@ public class SphereGraph {
 
 		nodes = new ArrayList<TriangleNode>();
 
-		new TriangleNode(0, Vertex3D.up(), Vertex3D.front(), Vertex3D.right()); 	// front, up, right
-		new TriangleNode(0, Vertex3D.up(), Vertex3D.left(), Vertex3D.front()); 		// front, up, left
-		new TriangleNode(0, Vertex3D.front(), Vertex3D.down(), Vertex3D.right()); 	// front, down, right
-		new TriangleNode(0, Vertex3D.front(), Vertex3D.left(), Vertex3D.down()); 	// front, down, left
-		new TriangleNode(0, Vertex3D.back(), Vertex3D.up(), Vertex3D.right()); 		// back, up, right
-		new TriangleNode(0, Vertex3D.back(), Vertex3D.left(), Vertex3D.up()); 		// back, up, left
-		new TriangleNode(0, Vertex3D.down(), Vertex3D.back(), Vertex3D.right()); 	// back, down, right
-		new TriangleNode(0, Vertex3D.down(), Vertex3D.left(), Vertex3D.back()); 	// back, down, left
+		new TriangleNode(0, Vertex.up(), Vertex.front(), Vertex.right()); 	// front, up, right
+		new TriangleNode(0, Vertex.up(), Vertex.left(), Vertex.front()); 		// front, up, left
+		new TriangleNode(0, Vertex.front(), Vertex.down(), Vertex.right()); 	// front, down, right
+		new TriangleNode(0, Vertex.front(), Vertex.left(), Vertex.down()); 	// front, down, left
+		new TriangleNode(0, Vertex.back(), Vertex.up(), Vertex.right()); 		// back, up, right
+		new TriangleNode(0, Vertex.back(), Vertex.left(), Vertex.up()); 		// back, up, left
+		new TriangleNode(0, Vertex.down(), Vertex.back(), Vertex.right()); 	// back, down, right
+		new TriangleNode(0, Vertex.down(), Vertex.left(), Vertex.back()); 	// back, down, left
 
 		return nodes;
 	}
@@ -71,10 +71,10 @@ public class SphereGraph {
 		}
 
 		private void createChildren() {
-			new TriangleNode(depth + 1, v1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v1, v3, 0.5f)); //top
-			new TriangleNode(depth + 1, v2, Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v1, v2, 0.5f)); //left
-			new TriangleNode(depth + 1, v3, Vertex3D.lerp(v1, v3, 0.5f), Vertex3D.lerp(v2, v3, 0.5f)); //right
-			new TriangleNode(depth + 1, Vertex3D.lerp(v1, v2, 0.5f), Vertex3D.lerp(v2, v3, 0.5f), Vertex3D.lerp(v1, v3, 0.5f)); //center
+			new TriangleNode(depth + 1, v1, Vertex.lerp(v1, v2, 0.5f), Vertex.lerp(v1, v3, 0.5f)); //top
+			new TriangleNode(depth + 1, v2, Vertex.lerp(v2, v3, 0.5f), Vertex.lerp(v1, v2, 0.5f)); //left
+			new TriangleNode(depth + 1, v3, Vertex.lerp(v1, v3, 0.5f), Vertex.lerp(v2, v3, 0.5f)); //right
+			new TriangleNode(depth + 1, Vertex.lerp(v1, v2, 0.5f), Vertex.lerp(v2, v3, 0.5f), Vertex.lerp(v1, v3, 0.5f)); //center
 		}
 
 		private void addNodeToArrayList() {

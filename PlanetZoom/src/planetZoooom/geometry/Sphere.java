@@ -62,27 +62,27 @@ public class Sphere extends GameObject3D {
 
 		vertexData.clear();
 
-		Vertex3D v1, v2, v3;
+		Vertex v1, v2, v3;
 
 		for(int i = 0; i < nodes.size(); i++)
 		{
 			SphereGraph.TriangleNode currentNode = nodes.get(i);
 
-			v1 = new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal);
+			v1 = new Vertex(currentNode.v1, uvDummy, currentNode.faceNormal);
 			v1.getPosition().scale(radius);
 			notifyListeners(v1);
 			vertexData.add(v1);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
-			v2 = new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal);
+			v2 = new Vertex(currentNode.v2, uvDummy, currentNode.faceNormal);
 			v2.getPosition().scale(radius);
 			notifyListeners(v2);
 			vertexData.add(v2);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
-			v3 = new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal);
+			v3 = new Vertex(currentNode.v3, uvDummy, currentNode.faceNormal);
 			v3.getPosition().scale(radius);
 			notifyListeners(v3);
 			vertexData.add(v3);

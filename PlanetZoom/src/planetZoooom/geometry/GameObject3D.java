@@ -6,15 +6,15 @@ import planetZoooom.engine.VertexArrayObject;
 
 public class GameObject3D extends GameObject
 {
-	protected ArrayList<Vertex3D> vertexData;
+	protected ArrayList<Vertex> vertexData;
 	
 	public GameObject3D()
 	{
 		super();
-		this.vertexData = new ArrayList<Vertex3D>();
+		this.vertexData = new ArrayList<Vertex>();
 	}
 	
-	public GameObject3D(ArrayList<Vertex3D> vertices, int[] indices)
+	public GameObject3D(ArrayList<Vertex> vertices, int[] indices)
 	{
 		super();
 		this.vertexData= vertices;
@@ -22,13 +22,13 @@ public class GameObject3D extends GameObject
 	}
 
 
-	public ArrayList<Vertex3D> getVertices()
+	public ArrayList<Vertex> getVertices()
 	{
 		return vertexData;
 	}
 
 
-	public void setVertices(ArrayList<Vertex3D> vertices)
+	public void setVertices(ArrayList<Vertex> vertices)
 	{
 		this.vertexData = vertices;
 	}

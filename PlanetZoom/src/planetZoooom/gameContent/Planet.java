@@ -5,7 +5,6 @@ import org.lwjgl.util.vector.Vector4f;
 
 import planetZoooom.geometry.Sphere;
 import planetZoooom.geometry.Vertex;
-import planetZoooom.geometry.Vertex3D;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.GameUtils;
@@ -78,7 +77,7 @@ public class Planet implements IGameObjectListener
 	@Override
 	public void vertexCreated(Vertex v) 
 	{
-		Vertex3D v3d = (Vertex3D) v;
+		Vertex v3d = (Vertex) v;
 		Vector3f position = v3d.getPosition();
 		float planetRadius = this.getRadius();
 		

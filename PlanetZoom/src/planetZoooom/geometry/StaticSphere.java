@@ -10,9 +10,8 @@ public class StaticSphere extends GameObject3D
 	private Vector3f[] normals;
 	private Vector2f[] uv;
 
-
-	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
-			Vertex3D.right(), Vertex3D.front() };
+	private static Vector3f[] directions = { Vertex.left(), Vertex.back(),
+			Vertex.right(), Vertex.front() };
 
 	public StaticSphere()
 	{
@@ -60,7 +59,7 @@ public class StaticSphere extends GameObject3D
 		int t = 0;
 		for (int i = 0; i < 4; i++)
 		{
-			vertices[v++] = Vertex3D.down();
+			vertices[v++] = Vertex.down();
 		}
 		// LOWERSPHERE
 		for (int i = 1; i <= resolution; i++)
@@ -68,12 +67,12 @@ public class StaticSphere extends GameObject3D
 			float progress = (float) i / resolution;
 			Vector3f from;
 			Vector3f to;
-			vertices[v++] = to = Vertex3D.lerp(Vertex3D.down(),
-					Vertex3D.front(), progress);
+			vertices[v++] = to = Vertex.lerp(Vertex.down(),
+					Vertex.front(), progress);
 			for (int d = 0; d < 4; d++)
 			{
 				from = to;
-				to = Vertex3D.lerp(Vertex3D.down(), directions[d], progress);
+				to = Vertex.lerp(Vertex.down(), directions[d], progress);
 				t = createLowerStrip(i, v, vBottom, t);
 				v = createVertexLine(from, to, i, v);
 				vBottom += i > 1 ? (i - 1) : 1;
@@ -86,12 +85,12 @@ public class StaticSphere extends GameObject3D
 			float progress = (float) i / resolution;
 			Vector3f from;
 			Vector3f to;
-			vertices[v++] = to = Vertex3D.lerp(Vertex3D.up(), Vertex3D.front(),
+			vertices[v++] = to = Vertex.lerp(Vertex.up(), Vertex.front(),
 					progress);
 			for (int d = 0; d < 4; d++)
 			{
 				from = to;
-				to = Vertex3D.lerp(Vertex3D.up(), directions[d], progress);
+				to = Vertex.lerp(Vertex.up(), directions[d], progress);
 				t = createUpperStrip(i, v, vBottom, t);
 				v = createVertexLine(from, to, i, v);
 				vBottom += i + 1;
@@ -103,7 +102,7 @@ public class StaticSphere extends GameObject3D
 			indices[t++] = vBottom;
 			indices[t++] = v;
 			indices[t++] = ++vBottom;
-			vertices[v++] = Vertex3D.up();
+			vertices[v++] = Vertex.up();
 		}
 	}
 
@@ -111,7 +110,7 @@ public class StaticSphere extends GameObject3D
 	{
 		for (int i = 1; i <= steps; i++)
 		{
-			vertices[v++] = Vertex3D.lerp(from, to, (float) i / steps);
+			vertices[v++] = Vertex.lerp(from, to, (float) i / steps);
 		}
 		return v;
 	}
@@ -181,7 +180,7 @@ public class StaticSphere extends GameObject3D
 	{
 		for (int i = 0; i < vertices.length; i++)
 		{
-			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i]));
+			vertexData.add(new Vertex(vertices[i], uv[i], normals[i]));
 		}
 	}
 	

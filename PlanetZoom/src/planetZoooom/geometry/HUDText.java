@@ -98,10 +98,10 @@ public class HUDText extends GameObject3D
 			uvs[2] = new Vector2f(uv_x, uv_y); 								//bottom left
 			uvs[3] = new Vector2f(uv_x + uvCellWidth, uv_y); 				//bottom right
 
-			vertexData.add(new Vertex3D(positions[0], uvs[0], normal));
-			vertexData.add(new Vertex3D(positions[1], uvs[1], normal));
-			vertexData.add(new Vertex3D(positions[2], uvs[2], normal));
-			vertexData.add(new Vertex3D(positions[3], uvs[3], normal));
+			vertexData.add(new Vertex(positions[0], uvs[0], normal));
+			vertexData.add(new Vertex(positions[1], uvs[1], normal));
+			vertexData.add(new Vertex(positions[2], uvs[2], normal));
+			vertexData.add(new Vertex(positions[3], uvs[3], normal));
 
 			// First triangle
 			indices[(i * 6) + 0] = index + 2;
