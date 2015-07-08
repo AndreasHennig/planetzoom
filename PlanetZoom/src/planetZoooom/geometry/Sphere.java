@@ -19,7 +19,7 @@ public class Sphere extends GameObject3D {
 	private ArrayList<SphereGraph.TriangleNode> nodes;
 
 	private Vector3f[] vertices;
-	private Vector3f[] normals;
+	//private Vector3f[] normals;
 
 	public Sphere()
 	{
@@ -46,7 +46,7 @@ public class Sphere extends GameObject3D {
 		nodes = graph.createGraph(this.subdivisions, cameraAngle);
 
 		vertices = new Vector3f[nodes.size() * 3];
-		normals = new Vector3f[vertices.length];
+		//normals = new Vector3f[vertices.length];
 		indices = new int[vertices.length];
 
 		addNodeDataToGameObject();
@@ -59,7 +59,6 @@ public class Sphere extends GameObject3D {
 		int metaIndex = 0;
 
 		Vector2f uvDummy = new Vector2f(0, 0);
-		Vector4f colorDummy = new Vector4f(1,1,1,1);
 
 		vertexData.clear();
 
@@ -69,21 +68,21 @@ public class Sphere extends GameObject3D {
 		{
 			SphereGraph.TriangleNode currentNode = nodes.get(i);
 
-			v1 = new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal, colorDummy);
+			v1 = new Vertex3D(currentNode.v1, uvDummy, currentNode.faceNormal);
 			v1.getPosition().scale(radius);
 			notifyListeners(v1);
 			vertexData.add(v1);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
-			v2 = new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal, colorDummy);
+			v2 = new Vertex3D(currentNode.v2, uvDummy, currentNode.faceNormal);
 			v2.getPosition().scale(radius);
 			notifyListeners(v2);
 			vertexData.add(v2);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
-			v3 = new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal, colorDummy);
+			v3 = new Vertex3D(currentNode.v3, uvDummy, currentNode.faceNormal);
 			v3.getPosition().scale(radius);
 			notifyListeners(v3);
 			vertexData.add(v3);

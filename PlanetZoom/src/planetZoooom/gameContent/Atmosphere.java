@@ -43,7 +43,7 @@ public class Atmosphere
 	{
 		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() * 1.025f);
 		position = planet.getPosition();	
-		setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+		sphere.createVAO();
 	}
 	
 	public void loadSpecificUniforms(ShaderProgram atmosphereShader)
@@ -57,17 +57,6 @@ public class Atmosphere
 		atmosphereShader.loadUniform1f(RAYLEIGH_SCALE_DEPTH, "scaleDepth");
 		atmosphereShader.loadUniform1f(MIE_PHASE_ASYMETRY_FACTOR, "miePhaseAsymetryFactor");
 		atmosphereShader.loadUniform1f(SAMPLE_RAYS, "sampleRays");
-	}
-	 
-	
-	private void setColor(Vector4f color)
-	{
-		ArrayList<Vertex3D> vertices = sphere.getVertices();
-		
-		for(int i = 0; i < vertices.size(); i++)
-			vertices.get(i).setColorRGBA(color);
-		
-		sphere.createVAO();
 	}
 	
 	public Vector3f getPosition()

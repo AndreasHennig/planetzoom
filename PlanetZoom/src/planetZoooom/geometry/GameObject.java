@@ -40,7 +40,7 @@ public abstract class GameObject
         // Draw vertices
         GL11.glDrawElements(mode, vao.getIndexCount() , GL11.GL_UNSIGNED_INT, 0);
       
-		//disableVertexAttributeArrays();
+		disableVertexAttributeArrays();
         vao.unbind();
 	}
 	
@@ -51,7 +51,6 @@ public abstract class GameObject
         GL20.glEnableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
         GL20.glEnableVertexAttribArray(VertexArrayObject.UV_LOCATION);
         GL20.glEnableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
-        GL20.glEnableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
 	}
 	
 	private void disableVertexAttributeArrays()
@@ -59,7 +58,6 @@ public abstract class GameObject
         GL20.glDisableVertexAttribArray(VertexArrayObject.POSITION_LOCATION);
         GL20.glDisableVertexAttribArray(VertexArrayObject.UV_LOCATION);
         GL20.glDisableVertexAttribArray(VertexArrayObject.NORMAL_LOCATION);
-        GL20.glDisableVertexAttribArray(VertexArrayObject.COLOR_LOCATION);
 	}
 	
 	public int[] getIndices()

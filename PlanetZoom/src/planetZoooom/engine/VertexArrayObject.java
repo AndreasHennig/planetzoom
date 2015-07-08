@@ -11,14 +11,13 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 import planetZoooom.geometry.GameObject;
 import planetZoooom.geometry.GameObject2D;
 import planetZoooom.geometry.GameObject3D;
 import planetZoooom.geometry.Vertex2D;
 import planetZoooom.geometry.Vertex3D;
-
+//TODO get rid of toFloat methods!!
 public class VertexArrayObject
 {
 	private int id;
@@ -27,12 +26,10 @@ public class VertexArrayObject
 	private int positionHandle;
 	private int uvHandle;
 	private int indexHandle;
-	private int colorHandle;
 	
 	private FloatBuffer normalBuffer;
 	private FloatBuffer positionBuffer;
 	private FloatBuffer uvBuffer;
-	private FloatBuffer colorBuffer;
 	private IntBuffer indexBuffer;
 	
 	private int indexCount;
@@ -41,7 +38,6 @@ public class VertexArrayObject
 	public static final int POSITION_LOCATION = 0;
 	public static final int UV_LOCATION = 1;
 	public static final int NORMAL_LOCATION = 2;
-	public static final int COLOR_LOCATION = 3;
 	
 	private VertexArrayObject(GameObject gameObject)
 	{
@@ -77,7 +73,6 @@ public class VertexArrayObject
 		
 		bindArrayBuffer(UV_LOCATION, 2, uvHandle, uvBuffer);
 		bindArrayBuffer(NORMAL_LOCATION, 3, normalHandle, normalBuffer);
-		bindArrayBuffer(COLOR_LOCATION, 4, colorHandle, colorBuffer);
 		
 		bindIndexBuffer(indexHandle, indexBuffer);
 	}
@@ -95,7 +90,6 @@ public class VertexArrayObject
         GL15.glDeleteBuffers(positionHandle);
         GL15.glDeleteBuffers(uvHandle);
         GL15.glDeleteBuffers(normalHandle);
-        GL15.glDeleteBuffers(colorHandle);
         GL15.glDeleteBuffers(indexHandle);
          
         // Delete the VAO
@@ -142,7 +136,6 @@ public class VertexArrayObject
 			positionBuffer.put(asFloats(vertices.get(i).getPosition()));
 			uvBuffer.put(asFloats(vertices.get(i).getUv()));
 			normalBuffer.put(asFloats(vertices.get(i).getNormal()));
-			colorBuffer.put(asFloats(vertices.get(i).getColorRGBA()));
 		}
 		
 		flipBuffers();
@@ -170,7 +163,6 @@ public class VertexArrayObject
 		uvHandle = GL15.glGenBuffers();
 		indexHandle = GL15.glGenBuffers();
 		normalHandle = GL15.glGenBuffers();
-		colorHandle = GL15.glGenBuffers();
 	}
 	
 	private void createBuffers(int vertexCount, boolean is3D, int indexCount)
@@ -184,7 +176,6 @@ public class VertexArrayObject
 		uvBuffer = BufferUtils.createFloatBuffer(vertexCount * 2);
 		indexBuffer = BufferUtils.createIntBuffer(indexCount);
 		normalBuffer = BufferUtils.createFloatBuffer(vertexCount * 3);
-		colorBuffer = BufferUtils.createFloatBuffer(vertexCount * 4);
 
 	}
 	
@@ -193,7 +184,6 @@ public class VertexArrayObject
 		positionBuffer.flip();
 		uvBuffer.flip();
 		normalBuffer.flip();	
-		colorBuffer.flip();
 		indexBuffer.flip();	
 	}
 	
@@ -206,9 +196,5 @@ public class VertexArrayObject
 	{
 		return new float[]{v.x, v.y, v.z};
 	}	
-	
-	private float[] asFloats(Vector4f v) 
-	{
-		return new float[]{v.x, v.y, v.z, v.w};
-	}	
+		
 }

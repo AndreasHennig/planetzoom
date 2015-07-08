@@ -2,13 +2,11 @@ package planetZoooom.geometry;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 public abstract class Vertex
 {
 	protected Vector2f uv;
 	protected Vector3f normal;
-	protected Vector4f colorRGBA;
 	
 	public static Vector3f up() {
 		return new Vector3f(0, 1, 0);
@@ -47,16 +45,6 @@ public abstract class Vertex
 	public void setNormal(Vector3f normal)
 	{
 		this.normal = normal;
-	}
-
-	public Vector4f getColorRGBA()
-	{
-		return colorRGBA;
-	}
-
-	public void setColorRGBA(Vector4f colorRGBA)
-	{
-		this.colorRGBA = colorRGBA;
 	}
 	
 }

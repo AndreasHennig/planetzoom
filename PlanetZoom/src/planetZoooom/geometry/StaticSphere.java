@@ -2,8 +2,6 @@ package planetZoooom.geometry;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
-
 
 public class StaticSphere extends GameObject3D
 {
@@ -12,8 +10,6 @@ public class StaticSphere extends GameObject3D
 	private Vector3f[] normals;
 	private Vector2f[] uv;
 
-	private final static Vector4f vertexColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-	
 
 	private static Vector3f[] directions = { Vertex3D.left(), Vertex3D.back(),
 			Vertex3D.right(), Vertex3D.front() };
@@ -41,12 +37,6 @@ public class StaticSphere extends GameObject3D
 	
 		createVAO();
 	}
-	
-	private void init()
-	{
-		
-	}
-
 
 	public void normalizeVerticesAndCreateNormals()
 	{
@@ -191,7 +181,7 @@ public class StaticSphere extends GameObject3D
 	{
 		for (int i = 0; i < vertices.length; i++)
 		{
-			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i],	vertexColor));
+			vertexData.add(new Vertex3D(vertices[i], uv[i], normals[i]));
 		}
 	}
 	
