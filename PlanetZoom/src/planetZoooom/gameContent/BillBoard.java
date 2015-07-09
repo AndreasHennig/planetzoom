@@ -58,20 +58,6 @@ public class BillBoard
 		mesh.render(mode);
 	}
 	
-//	private void init()
-//	{		
-//		float localSize = size / 2.0f;
-//		Vector3f normal = new Vector3f(0.0f, 0.0f, 1.0f);
-//		vertexData.add(new Vertex(new Vector3f(-localSize, -localSize, 0), new Vector2f(0.0f, 1.0f), normal));
-//		vertexData.add(new Vertex(new Vector3f(-localSize, localSize, 0), new Vector2f(0.0f, 0.0f), normal));
-//		vertexData.add(new Vertex(new Vector3f(localSize, localSize, 0), new Vector2f(1.0f, 0.0f), normal));
-//		vertexData.add(new Vertex(new Vector3f(localSize, -localSize, 0), new Vector2f(1.0f, 1.0f), normal));
-//		indices = new int[]{2, 1, 0, 0, 3, 2};	
-//
-//		modelMatrix.translate(position);
-//		createVAO();
-//	}
-	
 	public Matrix4f getModelMatrix()
 	{
 		return modelMatrix;

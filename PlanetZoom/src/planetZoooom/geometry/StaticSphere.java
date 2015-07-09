@@ -3,12 +3,20 @@ package planetZoooom.geometry;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class StaticSphere extends GameObject
+import planetZoooom.engine.VertexArray;
+
+public class StaticSphere
 {
 	private float radius;
-	private Vector3f[] vertices;
-	private Vector3f[] normals;
-	private Vector2f[] uv;
+	private Vector3f[] verticesVec;
+	private Vector3f[] normalsVec;
+	private Vector2f[] uvCoordsVec;
+	
+	private float[] vertices;
+	private float[] normals;
+	private float[] uvCoords;
+	private int[] indices;
+	private VertexArray mesh;
 
 	private static Vector3f[] directions = { Vertex.left(), Vertex.back(),
 			Vertex.right(), Vertex.front() };
@@ -16,42 +24,26 @@ public class StaticSphere extends GameObject
 	public StaticSphere()
 	{
 		this(4, 1);
-		createVAO();
 	}
 
 	public StaticSphere(int subdivisions, float radius)
 	{
 		this.radius = radius;
 		int resolution = 1 << subdivisions;
-		vertices = new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
-		normals = new Vector3f[vertices.length];
-		uv = new Vector2f[vertices.length];
+		verticesVec = new Vector3f[(resolution + 1) * (resolution + 1) * 4 - (resolution * 2 - 1) * 3];
+		normalsVec = new Vector3f[verticesVec.length];
+		uvCoordsVec = new Vector2f[verticesVec.length];
 		indices = new int[(1 << (subdivisions * 2 + 3)) * 3];
 	
 		createOctahedron(resolution);
 		normalizeVerticesAndCreateNormals();
 		createUVs();
 		applyMeshModifications();
-		addVertexDataToGameObject();
+		createVerticesAndUVFloatArrays();
 	
-		createVAO();
+		mesh = new VertexArray(vertices, normals, uvCoords, indices);
 	}
 
-	public void normalizeVerticesAndCreateNormals()
-	{
-		for (int i = 0; i < vertices.length; i++)
-		{
-			vertices[i].normalise();
-			normals[i] = (Vector3f) new Vector3f(vertices[i]);
-		}
-	}
-
-	public void applyMeshModifications()
-	{
-		for(int i = 0; i < vertices.length; i++)
-			vertices[i].scale((float) (radius));
-	}
-	
 	private void createOctahedron(int resolution)
 	{
 		int v = 0;
@@ -59,7 +51,7 @@ public class StaticSphere extends GameObject
 		int t = 0;
 		for (int i = 0; i < 4; i++)
 		{
-			vertices[v++] = Vertex.down();
+			verticesVec[v++] = Vertex.down();
 		}
 		// LOWERSPHERE
 		for (int i = 1; i <= resolution; i++)
@@ -67,7 +59,7 @@ public class StaticSphere extends GameObject
 			float progress = (float) i / resolution;
 			Vector3f from;
 			Vector3f to;
-			vertices[v++] = to = Vertex.lerp(Vertex.down(),
+			verticesVec[v++] = to = Vertex.lerp(Vertex.down(),
 					Vertex.front(), progress);
 			for (int d = 0; d < 4; d++)
 			{
@@ -85,7 +77,7 @@ public class StaticSphere extends GameObject
 			float progress = (float) i / resolution;
 			Vector3f from;
 			Vector3f to;
-			vertices[v++] = to = Vertex.lerp(Vertex.up(), Vertex.front(),
+			verticesVec[v++] = to = Vertex.lerp(Vertex.up(), Vertex.front(),
 					progress);
 			for (int d = 0; d < 4; d++)
 			{
@@ -102,7 +94,7 @@ public class StaticSphere extends GameObject
 			indices[t++] = vBottom;
 			indices[t++] = v;
 			indices[t++] = ++vBottom;
-			vertices[v++] = Vertex.up();
+			verticesVec[v++] = Vertex.up();
 		}
 	}
 
@@ -110,7 +102,7 @@ public class StaticSphere extends GameObject
 	{
 		for (int i = 1; i <= steps; i++)
 		{
-			vertices[v++] = Vertex.lerp(from, to, (float) i / steps);
+			verticesVec[v++] = Vertex.lerp(from, to, (float) i / steps);
 		}
 		return v;
 	}
@@ -149,15 +141,27 @@ public class StaticSphere extends GameObject
 		return t;
 	}
 
+	public void normalizeVerticesAndCreateNormals()
+	{
+		for (int i = 0; i < verticesVec.length; i++)
+		{
+			verticesVec[i].normalise();
+			normals = new float[verticesVec.length * 3];
+			normals[i * 3    ] = verticesVec[i].x;
+			normals[i * 3 + 1] = verticesVec[i].y;
+			normals[i * 3 + 2] = verticesVec[i].z;
+		}
+	}
+	
 	private void createUVs()
 	{
 		float previousX = 1f;
-		for (int i = 0; i < vertices.length; i++)
+		for (int i = 0; i < verticesVec.length; i++)
 		{
-			Vector3f vector = new Vector3f(vertices[i]);
+			Vector3f vector = new Vector3f(verticesVec[i]);
 			if (vector.x == previousX)
 			{
-				uv[i - 1].x = 1f;
+				uvCoordsVec[i - 1].x = 1f;
 			}
 			previousX = vector.x;
 			Vector2f texCoords = new Vector2f();
@@ -168,20 +172,38 @@ public class StaticSphere extends GameObject
 				texCoords.x += 1f;
 			}
 			texCoords.y = (float) Math.asin(vector.y) / (float) Math.PI + 0.5f;
-			uv[i] = texCoords;
+			uvCoordsVec[i] = texCoords;
 		}
-		uv[vertices.length - 4].x = uv[0].x = 0.125f;
-		uv[vertices.length - 3].x = uv[1].x = 0.375f;
-		uv[vertices.length - 2].x = uv[2].x = 0.625f;
-		uv[vertices.length - 1].x = uv[3].x = 0.875f;
+		uvCoordsVec[verticesVec.length - 4].x = uvCoordsVec[0].x = 0.125f;
+		uvCoordsVec[verticesVec.length - 3].x = uvCoordsVec[1].x = 0.375f;
+		uvCoordsVec[verticesVec.length - 2].x = uvCoordsVec[2].x = 0.625f;
+		uvCoordsVec[verticesVec.length - 1].x = uvCoordsVec[3].x = 0.875f;
 	}
 
-	private void addVertexDataToGameObject()
+	public void applyMeshModifications()
 	{
-		for (int i = 0; i < vertices.length; i++)
+		for(int i = 0; i < verticesVec.length; i++)
+			verticesVec[i].scale((float) (radius));
+	}
+	
+	private void createVerticesAndUVFloatArrays()
+	{
+		vertices = new float[verticesVec.length * 3]; 
+		uvCoords = new float[verticesVec.length * 2];
+		for (int i = 0; i < verticesVec.length; i++)
 		{
-			vertexData.add(new Vertex(vertices[i], uv[i], normals[i]));
+			vertices[i * 3    ] = verticesVec[i].x;
+			vertices[i * 3 + 1] = verticesVec[i].y;
+			vertices[i * 3 + 2] = verticesVec[i].z;
+					
+			uvCoords[i * 2    ] = uvCoordsVec[i].x;
+			uvCoords[i * 2 + 1] = uvCoordsVec[i].y;
 		}
+	}
+	
+	public void render(int mode)
+	{
+		mesh.render(mode);
 	}
 	
 	public float getRadius()
