@@ -16,8 +16,13 @@ public class HUDText
 	private int startPositionX;
 	private int startPositionY;
 	private int cellSize;
+	private int textLength;
 	
 	private VertexArray mesh;
+	private float[] vertices;
+	private float[] normals;
+	private float[] uvCoords;
+	private int[] indices;
 	
 	/**
 	 * 
@@ -51,11 +56,26 @@ public class HUDText
 		this.startPositionX = x;
 		this.startPositionY = y;
 		this.cellSize = size;
+		this.textLength = text.length();
+		createFloatArrays();
 		update(text);
 	}
 	
+	private void createFloatArrays()
+	{
+		vertices = new float[12 * textLength];	//4 vertices per quad * 3 floats(x,y,z) * chars
+		normals = new float[vertices.length];
+		uvCoords = new float[8 * textLength];	//4 texCoords per quad * 2 floats(u,v) * chars
+		indices = new int[6 * textLength];		//6 points to draw 2 triangles = 1 quad
+	}
+	
+	//int creations = 0;
+	//int updates = 0;
+	
 	public void update(String text)
 	{
+		//updates++;
+		//System.out.println("updates: " + updates + " / creations: " + creations);
 		int index = 0;
 		char currentChar;
 		float uv_x, uv_y;
@@ -64,12 +84,14 @@ public class HUDText
 		int row, column;
 		int x = startPositionX, y = startPositionY;
 
-		float[] vertices = new float[12 * text.length()];	//4 vertices per quad * 3 floats(x,y,z) * chars
-		float[] normals = new float[vertices.length];
-		float[] uvCoords = new float[8 * text.length()];	//4 texCoords per quad * 2 floats(u,v) * chars
-		int[] indices = new int[6 * text.length()];				//6 points to draw 2 triangles = 1 quad
+		if(text.length() != textLength)
+		{
+			this.textLength = text.length();
+			createFloatArrays();
+			//creations++;
+		}
 		
-		for (int i = 0; i < text.length() ; i++)
+		for (int i = 0; i < textLength ; i++)
 		{
 			currentChar = text.charAt(i);
 			row = (currentChar % rowCount);
@@ -131,80 +153,10 @@ public class HUDText
 		mesh = new VertexArray(vertices, normals, uvCoords, indices);
 	}
 
-	
-//	public void update(String text)
-//	{
-//		int index = 0;
-//		char currentChar;
-//		float uv_x, uv_y;
-//		float uvCellHeight = 1.0f / colCount;
-//		float uvCellWidth = 1.0f / rowCount;
-//		int row, column;
-//		int x = startPositionX, y = startPositionY;
-//
-//		vertexData.clear();
-//		indices = new int[text.length() * 6];
-//		
-//		Vector3f[] positions = new Vector3f[4];
-//		Vector2f[] uvs = new Vector2f[4];
-//		Vector3f normal = new Vector3f(0, 0, 1);
-//
-//		for (int i = 0; i < text.length(); i++)
-//		{
-//			currentChar = text.charAt(i);
-//			row = (currentChar % rowCount);
-//			column = (currentChar / colCount);
-//
-//			uv_x = row / (float) rowCount;
-//			uv_y = column / (float) colCount;
-//
-//			if (currentChar == '\n')
-//			{
-//				y += cellSize;
-//				x = 0;
-//				continue;
-//			}
-//
-//			positions[0] = new Vector3f(x, (y + cellSize), 0.0f); 				//top left 
-//			positions[1] = new Vector3f(x + cellSize, (y + cellSize), 0.0f); 		//top right
-//			positions[2] = new Vector3f(x, y, 0.0f); 								//bottom left 
-//			positions[3] = new Vector3f(x + cellSize, y, 0.0f); 					//bottom right 
-//
-//			uvs[0] = new Vector2f(uv_x, uv_y + uvCellHeight); 				//top left 
-//			uvs[1] = new Vector2f(uv_x + uvCellWidth, uv_y + uvCellHeight); //top right
-//			uvs[2] = new Vector2f(uv_x, uv_y); 								//bottom left
-//			uvs[3] = new Vector2f(uv_x + uvCellWidth, uv_y); 				//bottom right
-//
-//			vertexData.add(new Vertex(positions[0], uvs[0], normal));
-//			vertexData.add(new Vertex(positions[1], uvs[1], normal));
-//			vertexData.add(new Vertex(positions[2], uvs[2], normal));
-//			vertexData.add(new Vertex(positions[3], uvs[3], normal));
-//
-//			// First triangle
-//			indices[(i * 6) + 0] = index + 2;
-//			indices[(i * 6) + 1] = index;
-//			indices[(i * 6) + 2] = index + 3;
-//
-//			// Second triangle
-//			indices[(i * 6) + 3] = index;
-//			indices[(i * 6) + 4] = index + 1;
-//			indices[(i * 6) + 5] = index + 3;
-//
-//			index += 4;
-//			x += cellSize;
-//		}
-//
-//		if (this.vao != null)
-//			this.vao.delete();
-//		
-//		createVAO();
-//	}
-	
 	/**
 	 * @param mode render mode (GL_LENUM)
 	 * Handels binding of font texture and calls GameObject2D's draw method
 	 */
-
 	public void render(int mode)
 	{	
 	    fontTexture.bind();
