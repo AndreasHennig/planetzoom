@@ -120,6 +120,12 @@ public class Game implements IGame
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //DO NOT MOVE THIS LINE! ....THERE IS A REASON THAT IT IS NOT IN RENDERER;
 		
+		//I KNOW YOU GONNA HANG ME FOR THAT BUT IT WORKS :D
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
+				
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
@@ -147,7 +153,7 @@ public class Game implements IGame
 		}
 		
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getSphere().getModelMatrix(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
 		
 		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
 		lightDirection.normalise();
@@ -165,14 +171,23 @@ public class Game implements IGame
 			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
-			renderer.renderGameObject(planet.getAtmosphere().getSphere(), null, GL_TRIANGLES);
+			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
+			if(wireframe)
+			{
+				glUseProgram(wireFrameShader.getId());
+				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+				wireFrameShader.loadUniform1f(1.0f, "greytone");
+				planet.getAtmosphere().getSphere().render(GL_POINTS);
+				wireFrameShader.loadUniform1f(0.4f, "greytone");
+				planet.getAtmosphere().getSphere().render(GL_LINE_STRIP);
+			}
 		}
-		
 		glFrontFace(GL_CCW);
 		
 		glEnable(GL_DEPTH_TEST);
 		
-		planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
+		//planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
 
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
@@ -182,12 +197,6 @@ public class Game implements IGame
 			planet.update(planetCamDistance, false);
 		}
 		updates++;
-		
-		//I KNOW YOU GONNA HANG ME FOR THAT BUT IT WORKS :D
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
 		
 		glUseProgram(planetShader.getId());
 		{

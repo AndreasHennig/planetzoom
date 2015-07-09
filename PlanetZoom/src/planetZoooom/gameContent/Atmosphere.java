@@ -1,12 +1,15 @@
 package planetZoooom.gameContent;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+
 import planetZoooom.geometry.StaticSphere;
 import planetZoooom.graphics.ShaderProgram;
 
 
 public class Atmosphere 
 {
+	private Matrix4f modelMatrix;
 	private StaticSphere sphere;
 	private Vector3f position;
 	
@@ -38,8 +41,8 @@ public class Atmosphere
 	public Atmosphere(Planet planet)
 	{
 		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() * 1.025f);
-		position = planet.getPosition();	
-		sphere.createVAO();
+		position = planet.getPosition();
+		modelMatrix = new Matrix4f().translate(position);
 	}
 	
 	public void loadSpecificUniforms(ShaderProgram atmosphereShader)
@@ -63,6 +66,11 @@ public class Atmosphere
 	public StaticSphere getSphere()
 	{
 		return sphere;
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
 	}
 
 }
