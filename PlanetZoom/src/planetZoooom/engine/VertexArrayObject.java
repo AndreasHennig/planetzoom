@@ -19,7 +19,6 @@ import planetZoooom.geometry.Vertex;
 public class VertexArrayObject
 {
 	private int id;
-
 	private int normalHandle;
 	private int positionHandle;
 	private int uvHandle;
