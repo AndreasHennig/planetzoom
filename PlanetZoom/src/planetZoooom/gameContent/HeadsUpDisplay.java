@@ -1,11 +1,13 @@
 package planetZoooom.gameContent;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.HUDText;
 
 public class HeadsUpDisplay
 {
+	private Matrix4f modelMatrix = new Matrix4f();
 	private Vector3f cameraPosition;
 	private Vector3f cameraLookAt;
 	private float distanceToPlanetSurface;
@@ -79,9 +81,14 @@ public class HeadsUpDisplay
 			fps
 		);
 	}
-	public HUDText getMesh()
+	public HUDText getTextMesh()
 	{
 	    return text;
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
 	}
 
 	public void setCameraPosition(Vector3f cameraPosition)
