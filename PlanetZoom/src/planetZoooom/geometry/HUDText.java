@@ -16,6 +16,7 @@ public class HUDText
 	private int startPositionX;
 	private int startPositionY;
 	private int cellSize;
+
 	private int textLength;
 	
 	private VertexArray mesh;
@@ -23,7 +24,7 @@ public class HUDText
 	private float[] normals;
 	private float[] uvCoords;
 	private int[] indices;
-	
+
 	/**
 	 * 
 	 * @param text text to be rendered
@@ -90,7 +91,7 @@ public class HUDText
 			createFloatArrays();
 			//creations++;
 		}
-		
+
 		for (int i = 0; i < textLength ; i++)
 		{
 			currentChar = text.charAt(i);
@@ -147,8 +148,6 @@ public class HUDText
 			index += 4;
 			x += cellSize;
 		}
-		
-		
 
 		mesh = new VertexArray(vertices, normals, uvCoords, indices);
 	}
