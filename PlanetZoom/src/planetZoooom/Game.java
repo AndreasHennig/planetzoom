@@ -216,8 +216,8 @@ public class Game implements IGame
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
-			hudShader.loadUniformMat4f(hud.getMesh().getModelMatrix(), "modelViewMatrix", false);
-			hud.getMesh().draw(GL_TRIANGLES);
+			hudShader.loadUniformMat4f(hud.getModelMatrix(), "modelViewMatrix", false);
+			hud.getTextMesh().render(GL_TRIANGLES);
 		}
 		glUseProgram(0);
 	}
