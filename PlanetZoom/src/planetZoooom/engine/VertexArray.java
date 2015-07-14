@@ -26,60 +26,67 @@ public class VertexArray
 	
 	public VertexArray(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
 	{
+		initBufferHandles();
+		doBufferStuff(vertices, normals, uvCoords, indices);
+	}
+	
+	public void update(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
+	{
+		doBufferStuff(vertices, normals, uvCoords, indices);
+	}
+	
+	private void initBufferHandles()
+	{
+		vaoHandle = glGenVertexArrays();
+		vboHandle = glGenBuffers();
+		nboHandle = glGenBuffers();
+		uvboHandle = glGenBuffers();
+		iboHandle = glGenBuffers();
+	}
+	
+	private void fillFloatBuffer(int handle, float[] data, int location, int stride, boolean normalize)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, handle);
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
+		buffer.put(data).flip();
+		glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(location, stride, GL_FLOAT, normalize, 0, 0);
+		glEnableVertexAttribArray(location);
+	}
+	
+	private void doBufferStuff(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
+	{
 		count = indices.length;
 		
-		vaoHandle = glGenVertexArrays();
 		glBindVertexArray(vaoHandle);
 		
-		vboHandle = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length);
-		vertexBuffer.put(vertices).flip();
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, false, 0, 0);
-		glEnableVertexAttribArray(VERTEX_LOCATION);
+		fillFloatBuffer(vboHandle, vertices, VERTEX_LOCATION, 3, false);
+		fillFloatBuffer(nboHandle, normals, NORMAL_LOCATION, 3, true);
+		fillFloatBuffer(uvboHandle, uvCoords, UV_LOCATION, 2, false);
 		
-		uvboHandle = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, uvboHandle);
-		FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(uvCoords.length);
-		uvBuffer.put(uvCoords).flip();
-		glBufferData(GL_ARRAY_BUFFER, uvBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(UV_LOCATION, 2, GL_FLOAT, false, 0, 0);
-		glEnableVertexAttribArray(UV_LOCATION);
-		
-		nboHandle = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, nboHandle);
-		FloatBuffer normalBuffer = BufferUtils.createFloatBuffer(normals.length);
-		normalBuffer.put(normals).flip();
-		glBufferData(GL_ARRAY_BUFFER, normalBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, true, 0, 0);	//true for normalized
-		glEnableVertexAttribArray(NORMAL_LOCATION);
-		
-		iboHandle = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle);
 		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
 		indexBuffer.put(indices).flip();
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
 		
-		//UNBIND
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 	
-	public void bind()
+	private void bind()
 	{
 		glBindVertexArray(vaoHandle);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle);
 	}
 
-	public void unbind()
+	private void unbind()
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 	
-	public void draw(int mode)
+	private void draw(int mode)
 	{
 		glDrawElements(mode, count, GL_UNSIGNED_INT, 0);
 	}

@@ -1,7 +1,6 @@
 package planetZoooom.engine;
 
 import static org.lwjgl.opengl.GL11.*;
-import planetZoooom.gameContent.BillBoard;
 import planetZoooom.geometry.GameObject;
 import planetZoooom.graphics.Texture;
 
@@ -18,18 +17,6 @@ public class Renderer
 			texture.bind();
 		
 		gameObject.draw(renderMode);
-		
-        //Clean up
-		if(texture != null)
-			texture.unbind();
-	}
-	
-	public void renderGameObject(BillBoard gameObject, Texture texture, int renderMode)
-	{
-		if(texture != null)
-			texture.bind();
-		
-		gameObject.render(renderMode);
 		
         //Clean up
 		if(texture != null)

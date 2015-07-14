@@ -3,21 +3,16 @@ package planetZoooom.geometry;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import planetZoooom.engine.MeshObject;
 import planetZoooom.engine.VertexArray;
 
-public class StaticSphere
+public class StaticSphere extends MeshObject
 {
 	private float radius;
 	private Vector3f[] verticesVec;
 	private Vector3f[] normalsVec;
 	private Vector2f[] uvCoordsVec;
 	
-	private float[] vertices;
-	private float[] normals;
-	private float[] uvCoords;
-	private int[] indices;
-	private VertexArray mesh;
-
 	private static Vector3f[] directions = { Vertex.left(), Vertex.back(),
 			Vertex.right(), Vertex.front() };
 

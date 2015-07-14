@@ -1,9 +1,10 @@
 package planetZoooom.geometry;
 
+import planetZoooom.engine.MeshObject;
 import planetZoooom.engine.VertexArray;
 import planetZoooom.graphics.Texture;
 
-public class HUDText
+public class HUDText extends MeshObject
 {
 	
 	private static final int ROWCOUNT_STANDARD = 16;
@@ -12,18 +13,16 @@ public class HUDText
 	private Texture fontTexture;
 	private int rowCount;
 	private int colCount;
+
+	private int x,y, row, column, index;
+	private float uvCellWidth, uvCellHeight, uv_x, uv_y;
+	private char currentChar;
 	
 	private int startPositionX;
 	private int startPositionY;
 	private int cellSize;
 
 	private int textLength;
-	
-	private VertexArray mesh;
-	private float[] vertices;
-	private float[] normals;
-	private float[] uvCoords;
-	private int[] indices;
 
 	/**
 	 * 
@@ -59,6 +58,7 @@ public class HUDText
 		this.cellSize = size;
 		this.textLength = text.length();
 		createFloatArrays();
+		mesh = new VertexArray(vertices, normals, uvCoords, indices);
 		update(text);
 	}
 	
@@ -73,17 +73,17 @@ public class HUDText
 	//int creations = 0;
 	//int updates = 0;
 	
+	
 	public void update(String text)
 	{
 		//updates++;
 		//System.out.println("updates: " + updates + " / creations: " + creations);
-		int index = 0;
-		char currentChar;
-		float uv_x, uv_y;
-		float uvCellHeight = 1.0f / colCount;
-		float uvCellWidth = 1.0f / rowCount;
-		int row, column;
-		int x = startPositionX, y = startPositionY;
+		index = 0;
+		
+		uvCellHeight = 1.0f / colCount;
+		uvCellWidth = 1.0f / rowCount;
+		x = startPositionX; 
+		y = startPositionY;
 
 		if(text.length() != textLength)
 		{
@@ -149,7 +149,7 @@ public class HUDText
 			x += cellSize;
 		}
 
-		mesh = new VertexArray(vertices, normals, uvCoords, indices);
+		mesh.update(vertices, normals, uvCoords, indices);
 	}
 
 	/**

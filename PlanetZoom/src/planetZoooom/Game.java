@@ -1,6 +1,5 @@
 package planetZoooom;
 
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
@@ -22,7 +21,6 @@ import planetZoooom.interfaces.IGame;
 import planetZoooom.utils.GameUtils;
 import planetZoooom.utils.Info;
 import planetZoooom.utils.MatrixUtils;
-import planetZoooom.input.*;
 
 public class Game implements IGame 
 {
@@ -112,9 +110,12 @@ public class Game implements IGame
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
+		sun.setTexture(sunTexture);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
+		sunGlow.setTexture(sunGlowTexture);
 	}
 
+	
 	@Override
 	public void update(int deltaTime) 
 	{
@@ -154,7 +155,7 @@ public class Game implements IGame
 			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
-			renderer.renderGameObject(sunGlow, sunGlowTexture, GL_TRIANGLES);
+			sunGlow.render(GL_TRIANGLES);
 		}
 
 		glUseProgram(sunShader.getId());
@@ -164,7 +165,7 @@ public class Game implements IGame
 			sunShader.loadUniformVec3f(sun.getPosition(), "billboardCenter");
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
-			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
+			sun.render(GL_TRIANGLES);
 		}
 	}
 	
@@ -184,16 +185,17 @@ public class Game implements IGame
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
 			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
-			if(wireframe)
-			{
-				glUseProgram(wireFrameShader.getId());
-				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-				wireFrameShader.loadUniform1f(0.4f, "greytone");
-				planet.getAtmosphere().getSphere().render(GL_LINE_STRIP);
-				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				planet.getAtmosphere().getSphere().render(GL_POINTS);
-			}
+			
+//			if(wireframe)
+//			{
+//				glUseProgram(wireFrameShader.getId());
+//				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+//				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+//				wireFrameShader.loadUniform1f(0.4f, "greytone");
+//				planet.getAtmosphere().getSphere().render(GL_LINE_STRIP);
+//				wireFrameShader.loadUniform1f(1.0f, "greytone");
+//				planet.getAtmosphere().getSphere().render(GL_POINTS);
+//			}
 		}
 	}
 	

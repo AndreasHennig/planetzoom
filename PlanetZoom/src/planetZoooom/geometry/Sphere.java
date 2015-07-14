@@ -10,8 +10,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 public class Sphere extends GameObject
 {
-	public final static int MAX_SUBDIVISIONS = 7;
-	public final static int MIN_SUBDIVISIONS = 7;
+	public final static int MAX_SUBDIVISIONS = 5;
+	public final static int MIN_SUBDIVISIONS = 5;
 
 	private int subdivisions;
 	private float radius;
