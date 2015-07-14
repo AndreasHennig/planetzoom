@@ -18,6 +18,7 @@ out DATA
 	vec3 viewDir;
 	vec3 lightDir;
 	float seaLevel;
+	float mountainHeight;
 } pass_data;
 
 uniform mat4 modelViewMatrix;
@@ -26,7 +27,10 @@ uniform mat4 normalMatrix;
 uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform float radius;
+
 uniform float flatShading;
+
+uniform float mountainHeight;
 
 void main(void)
 {
@@ -43,9 +47,12 @@ void main(void)
 	}
 	
 	pass_data.uv = uvCoords;
+
 	pass_data.seaLevel = 0.43;
 	pass_data.viewDir = cameraPosition - position;
 	pass_data.lightDir = vec3(modelViewMatrix * vec4(lightPosition, 1.0));
+
+	pass_data.mountainHeight = mountainHeight;
 
 	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);
 }

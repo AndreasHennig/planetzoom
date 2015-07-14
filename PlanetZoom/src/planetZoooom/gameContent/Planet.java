@@ -12,9 +12,86 @@ import planetZoooom.utils.Info;
 
 public class Planet implements IGameObjectListener 
 {
+	final static float MIN_AMPLITUDE = 1;
+	final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
+	final static int MIN_OCTAVES = 1;
+	final static float MIN_MOUNTAIN_HEIGHT = 0.0014f;
+	
 	private Sphere sphere;
 	private Vector3f position;
 	private Atmosphere atmosphere;
+	
+	private float amplitude;
+	private int octaves;
+	private float lambdaBaseFactor;
+	private float noiseSeed;
+	private float mountainHeight;
+	
+	public float getAmplitude() {
+		return amplitude;
+	}
+
+	public void setAmplitude(float amplitude) {
+		if(amplitude < MIN_AMPLITUDE)
+			this.amplitude = MIN_AMPLITUDE;
+		else
+			this.amplitude = amplitude;
+		
+		System.out.printf("Noise Amplitude: %.2f\n", this.amplitude);
+	}
+
+	public int getOctaves() {
+		return octaves;
+	}
+
+	public void setOctaves(int octaves) {
+		if(octaves < MIN_OCTAVES)
+			this.octaves = MIN_OCTAVES;
+		else
+			this.octaves = octaves;
+		
+		System.out.println("Noise Octaves: " + this.octaves);
+	}
+
+	public float getLambdaBaseFactor() {
+		return lambdaBaseFactor;
+	}
+
+	public void setLambdaBaseFactor(float lambdaBaseFactor) {
+		if(lambdaBaseFactor < MIN_LAMBDA_BASE_FACTOR)
+			this.lambdaBaseFactor = MIN_LAMBDA_BASE_FACTOR;
+		else
+			this.lambdaBaseFactor = lambdaBaseFactor;
+		
+		System.out.printf("Noise Lambda: %.2f\n",this.lambdaBaseFactor);
+	}
+
+	public float getNoiseSeed() {
+		return noiseSeed;
+	}
+
+	public void setNoiseSeed(float noiseSeed) {
+		this.noiseSeed = noiseSeed;
+		
+		System.out.println("Noise Seed: " + this.noiseSeed);
+	}
+
+	public void setAtmosphere(Atmosphere atmosphere) {
+		this.atmosphere = atmosphere;
+	}
+	
+	public float getMountainHeight() {
+		return mountainHeight;
+	}
+
+	public void setMountainHeight(float mountainHeight) {
+		if(mountainHeight < MIN_MOUNTAIN_HEIGHT)
+			this.mountainHeight = MIN_MOUNTAIN_HEIGHT;
+		else
+			this.mountainHeight = mountainHeight;
+		
+		System.out.printf("Mountain Height: %.4f %%\n", this.mountainHeight);
+	}
 	
 	public Planet(float radius, Vector3f position) 
 	{
@@ -22,8 +99,14 @@ public class Planet implements IGameObjectListener
 		this.sphere = new Sphere(radius);
 		this.atmosphere = new Atmosphere(this);
 		sphere.addListener(this);
+		
+		lambdaBaseFactor = 0.75f;
+		octaves = 3;
+		amplitude = 3.07f;
+		noiseSeed = 0;
+		mountainHeight = MIN_MOUNTAIN_HEIGHT;
 	}
-	
+
 	public void update(int subdivisions)
 	{
 		sphere.update(subdivisions, Info.camera.getLookAt());
@@ -81,15 +164,13 @@ public class Planet implements IGameObjectListener
 		Vector3f position = v3d.getPosition();
 		float planetRadius = this.getRadius();
 		
-		final int octaves = 3;
-		final float lambda = 0.75f * planetRadius;
-		final float amplitude = 3.57f;
-		
-		float noise = (float) CustomNoise.perlinNoise(position.x, position.y, position.z, octaves, lambda, amplitude);
+		final float lambda = lambdaBaseFactor * planetRadius;
+		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, position.y + noiseSeed, position.z + noiseSeed, octaves, lambda, amplitude);
 
 		noise = (noise + 1) / 2;
 		
 		// 0.14 % = 8 km von 6000 km
-		position.scale(1 + noise * 0.03f);
+		position.scale(1 + noise * mountainHeight);
+
 	}
 }

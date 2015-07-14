@@ -22,6 +22,7 @@ import planetZoooom.interfaces.IGame;
 import planetZoooom.utils.GameUtils;
 import planetZoooom.utils.Info;
 import planetZoooom.utils.MatrixUtils;
+import planetZoooom.input.*;
 
 public class Game implements IGame 
 {
@@ -192,12 +193,13 @@ public class Game implements IGame
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
+		this.processKeyboardInputs();
 		if(updates % 30 == 0)
 		{
 			planet.update(planetCamDistance, false);
 		}
 		updates++;
-		
+
 		glUseProgram(planetShader.getId());
 		{
 			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
@@ -207,6 +209,7 @@ public class Game implements IGame
 			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			planetShader.loadUniform1f(planet.getRadius(), "radius");
 			planetShader.loadUniform1f(flatShading, "flatShading");
+			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
 			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
 			
 			if(wireframe)
@@ -236,5 +239,32 @@ public class Game implements IGame
 		System.out.println("GPU Vendor: " + glGetString(GL_VENDOR));
 		System.out.println("OpenGL version: " + glGetString(GL_VERSION));
 		System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
+	}
+	
+	private void processKeyboardInputs() {
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
+			planet.setAmplitude(planet.getAmplitude() + 0.1f);
+		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
+			planet.setAmplitude(planet.getAmplitude() - 0.1f);
+		
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_I))
+			planet.setOctaves(planet.getOctaves() + 1);
+		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_K))
+			planet.setOctaves(planet.getOctaves() - 1);
+		
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_U))
+			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() + 0.01f);
+		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_J))
+			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() - 0.01f);
+		
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_Y))
+			planet.setNoiseSeed(planet.getNoiseSeed() + planet.getRadius() / 50);
+		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
+			planet.setNoiseSeed(planet.getNoiseSeed() - planet.getRadius() / 50);
+		
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_T))
+			planet.setMountainHeight(planet.getMountainHeight() + 0.01f);
+		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_G))
+			planet.setMountainHeight(planet.getMountainHeight() - 0.01f);
 	}
 }

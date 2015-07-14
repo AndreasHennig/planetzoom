@@ -13,6 +13,7 @@ in DATA
 	vec3 viewDir;
 	vec3 lightDir;
 	float seaLevel;
+	float mountainHeight;
 } pass_data;
 
 uniform float radius;
@@ -35,7 +36,8 @@ void main(void)
 	vec4 heightColor;
 	
 	float height = length(pass_data.positionVector) - radius;
-	float maxHeight = radius * 0.03;
+	float maxHeight = radius * pass_data.mountainHeight;
+
 	float heightGradientValue = height / maxHeight;
  
  	vec3 L = normalize(pass_data.lightDir - pass_data.position);   
