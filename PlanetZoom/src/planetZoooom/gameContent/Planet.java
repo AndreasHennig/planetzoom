@@ -83,7 +83,7 @@ public class Planet implements IGameObjectListener
 		
 		final int octaves = 3;
 		final float lambda = 0.75f * planetRadius;
-		final float amplitude = 3.07f;
+		final float amplitude = 3.57f;
 		
 		float noise = (float) CustomNoise.perlinNoise(position.x, position.y, position.z, octaves, lambda, amplitude);
 

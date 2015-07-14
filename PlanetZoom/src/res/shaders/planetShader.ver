@@ -28,24 +28,10 @@ uniform vec3 lightPosition;
 uniform float radius;
 uniform float flatShading;
 
-float maxHeight = radius * 0.03;
-float seaLevel = 0.43;
-
 void main(void)
 {
-	vec3 newPosition;
-
-	if(length(position) < radius + seaLevel * 5)
-	{
-		newPosition = normalize(position) * radius;						
-	}
-	else
-	{
-		newPosition = position;
-	}
-	
 	pass_data.positionVector = position;
-	pass_data.position = vec3(modelViewMatrix * vec4(newPosition, 1.0));
+	pass_data.position = vec3(modelViewMatrix * vec4(position, 1.0));
 	
 	if(flatShading > 0.5)
 	{	
@@ -57,9 +43,9 @@ void main(void)
 	}
 	
 	pass_data.uv = uvCoords;
-	pass_data.seaLevel = seaLevel;
+	pass_data.seaLevel = 0.43;
 	pass_data.viewDir = cameraPosition - position;
 	pass_data.lightDir = vec3(modelViewMatrix * vec4(lightPosition, 1.0));
 
-	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(newPosition, 1.0);
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);
 }
