@@ -59,7 +59,6 @@ public class Game implements IGame
 	private float planetCamDistance;
 	
 	//	CONTROLS
-	private int updates = 0;
 	private boolean wireframe = false;
 	private float flatShading = 0.0f;
 	
@@ -119,22 +118,37 @@ public class Game implements IGame
 	@Override
 	public void update(int deltaTime) 
 	{
+		this.processKeyboardInputs(deltaTime);
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //DO NOT MOVE THIS LINE! ....THERE IS A REASON THAT IT IS NOT IN RENDERER;
 		
-		//I KNOW YOU GONNA HANG ME FOR THAT BUT IT WORKS :D
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
-				
-		cameraControl = Info.camera.getCameraControl();
-		Info.camera = cameraControl.handleInput(deltaTime);
-		
-		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
-		
 		glDisable(GL_DEPTH_TEST);
-	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
+		drawSun();		
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
+		glFrontFace(GL_CW);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
+		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+		lightDirection.normalise();
+		drawAtmosphere();
+		glFrontFace(GL_CCW);
+		glEnable(GL_DEPTH_TEST);
+		
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
+		Matrix4f.invert(modelViewMatrix, normalMatrix);
+		
+		planet.update(planetCamDistance, false);
+		
+		drawPlanet();
+
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		drawHUD();
+	}
+
+	private void drawSun()
+	{
 		glUseProgram(sunGlowShader.getId());
 		{
 			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
@@ -152,13 +166,10 @@ public class Game implements IGame
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
 			renderer.renderGameObject(sun, sunTexture, GL_TRIANGLES);
 		}
-		
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
-		
-		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
-		lightDirection.normalise();
-		glFrontFace(GL_CW);
+	}
+	
+	private void drawAtmosphere()
+	{
 		glUseProgram(atmosphereShader.getId());
 		{
 			planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
@@ -178,28 +189,16 @@ public class Game implements IGame
 				glUseProgram(wireFrameShader.getId());
 				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				planet.getAtmosphere().getSphere().render(GL_POINTS);
 				wireFrameShader.loadUniform1f(0.4f, "greytone");
 				planet.getAtmosphere().getSphere().render(GL_LINE_STRIP);
+				wireFrameShader.loadUniform1f(1.0f, "greytone");
+				planet.getAtmosphere().getSphere().render(GL_POINTS);
 			}
 		}
-		glFrontFace(GL_CCW);
-		
-		glEnable(GL_DEPTH_TEST);
-		
-		//planetCamDistance = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius();
-
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
-		Matrix4f.invert(modelViewMatrix, normalMatrix);
-		
-		this.processKeyboardInputs();
-//		if(updates % 30 == 0)
-//		{
-			planet.update(planetCamDistance, false);
-//		}
-		updates++;
-
+	}
+	
+	private void drawPlanet()
+	{
 		glUseProgram(planetShader.getId());
 		{
 			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
@@ -217,14 +216,16 @@ public class Game implements IGame
 				glUseProgram(wireFrameShader.getId());
 				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_POINTS);
 				wireFrameShader.loadUniform1f(0.4f, "greytone");
 				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_LINE_STRIP);
+				wireFrameShader.loadUniform1f(1.0f, "greytone");
+				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_POINTS);
 			}
 		}
-
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+	}
+	
+	private void drawHUD()
+	{
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
@@ -233,7 +234,7 @@ public class Game implements IGame
 		}
 		glUseProgram(0);
 	}
-
+	
 	private void printVersionInfo() 
 	{
 		System.out.println("GPU Vendor: " + glGetString(GL_VENDOR));
@@ -241,7 +242,16 @@ public class Game implements IGame
 		System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
 	}
 	
-	private void processKeyboardInputs() {
+	private void processKeyboardInputs(int deltaTime) {
+		
+		cameraControl = Info.camera.getCameraControl();
+		Info.camera = cameraControl.handleInput(deltaTime);
+		
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
+		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
 			planet.setAmplitude(planet.getAmplitude() + 0.1f);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
