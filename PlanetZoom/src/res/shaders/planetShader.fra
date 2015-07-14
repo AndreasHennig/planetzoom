@@ -12,7 +12,6 @@ in DATA
 	vec3 positionVector;
 	vec3 viewDir;
 	vec3 lightDir;
-	float seaLevel;
 	float mountainHeight;
 } pass_data;
 
@@ -55,8 +54,8 @@ void main(void)
 	//ColorBorders
 	float snow = 0.94;
 	float stone = 0.7;
-	float grass = 0.45;
-	float sand = pass_data.seaLevel;
+	float grass = 0.06;
+	float sand = 0.04;
 	
 	if(heightGradientValue > snow)
 	{

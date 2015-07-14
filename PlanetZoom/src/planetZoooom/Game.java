@@ -194,10 +194,10 @@ public class Game implements IGame
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
 		this.processKeyboardInputs();
-		if(updates % 30 == 0)
-		{
+//		if(updates % 30 == 0)
+//		{
 			planet.update(planetCamDistance, false);
-		}
+//		}
 		updates++;
 
 		glUseProgram(planetShader.getId());

@@ -17,7 +17,6 @@ out DATA
 	vec3 positionVector;
 	vec3 viewDir;
 	vec3 lightDir;
-	float seaLevel;
 	float mountainHeight;
 } pass_data;
 
@@ -48,7 +47,6 @@ void main(void)
 	
 	pass_data.uv = uvCoords;
 
-	pass_data.seaLevel = 0.43;
 	pass_data.viewDir = cameraPosition - position;
 	pass_data.lightDir = vec3(modelViewMatrix * vec4(lightPosition, 1.0));
 

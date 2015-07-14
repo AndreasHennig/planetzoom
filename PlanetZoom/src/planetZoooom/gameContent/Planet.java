@@ -15,7 +15,7 @@ public class Planet implements IGameObjectListener
 	final static float MIN_AMPLITUDE = 1;
 	final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
 	final static int MIN_OCTAVES = 1;
-	final static float MIN_MOUNTAIN_HEIGHT = 0.0014f;
+	final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
 	
 	private Sphere sphere;
 	private Vector3f position;
@@ -102,7 +102,7 @@ public class Planet implements IGameObjectListener
 		
 		lambdaBaseFactor = 0.75f;
 		octaves = 3;
-		amplitude = 3.07f;
+		amplitude = 1.77f;
 		noiseSeed = 0;
 		mountainHeight = MIN_MOUNTAIN_HEIGHT;
 	}
@@ -167,7 +167,10 @@ public class Planet implements IGameObjectListener
 		final float lambda = lambdaBaseFactor * planetRadius;
 		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, position.y + noiseSeed, position.z + noiseSeed, octaves, lambda, amplitude);
 
-		noise = (noise + 1) / 2;
+		if(noise < 0)
+			noise = 0;
+		
+//		noise = (noise + 1) / 2;
 		
 		// 0.14 % = 8 km von 6000 km
 		position.scale(1 + noise * mountainHeight);
