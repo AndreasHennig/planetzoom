@@ -14,6 +14,7 @@ import planetZoooom.gameContent.BillBoard;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
 import planetZoooom.gameContent.Planet;
+import planetZoooom.geometry.Sphere;
 import planetZoooom.graphics.ShaderProgram;
 import planetZoooom.graphics.Texture;
 import planetZoooom.input.Keyboard;
@@ -73,7 +74,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 10000f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 8f);
 		Info.projectionMatrix = planetZoooom.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
 		modelViewMatrix = new Matrix4f();
@@ -109,10 +110,10 @@ public class Game implements IGame
 
 	private void initGameObjects() 
 	{
-		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
+//		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
-		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
-		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
+//		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
+//		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
 	}
 
 	@Override
@@ -124,27 +125,31 @@ public class Game implements IGame
 		
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
-		drawSun();		
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		glFrontFace(GL_CW);
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
-		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
-		lightDirection.normalise();
-		drawAtmosphere();
-		glFrontFace(GL_CCW);
-		glEnable(GL_DEPTH_TEST);
-		
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
-		Matrix4f.invert(modelViewMatrix, normalMatrix);
-		
-		planet.update(planetCamDistance, false);
-		
-		drawPlanet();
-
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		Matrix4f modelMatrix = new Matrix4f();
+		modelMatrix.setIdentity();
+		Matrix4f.mul(Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
+//		drawSun();		
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		
+//		glFrontFace(GL_CW);
+//		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
+//		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+//		lightDirection.normalise();
+//		drawAtmosphere();
+//		glFrontFace(GL_CCW);
+//		glEnable(GL_DEPTH_TEST);
+//		
+//		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
+//		Matrix4f.invert(modelViewMatrix, normalMatrix);
+//		
+//		planet.update(planetCamDistance, false);
+//		
+//		drawPlanet();
+//
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, 0, 0, game.timer.getFPS());
 		drawHUD();
+		
+		drawSphereTest();
 	}
 
 	private void drawSun()
@@ -197,31 +202,42 @@ public class Game implements IGame
 		}
 	}
 	
+	private void drawSphereTest()
+	{
+		
+		Sphere testSphere = new Sphere(1, 7);
+		glUseProgram(wireFrameShader.getId());
+		wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+		wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+		wireFrameShader.loadUniform1f(0.4f, "greytone");
+		testSphere.render(GL_TRIANGLES);
+	}
+	
 	private void drawPlanet()
 	{
-		glUseProgram(planetShader.getId());
-		{
-			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			planetShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			planetShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-			planetShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
-			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			planetShader.loadUniform1f(planet.getRadius(), "radius");
-			planetShader.loadUniform1f(flatShading, "flatShading");
-			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
-			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
-			
-			if(wireframe)
-			{
-				glUseProgram(wireFrameShader.getId());
-				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-				wireFrameShader.loadUniform1f(0.4f, "greytone");
-				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_LINE_STRIP);
-				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_POINTS);
-			}
-		}
+//		glUseProgram(planetShader.getId());
+//		{
+//			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+//			planetShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+//			planetShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
+//			planetShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+//			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
+//			planetShader.loadUniform1f(planet.getRadius(), "radius");
+//			planetShader.loadUniform1f(flatShading, "flatShading");
+//			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
+//			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
+//			
+//			if(wireframe)
+//			{
+//				glUseProgram(wireFrameShader.getId());
+//				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+//				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+//				wireFrameShader.loadUniform1f(0.4f, "greytone");
+//				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_LINE_STRIP);
+//				wireFrameShader.loadUniform1f(1.0f, "greytone");
+//				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_POINTS);
+//			}
+//		}
 	}
 	
 	private void drawHUD()

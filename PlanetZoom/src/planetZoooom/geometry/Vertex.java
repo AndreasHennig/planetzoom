@@ -85,4 +85,6 @@ public class Vertex
 		
 		return new Vector3f(x, y, z);
 	}
+	
+	
 }
