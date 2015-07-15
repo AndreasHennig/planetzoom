@@ -253,9 +253,9 @@ public class Game implements IGame
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
-			planet.setAmplitude(planet.getAmplitude() + 0.1f);
+			planet.setAmplitude(planet.getAmplitude() + 0.02f);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
-			planet.setAmplitude(planet.getAmplitude() - 0.1f);
+			planet.setAmplitude(planet.getAmplitude() - 0.02f);
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_I))
 			planet.setOctaves(planet.getOctaves() + 1);
@@ -263,18 +263,18 @@ public class Game implements IGame
 			planet.setOctaves(planet.getOctaves() - 1);
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_U))
-			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() + 0.01f);
+			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() + 0.001f);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_J))
-			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() - 0.01f);
+			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() - 0.001f);
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_Y))
-			planet.setNoiseSeed(planet.getNoiseSeed() + planet.getRadius() / 50);
+			planet.setNoiseSeed(planet.getNoiseSeed() + planet.getRadius() / 1000);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
-			planet.setNoiseSeed(planet.getNoiseSeed() - planet.getRadius() / 50);
+			planet.setNoiseSeed(planet.getNoiseSeed() - planet.getRadius() / 1000);
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_T))
-			planet.setMountainHeight(planet.getMountainHeight() + 0.01f);
+			planet.setMountainHeight(planet.getMountainHeight() + 0.0005f);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_G))
-			planet.setMountainHeight(planet.getMountainHeight() - 0.01f);
+			planet.setMountainHeight(planet.getMountainHeight() - 0.0005f);
 	}
 }
