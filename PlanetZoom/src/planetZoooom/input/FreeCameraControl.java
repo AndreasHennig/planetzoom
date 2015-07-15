@@ -14,7 +14,7 @@ import planetZoooom.interfaces.ICameraControl;
 public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
-	private float inputSensitivity = 0.005f;
+	private float inputSensitivity = 0.0005f;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{

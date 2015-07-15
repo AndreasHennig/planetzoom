@@ -118,7 +118,7 @@ public class Game implements IGame
 	private void initGameObjects() 
 	{
 //		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		masterSphere = new MasterSphere(6500.0f, 7);
+		masterSphere = new MasterSphere(1.0f, 10000);
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
@@ -160,9 +160,9 @@ public class Game implements IGame
 		float distance = 0;
 		
 		if(updateSphere)
-			masterSphere.update(5);
+			masterSphere.update();
 				
-		System.out.println(GameUtils.getDistanceCoefficient(distance));
+//		System.out.println(GameUtils.getDistanceCoefficient(distance));
 		drawMasterSphere();
 		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), distance, masterSphere.getTriangleCount(), masterSphere.getVertexCount(), game.timer.getFPS());
 		drawHUD();
