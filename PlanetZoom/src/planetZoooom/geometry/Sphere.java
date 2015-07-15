@@ -1,12 +1,10 @@
-//http://www.binpress.com/tutorial/creating-an-octahedron-sphere/162
-
 package planetZoooom.geometry;
 
+import java.security.Security;
 import java.util.ArrayList;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 public class Sphere extends GameObject
 {
