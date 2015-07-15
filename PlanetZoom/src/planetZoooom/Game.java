@@ -2,7 +2,12 @@ package planetZoooom;
 
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glGetString;
+import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Matrix4f;
@@ -14,6 +19,8 @@ import planetZoooom.gameContent.BillBoard;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
 import planetZoooom.gameContent.Planet;
+import planetZoooom.geometry.MasterSphere;
+import planetZoooom.geometry.Sphere;
 import planetZoooom.graphics.ShaderProgram;
 import planetZoooom.graphics.Texture;
 import planetZoooom.input.Keyboard;
@@ -22,7 +29,6 @@ import planetZoooom.interfaces.IGame;
 import planetZoooom.utils.GameUtils;
 import planetZoooom.utils.Info;
 import planetZoooom.utils.MatrixUtils;
-import planetZoooom.input.*;
 
 public class Game implements IGame 
 {
@@ -36,6 +42,7 @@ public class Game implements IGame
 	private HeadsUpDisplay hud;
 	private BillBoard sun;
 	private BillBoard sunGlow;
+	private MasterSphere masterSphere;
 
 	// TEXTURES
 	private Texture planetTexture;
@@ -60,6 +67,7 @@ public class Game implements IGame
 	
 	//	CONTROLS
 	private boolean wireframe = false;
+	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
 	
 	public static void main(String[] args) 
@@ -73,7 +81,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 10000f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 8);
 		Info.projectionMatrix = planetZoooom.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
 		modelViewMatrix = new Matrix4f();
@@ -109,7 +117,8 @@ public class Game implements IGame
 
 	private void initGameObjects() 
 	{
-		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
+//		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
+		masterSphere = new MasterSphere(6500.0f, 7);
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
@@ -124,26 +133,38 @@ public class Game implements IGame
 		
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
-		drawSun();		
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		glFrontFace(GL_CW);
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
-		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
-		lightDirection.normalise();
-		drawAtmosphere();
-		glFrontFace(GL_CCW);
-		glEnable(GL_DEPTH_TEST);
+		Matrix4f modelMatrix = new Matrix4f();
+		modelMatrix.setIdentity();
+		Matrix4f.mul(Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
 		
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
-		Matrix4f.invert(modelViewMatrix, normalMatrix);
+//		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
+//		drawSun();		
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		
+//		glFrontFace(GL_CW);
+//		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
+//		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+//		lightDirection.normalise();
+//		drawAtmosphere();
+//		glFrontFace(GL_CCW);
+//		glEnable(GL_DEPTH_TEST);
+//		
+//		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
+//		Matrix4f.invert(modelViewMatrix, normalMatrix);
+//		
+//		planet.update(planetCamDistance, false);
+//		
+//		drawPlanet();
 		
-		planet.update(planetCamDistance, false);
+		float distance = 0;
 		
-		drawPlanet();
-
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		if(updateSphere)
+			masterSphere.update(5);
+				
+		System.out.println(GameUtils.getDistanceCoefficient(distance));
+		drawMasterSphere();
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), distance, masterSphere.getTriangleCount(), masterSphere.getVertexCount(), game.timer.getFPS());
 		drawHUD();
 	}
 
@@ -197,6 +218,15 @@ public class Game implements IGame
 		}
 	}
 	
+	private void drawMasterSphere()
+	{
+		glUseProgram(wireFrameShader.getId());
+		wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+		wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+		wireFrameShader.loadUniform1f(0.4f, "greytone");
+		masterSphere.render(GL_LINES);
+	}
+	
 	private void drawPlanet()
 	{
 		glUseProgram(planetShader.getId());
@@ -247,10 +277,10 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
 			planet.setAmplitude(planet.getAmplitude() + 0.02f);
