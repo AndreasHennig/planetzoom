@@ -69,21 +69,21 @@ public class Sphere extends GameObject
 
 			v1 = new Vertex(currentNode.v1, uvDummy, currentNode.faceNormal);
 			v1.getPosition().scale(radius);
-			notifyListeners(v1);
+//			notifyListeners(v1);
 			vertexData.add(v1);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
 			v2 = new Vertex(currentNode.v2, uvDummy, currentNode.faceNormal);
 			v2.getPosition().scale(radius);
-			notifyListeners(v2);
+//			notifyListeners(v2);
 			vertexData.add(v2);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;
 
 			v3 = new Vertex(currentNode.v3, uvDummy, currentNode.faceNormal);
 			v3.getPosition().scale(radius);
-			notifyListeners(v3);
+//			notifyListeners(v3);
 			vertexData.add(v3);
 			indices[metaIndex] = metaIndex;
 			metaIndex++;

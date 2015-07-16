@@ -1,6 +1,5 @@
 package planetZoooom;
 
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -128,7 +127,7 @@ public class Game implements IGame
 	{
 //		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 
-		masterSphere = new MasterSphere(1.0f, 10000);
+		masterSphere = new MasterSphere(6500f, 10000);
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 //		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 //		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);

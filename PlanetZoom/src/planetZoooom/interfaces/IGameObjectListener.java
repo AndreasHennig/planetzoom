@@ -1,7 +1,7 @@
 package planetZoooom.interfaces;
 
-import planetZoooom.geometry.Vertex;
+import org.lwjgl.util.vector.Vector3f;
 
 public interface IGameObjectListener {
-	void vertexCreated(Vertex v);
+	void vertexCreated(Vector3f v);
 }

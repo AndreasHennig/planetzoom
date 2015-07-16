@@ -3,14 +3,18 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.engine.VertexArray;
+import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.Info;
 
 public class MasterSphere
@@ -20,8 +24,8 @@ public class MasterSphere
 	private static final int ARRAY_SIZE = 5000000;
 	private static final double VIEW_FRUSTUM_OFFSET = 0.3; //Percent
 	
-	
 	//To be inherited by superclass
+	protected List<IGameObjectListener> listeners;
 	private float[] positions;
 
 	private Matrix4f modelMatrix;
@@ -43,6 +47,8 @@ public class MasterSphere
 	{
 		positions = new float[ARRAY_SIZE];
 
+		listeners = new ArrayList<>();
+		
 		
 		lhs = new Vector3f();
 		rhs = new Vector3f();
@@ -62,6 +68,9 @@ public class MasterSphere
 		update();
 	}
 	
+	public void addListener(IGameObjectListener listener) {
+		listeners.add(listener);
+	}
 	
 	public void update()
 	{						
@@ -74,7 +83,7 @@ public class MasterSphere
 		triangleIndexCount = t.length;
 //		for(int depth = 0; depth < subdivisions; depth++)
 		int depth = 0;
-			while(t.length < 10000 * 3)
+			while(t.length < 2000 * 3)
 			{
 				t = subdivide(t, triangleIndexCount, depth++);
 				if(depth > 14)
@@ -129,6 +138,8 @@ public class MasterSphere
 	
 	private int writePosition(Vector3f pos)
 	{
+		notifyListeners(pos);
+		
 		this.positions[positionPointer++] = pos.x;
 		this.positions[positionPointer++] = pos.y;
 		this.positions[positionPointer++] = pos.z;
@@ -163,7 +174,7 @@ public class MasterSphere
 				if(!isFacingTowardsCamera(triangleIndices))
 					continue;
 			}
-			if(newTriangles.length > 10000)
+			if(newTriangles.length > 2000)
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
 			
@@ -209,7 +220,7 @@ public class MasterSphere
 //		n1.scale(radius);
 //		n2.scale(radius);
 //		n3.scale(radius);
-
+		
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
 		newIndices[2] = writePosition(n3);
@@ -295,6 +306,10 @@ public class MasterSphere
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
 	
+	public void notifyListeners(Vector3f v) {
+		for(IGameObjectListener listener : listeners)
+			listener.vertexCreated(v);
+	}
 	
 	public class VA
 	{

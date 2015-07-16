@@ -98,6 +98,8 @@ public class Planet implements IGameObjectListener
 		this.position = position;
 		this.sphere = new Sphere(radius);
 		this.atmosphere = new Atmosphere(this);
+		
+		// TODO: hier auch den Planet als Listener der MasterSphere hinzufuegen.
 		sphere.addListener(this);
 		
 		lambdaBaseFactor = 0.75f;
@@ -158,22 +160,17 @@ public class Planet implements IGameObjectListener
 	}
 
 	@Override
-	public void vertexCreated(Vertex v) 
+	public void vertexCreated(Vector3f v) 
 	{
-		Vertex v3d = (Vertex) v;
-		Vector3f position = v3d.getPosition();
 		float planetRadius = this.getRadius();
 		
 		final float lambda = lambdaBaseFactor * planetRadius;
-		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, position.y + noiseSeed, position.z + noiseSeed, octaves, lambda, amplitude);
+		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
 
 		if(noise < 0)
 			noise = 0;
 		
-//		noise = (noise + 1) / 2;
-		
 		// 0.14 % = 8 km von 6000 km
-		position.scale(1 + noise * mountainHeight);
-
+		v.scale(1 + noise * mountainHeight);
 	}
 }
