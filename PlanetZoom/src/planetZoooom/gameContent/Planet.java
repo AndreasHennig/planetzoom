@@ -16,6 +16,7 @@ public class Planet implements IGameObjectListener
 	final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
 	final static int MIN_OCTAVES = 1;
 	final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
+	final static float CAM_COLLISION_OFFSET = 30;
 	
 	private Sphere sphere;
 	private Vector3f position;
@@ -122,8 +123,42 @@ public class Planet implements IGameObjectListener
 		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
 		this.update(subdivisions);
 
-		// TODO: adjust cam speed with subdivisionCoefficient if adjustCamSpeed
-		// is true
+		// TODO: adjust cam speed with subdivisionCoefficient 
+		// if adjustCamSpeed is true
+		
+		handleCollision();
+	}
+	
+	private void handleCollision() {
+		Vector3f cam = Info.camera.getPosition();
+		Vector3f planet = getPosition();
+		Vector3f planetToCam = new Vector3f();
+		
+		Vector3f.sub(cam, planet, planetToCam);
+		
+		float actualCamDistance = planetToCam.length();
+		planetToCam.normalise().scale(this.getRadius());
+		
+		double noise = CustomNoise.perlinNoise(planetToCam.x + noiseSeed, 
+											   planetToCam.y + noiseSeed, 
+											   planetToCam.z + noiseSeed, 
+											   octaves, 
+											   getLambda(getRadius()), 
+											   amplitude);
+		
+		if(noise < 0)
+			noise = 0;
+		
+		noise *= mountainHeight * getRadius();
+		
+		float minCamDistance = (float) (getRadius() + noise);
+		
+		if(actualCamDistance < minCamDistance + CAM_COLLISION_OFFSET) {
+			planetToCam.normalise();
+			planetToCam.scale(-(actualCamDistance - minCamDistance) + CAM_COLLISION_OFFSET);
+			
+			Vector3f.add(cam, planetToCam, cam);
+		}
 	}
 	
 	public float getRadius() 
@@ -150,13 +185,16 @@ public class Planet implements IGameObjectListener
 	{
 		return sphere.getActualTriangleCount();
 	}
-
 	
 	public Atmosphere getAtmosphere()
 	{
 		return atmosphere;
 	}
 
+	private float getLambda(float planetRadius) {
+		return lambdaBaseFactor * planetRadius;
+	}
+	
 	@Override
 	public void vertexCreated(Vertex v) 
 	{
@@ -165,13 +203,14 @@ public class Planet implements IGameObjectListener
 		float planetRadius = this.getRadius();
 		
 		final float lambda = lambdaBaseFactor * planetRadius;
-		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, position.y + noiseSeed, position.z + noiseSeed, octaves, lambda, amplitude);
+		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, 
+													  position.y + noiseSeed, 
+													  position.z + noiseSeed, 
+													  octaves, getLambda(planetRadius), amplitude);
 
 		if(noise < 0)
 			noise = 0;
-		
-//		noise = (noise + 1) / 2;
-		
+
 		// 0.14 % = 8 km von 6000 km
 		position.scale(1 + noise * mountainHeight);
 
