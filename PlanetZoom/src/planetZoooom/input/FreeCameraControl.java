@@ -15,8 +15,7 @@ public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
 
-	private float inputSensitivity = 0.0005f;
-
+	private float inputSensitivity = 1.5f;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{
