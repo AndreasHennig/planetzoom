@@ -1,9 +1,21 @@
 package planetZoooom.geometry;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Line2D.Float;
+import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -13,16 +25,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import planetZoooom.engine.VertexArray;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.Info;
 
 public class MasterSphere
 {
 	private static final int CHECK_INTERVAL = 4;
-	private static final int FIRST_CHECK = 2;
+	private static final int FIRST_CHECK = 3;
 	private static final int ARRAY_SIZE = 5000000;
-	private static final double VIEW_FRUSTUM_OFFSET = 0.3; //Percent
+	private static final double VIEW_FRUSTUM_OFFSET = 2; 
 	
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
@@ -39,6 +50,7 @@ public class MasterSphere
 	private int positionPointer; 
 	private int triangleIndexCount;
 	private boolean firstCheck;
+	private int minTriangles;
 	private VA va;
 
 	private Matrix4f mv; //modelViewMatrix
@@ -63,6 +75,7 @@ public class MasterSphere
 		n3 = new Vector3f();
 		
 		positionPointer = 0;
+		this.minTriangles = minTriangles;
 		va = new VA(new float[]{}, 0, new int[]{});
 		this.radius = radius;
 		update();
@@ -74,7 +87,7 @@ public class MasterSphere
 	
 	public void update()
 	{						
-		Matrix4f.mul(modelMatrix, Info.camera.getViewMatrix(), mv);
+		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
 		
 		positionPointer = 0;
 		//Indices - 3 make up a triangle
@@ -83,16 +96,18 @@ public class MasterSphere
 		triangleIndexCount = t.length;
 //		for(int depth = 0; depth < subdivisions; depth++)
 		int depth = 0;
-			while(t.length < 2000 * 3)
-			{
-				t = subdivide(t, triangleIndexCount, depth++);
-				if(depth > 14)
-					break;
-			}
-//			System.out.println("depth: " + depth);
+		while(triangleIndexCount < minTriangles * 3)
+		{
+			t = subdivide(t, triangleIndexCount, depth++);
+			if(t.length == 0)
+				break;
+		}
+		
+//		for(int i = 0; i < 6; i++)
+//			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
-		va.update(positions, positionPointer, indices);
+		va.update(positions, positionPointer, indices, triangleIndexCount);
 	}
 	
 	
@@ -116,6 +131,7 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
+//					0,1,2
 					2,4,1,
 					2,0,4,
 					4,3,1,
@@ -126,13 +142,17 @@ public class MasterSphere
 					3,0,5
 				};
 		
-		writePosition(Vertex.left());
-		writePosition(Vertex.right());
-		writePosition(Vertex.up());
-		writePosition(Vertex.down());
-		writePosition(Vertex.front());
-		writePosition(Vertex.back());
-		
+//		
+//		writePosition(new Vector3f(0,0,0));
+//		writePosition(new Vector3f(1,0,0));
+//		writePosition(new Vector3f(0.5f,1,0));
+		writePosition((Vector3f) Vertex.left().scale(radius));
+		writePosition((Vector3f) Vertex.right().scale(radius));
+		writePosition((Vector3f) Vertex.up().scale(radius));
+		writePosition((Vector3f) Vertex.down().scale(radius));
+		writePosition((Vector3f) Vertex.front().scale(radius));
+		writePosition((Vector3f) Vertex.back().scale(radius));
+//		
 		return indices;
 	}
 	
@@ -173,10 +193,11 @@ public class MasterSphere
 			{
 				if(!isFacingTowardsCamera(triangleIndices))
 					continue;
-			}
-			if(newTriangles.length > 2000)
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
+			}
+
+
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -217,9 +238,9 @@ public class MasterSphere
 		n2.normalise();
 		n3.normalise();
 		
-//		n1.scale(radius);
-//		n2.scale(radius);
-//		n3.scale(radius);
+		n1.scale(radius);
+		n2.scale(radius);
+		n3.scale(radius);
 		
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
@@ -243,8 +264,7 @@ public class MasterSphere
 				};
 	}
 
-	
-	private boolean isInViewFrustum(float a, float b, float c) 
+	private boolean isInViewFrustum(float a, float b, float c, int depth) 
 	{
 		Matrix4f p = Info.projectionMatrix;
 		float x,y,z,w;
@@ -256,13 +276,15 @@ public class MasterSphere
 		z = (mv.m02 * a) + (mv.m12 * b) + (mv.m22 * c) + (mv.m32 * d);
 
 		w= -z;
-		if(firstCheck)
-		{
-			w*= 1 + VIEW_FRUSTUM_OFFSET *4;	
-			firstCheck = false;
-		}
-		else
-			w*= 1 + VIEW_FRUSTUM_OFFSET;
+		
+		if(depth < 2)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/1;
+		else if (depth < 8)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/1.5;
+		else if (depth < 12)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
+		
+		
 
 		//camera space -> clip space
 		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
@@ -272,20 +294,86 @@ public class MasterSphere
 		return (x <= w && x >= -w) && (y <= w && y >= -w);
 	}
 	
-	private boolean isInViewFrustum(int[] triangleIndices)
-	{	
-		float[] positions = getPositions(triangleIndices);
+	//TODO implement correct frustum culling maybe sutherland hodgen style
+	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
+	
+	private boolean isInViewFrustum(float[] positions) 
+	{
+		Matrix4f p = Info.projectionMatrix;
+		float x,y,z;
+
+
+		float[] w = new float[3];
+		for(int i = 0; i < positions.length; i+=3)
+		{
+			//Object space -> world space -> camera space
+			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
+			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
+			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
+			
+			w[i/3] = -z;
+			
+			//camera space -> clip space
+			x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30);
+			y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31);
+			z = (p.m02 * x) + (p.m12 * y) + (p.m22 * z) + (p.m32);
+
+			x/= w[i/3];
+			y/= w[i/3];
 		
-		if(isInViewFrustum(positions[0], positions[1], positions[2]))
-			return true;
-		if(isInViewFrustum(positions[3], positions[4], positions[5]))
-			return true;
-		if(isInViewFrustum(positions[6], positions[7], positions[8]))
+			
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
+				return true;
+								
+			positions[i] = x;
+			positions[i+1] = y;
+			positions[i+2] = z;
+		}
+		
+//		if(intersectsNDCPlane(positions))
+//			return true;
+		
+		return false;
+	}
+
+	private boolean intersectsNDCPlane(float[] ndc)
+	{
+		float x0, x1;
+		float y0, y1;
+		for(int i = 0; i < ndc.length-3; i+=3)
+		{
+			x0 = ndc[i];
+			y0 = ndc[i+1];
+			x1 = ndc[i+3];
+			y1 = ndc[i+4];
+			if(foo(x0, y0, x1, y1))
+				return true;
+		}
+		if(foo(ndc[6], ndc[7], ndc[0], ndc[1]))
 			return true;
 		
 		return false;
 	}
 	
+	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, 1, 2, 2);
+	private Line2D l1 = new Line2D.Float();
+	private boolean foo(float x0, float y0, float x1, float y1)
+	{
+		l1.setLine(x0,y0,x1,y1);
+		if(l1.intersects(NDCPlane))
+			return true;
+		
+		return false;
+	}
+	
+	private boolean isInViewFrustum(int[] triangleIndices)
+	{	
+		float[] positions = getPositions(triangleIndices);
+		
+		return isInViewFrustum(positions);
+	}
+		
+
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
@@ -306,15 +394,21 @@ public class MasterSphere
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
 	
-	public void notifyListeners(Vector3f v) {
+	public void notifyListeners(Vector3f v) 
+	{
 		for(IGameObjectListener listener : listeners)
 			listener.vertexCreated(v);
 	}
 	
+	public float getRadius()
+	{
+		return radius;
+	}
+	
 	public class VA
 	{
-		private int count;
 		private int vertexCount;
+		private int indexCount;
 		private int vaoHandle;
 		private int vboHandle;
 		private int nboHandle;
@@ -330,9 +424,10 @@ public class MasterSphere
 			doBufferStuff(vertices, indices);
 		}
 		
-		public void update(float[] vertices, int vertexCount, int[] indices)
+		public void update(float[] vertices, int vertexCount, int[] indices, int indexCount)
 		{
 			this.vertexCount = vertexCount;
+			this.indexCount = indexCount;
 			doBufferStuff(vertices, indices);
 		}
 		
@@ -345,9 +440,7 @@ public class MasterSphere
 		}
 		
 		private void doBufferStuff(float[] vertices, int[] indices)
-		{
-			count = indices.length;
-			
+		{		
 			glBindVertexArray(vaoHandle);
 			
 			FloatBuffer buffer = BufferUtils.createFloatBuffer(vertexCount);
@@ -364,8 +457,8 @@ public class MasterSphere
 			glEnableVertexAttribArray(NORMAL_LOCATION);
 			
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle);
-			IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
-			indexBuffer.put(indices).flip();
+			IntBuffer indexBuffer = BufferUtils.createIntBuffer(indexCount);
+			indexBuffer.put(indices, 0, indexCount).flip();
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);	
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -376,7 +469,7 @@ public class MasterSphere
 		{
 			glBindVertexArray(vaoHandle);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle);
-			glDrawElements(mode, count, GL_UNSIGNED_INT, 0);
+			glDrawElements(mode, indexCount, GL_UNSIGNED_INT, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 		}
