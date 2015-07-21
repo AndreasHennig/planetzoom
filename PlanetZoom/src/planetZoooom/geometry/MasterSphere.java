@@ -32,7 +32,6 @@ public class MasterSphere
 {
 	private static final int CHECK_INTERVAL = 4;
 	private static final int FIRST_CHECK = 3;
-	private static final int ARRAY_SIZE = 5000000;
 	private static final double VIEW_FRUSTUM_OFFSET = 2; 
 	
 	//To be inherited by superclass
@@ -49,7 +48,8 @@ public class MasterSphere
 	
 	private int positionPointer; 
 	private int triangleIndexCount;
-	private boolean firstCheck;
+
+	private int currentDepth;
 	private int minTriangles;
 	private VA va;
 
@@ -57,7 +57,7 @@ public class MasterSphere
 	
 	public MasterSphere(float radius, int minTriangles) 
 	{
-		positions = new float[ARRAY_SIZE];
+		positions = new float[minTriangles * 12 * 2];
 
 		listeners = new ArrayList<>();
 		
@@ -90,27 +90,36 @@ public class MasterSphere
 		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
 		
 		positionPointer = 0;
-		//Indices - 3 make up a triangle
-		firstCheck = true;
+		
 		int[] t = createOctahedron();
 		triangleIndexCount = t.length;
-//		for(int depth = 0; depth < subdivisions; depth++)
+		
 		int depth = 0;
-		while(triangleIndexCount < minTriangles * 3)
+		while(triangleIndexCount < (minTriangles * 3))
 		{
 			t = subdivide(t, triangleIndexCount, depth++);
 			if(t.length == 0)
 				break;
 		}
+		currentDepth = depth;
 		
-//		for(int i = 0; i < 6; i++)
-//			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
 		va.update(positions, positionPointer, indices, triangleIndexCount);
 	}
 	
-	
+	public int getSubdivisions()
+	{
+		return currentDepth;
+	}
+	public int getTotalTriangleCount()
+	{
+		int totalTriangles = 8;
+		for(int i = 0; i < currentDepth; i++)
+			totalTriangles = totalTriangles << 2;
+				
+		return totalTriangles;
+	}
 	
 	public void render(int mode)
 	{
@@ -131,7 +140,6 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
-//					0,1,2
 					2,4,1,
 					2,0,4,
 					4,3,1,
@@ -142,17 +150,13 @@ public class MasterSphere
 					3,0,5
 				};
 		
-//		
-//		writePosition(new Vector3f(0,0,0));
-//		writePosition(new Vector3f(1,0,0));
-//		writePosition(new Vector3f(0.5f,1,0));
 		writePosition((Vector3f) Vertex.left().scale(radius));
 		writePosition((Vector3f) Vertex.right().scale(radius));
 		writePosition((Vector3f) Vertex.up().scale(radius));
 		writePosition((Vector3f) Vertex.down().scale(radius));
 		writePosition((Vector3f) Vertex.front().scale(radius));
 		writePosition((Vector3f) Vertex.back().scale(radius));
-//		
+
 		return indices;
 	}
 	
@@ -189,8 +193,17 @@ public class MasterSphere
 		{
 			triangleIndices = new int[]{triangles[i], triangles[i+1], triangles[i+2]};
 			
-			if (depth % CHECK_INTERVAL == FIRST_CHECK)
+//			if(newTriangles.length > minTriangles) //Most likely last subdivide
+//			{
+//				if(!isFacingTowardsCamera(triangleIndices))
+//					continue;
+//				if (!isInViewFrustum(triangleIndices))
+//					continue; // clip
+//			}
+//			
+			if (depth % CHECK_INTERVAL == 0 || depth == FIRST_CHECK)
 			{
+				
 				if(!isFacingTowardsCamera(triangleIndices))
 					continue;
 				if (!isInViewFrustum(triangleIndices))
@@ -263,42 +276,15 @@ public class MasterSphere
 					new int[] {childIndices[0], childIndices[1], childIndices[2]}
 				};
 	}
-
-	private boolean isInViewFrustum(float a, float b, float c, int depth) 
-	{
-		Matrix4f p = Info.projectionMatrix;
-		float x,y,z,w;
-		float d = 1;
-
-		//Object space -> world space -> camera space
-		x = (mv.m00 * a) + (mv.m10 * b) + (mv.m20 * c) + (mv.m30 * d);
-		y = (mv.m01 * a) + (mv.m11 * b) + (mv.m21 * c) + (mv.m31 * d);
-		z = (mv.m02 * a) + (mv.m12 * b) + (mv.m22 * c) + (mv.m32 * d);
-
-		w= -z;
-		
-		if(depth < 2)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1;
-		else if (depth < 8)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1.5;
-		else if (depth < 12)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
-		
-		
-
-		//camera space -> clip space
-		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
-		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
-		z = (p.m02 * x) + (p.m12 * y) + (p.m22 * z) + (p.m32 * d);
-
-		return (x <= w && x >= -w) && (y <= w && y >= -w);
-	}
 	
 	//TODO implement correct frustum culling maybe sutherland hodgen style
 	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
 	
-	private boolean isInViewFrustum(float[] positions) 
+	private boolean isInViewFrustum(int[] triangleIndices) 
 	{
+		
+		float[] positions = getPositions(triangleIndices);
+		
 		Matrix4f p = Info.projectionMatrix;
 		float x,y,z;
 
@@ -321,7 +307,7 @@ public class MasterSphere
 			x/= w[i/3];
 			y/= w[i/3];
 		
-			//TODO:
+
 			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
 				return true;
 								
@@ -365,13 +351,6 @@ public class MasterSphere
 		
 		return false;
 	}
-	
-	private boolean isInViewFrustum(int[] triangleIndices)
-	{	
-		float[] positions = getPositions(triangleIndices);
-		
-		return isInViewFrustum(positions);
-	}
 		
 
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
@@ -388,6 +367,7 @@ public class MasterSphere
 		Vector3f.sub(v1, Info.camera.getPosition(), n1);
 		double angle = Vector3f.angle(n1, normal) * 180 / Math.PI;
 
+		
 		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
 		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
 

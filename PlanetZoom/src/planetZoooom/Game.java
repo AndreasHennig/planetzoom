@@ -64,6 +64,16 @@ public class Game implements IGame
 	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
 	
+	
+	
+	
+	private static final int HUD_MODE_OFF = 0;
+	private static final int HUD_MODE_INFO = 1;
+	private static final int HUD_MODE_NOISE = 2;
+	private static final int HUD_MODE_ATMOSPHERE = 3;
+	
+	private int hudMode;
+	
 	public static void main(String[] args) 
 	{
 		game = new CoreEngine(new Game());
@@ -90,6 +100,7 @@ public class Game implements IGame
 		initGameObjects();
 
 		Info.planet = planet;
+		hudMode = 0;
 	}
 
 	private void initTextures() 
@@ -112,7 +123,7 @@ public class Game implements IGame
 	private void initGameObjects() 
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
@@ -155,10 +166,35 @@ public class Game implements IGame
 		drawPlanet();
 		
 
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		updateHud(hudMode);
 		drawHUD();
 	}
+	
 
+	private void updateHud(int mode)
+	{
+//		//TODO Distance to surface shall consider noise
+		int triangleCount = planet.getSphere().getTriangleCount();
+		int totalTriangleCount = planet.getSphere().getTotalTriangleCount();
+		double trianglePercentage = triangleCount * 100 / (double) totalTriangleCount;
+		
+		String text = String.format(
+							"Mode %d\n"
+							+ "Distance: %.2f\n"
+							+ "Triangles: %d / %d (%.2f%%)\n"
+							+ "Vertices: %d\n"
+							+ "FPS: %d\n"
+							+ "Subdivisions: %d",
+							mode,
+							GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius(), 
+							triangleCount, totalTriangleCount, trianglePercentage,
+							planet.getSphere().getVertexCount(),
+							game.timer.getFPS(),
+							planet.getSphere().getSubdivisions());
+
+		hud.update(text);
+	}
+	
 	private void drawSun()
 	{
 		glUseProgram(sunGlowShader.getId());
@@ -260,19 +296,20 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
 			planet.setAmplitude(planet.getAmplitude() + 0.02f);
 		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
 			planet.setAmplitude(planet.getAmplitude() - 0.02f);
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_I))
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_I))
 			planet.setOctaves(planet.getOctaves() + 1);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_K))
+		else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_K))
 			planet.setOctaves(planet.getOctaves() - 1);
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_U))
