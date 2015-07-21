@@ -321,7 +321,7 @@ public class MasterSphere
 			x/= w[i/3];
 			y/= w[i/3];
 		
-			
+			//TODO:
 			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
 				return true;
 								
