@@ -21,5 +21,20 @@ public class Keyboard extends GLFWKeyCallback
 		
 		return false;
 	}
+	
+	public static boolean isKeyPressedWithReset(int key)
+	{	
+		if(key < keys.length)
+		{
+			if(keys[key])
+			{
+				keys[key] = false;
+				return true;
+			}
+			
+			return false;
+		}
+		return false;
+	}
 
 }

@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.engine.VertexArrayObject;
 import planetZoooom.interfaces.IGameObjectListener;
@@ -95,7 +96,7 @@ public class GameObject
 		this.modelMatrix = modelMatrix;
 	}
 	
-	public void notifyListeners(Vertex v) {
+	public void notifyListeners(Vector3f v) {
 		for(IGameObjectListener listener : listeners)
 			listener.vertexCreated(v);
 	}

@@ -1,24 +1,22 @@
 package planetZoooom.gameContent;
 
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
-import planetZoooom.geometry.Sphere;
-import planetZoooom.geometry.Vertex;
+import planetZoooom.geometry.MasterSphere;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
-import planetZoooom.utils.GameUtils;
 import planetZoooom.utils.Info;
 
 public class Planet implements IGameObjectListener 
 {
-	final static float MIN_AMPLITUDE = 1;
-	final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
-	final static int MIN_OCTAVES = 1;
-	final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
+	private final static float MIN_AMPLITUDE = 1;
+	private final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
+	private final static int MIN_OCTAVES = 1;
+	private final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
+	private final static int MIN_TRIANGLES = 10000;
 	final static float CAM_COLLISION_OFFSET = 30;
 	
-	private Sphere sphere;
+	private MasterSphere sphere;
 	private Vector3f position;
 	private Atmosphere atmosphere;
 	
@@ -27,6 +25,28 @@ public class Planet implements IGameObjectListener
 	private float lambdaBaseFactor;
 	private float noiseSeed;
 	private float mountainHeight;
+	
+	public Planet(float radius, Vector3f position) 
+	{
+		this.position = position;
+		this.sphere = new MasterSphere(radius, MIN_TRIANGLES);
+		this.atmosphere = new Atmosphere(this);
+		
+		sphere.addListener(this);
+		
+		lambdaBaseFactor = 0.75f;
+		octaves = 3;
+		amplitude = 1.77f;
+		noiseSeed = 0;
+		mountainHeight = MIN_MOUNTAIN_HEIGHT;
+	}
+
+	public void update()
+	{
+		sphere.update();
+		
+		handleCollision();
+	}
 	
 	public float getAmplitude() {
 		return amplitude;
@@ -94,40 +114,28 @@ public class Planet implements IGameObjectListener
 		System.out.printf("Mountain Height: %.4f %%\n", this.mountainHeight);
 	}
 	
-	public Planet(float radius, Vector3f position) 
-	{
-		this.position = position;
-		this.sphere = new Sphere(radius);
-		this.atmosphere = new Atmosphere(this);
-		sphere.addListener(this);
-		
-		lambdaBaseFactor = 0.75f;
-		octaves = 3;
-		amplitude = 1.77f;
-		noiseSeed = 0;
-		mountainHeight = MIN_MOUNTAIN_HEIGHT;
-	}
 
-	public void update(int subdivisions)
-	{
-		sphere.update(subdivisions, Info.camera.getLookAt());
-	}
 
-	public void update(float planetCamDistance, boolean adjustCamSpeed) 
-	{
-		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
-
-		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
-
-		// clamp
-		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
-		this.update(subdivisions);
-
-		// TODO: adjust cam speed with subdivisionCoefficient 
-		// if adjustCamSpeed is true
-		
-		handleCollision();
-	}
+//	public void update(int subdivisions)
+//	{
+//		sphere.update(subdivisions, Info.camera.getLookAt());
+//	}
+//
+//	public void update(float planetCamDistance, boolean adjustCamSpeed) 
+//	{
+//		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
+//
+//		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
+//
+//		// clamp
+//		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
+//		this.update(subdivisions);
+//
+//		// TODO: adjust cam speed with subdivisionCoefficient 
+//		// if adjustCamSpeed is true
+//		
+//		handleCollision();
+//	}
 	
 	private void handleCollision() {
 		Vector3f cam = Info.camera.getPosition();
@@ -160,7 +168,7 @@ public class Planet implements IGameObjectListener
 			Vector3f.add(cam, planetToCam, cam);
 		}
 	}
-	
+
 	public float getRadius() 
 	{
 		return sphere.getRadius();
@@ -170,25 +178,25 @@ public class Planet implements IGameObjectListener
 	{
 		return position;
 	}
-
-	public Sphere getMesh() 
-	{
-		return sphere;
-	}
 	
 	public int getTotalTriangleCount() 
 	{
-		return sphere.getTotalTriangleCount();
+		return sphere.getTriangleCount();
 	}
 	
-	public int getActualTriangleCount() 
+	public int getVertexCount() 
 	{
-		return sphere.getActualTriangleCount();
+		return sphere.getVertexCount();
 	}
 	
 	public Atmosphere getAtmosphere()
 	{
 		return atmosphere;
+	}
+	
+	public MasterSphere getSphere()
+	{
+		return sphere;
 	}
 
 	private float getLambda(float planetRadius) {
@@ -196,23 +204,18 @@ public class Planet implements IGameObjectListener
 	}
 	
 	@Override
-	public void vertexCreated(Vertex v) 
+	public void vertexCreated(Vector3f v) 
 	{
-		Vertex v3d = (Vertex) v;
-		Vector3f position = v3d.getPosition();
 		float planetRadius = this.getRadius();
 		
 		final float lambda = lambdaBaseFactor * planetRadius;
-		float noise = (float) CustomNoise.perlinNoise(position.x + noiseSeed, 
-													  position.y + noiseSeed, 
-													  position.z + noiseSeed, 
-													  octaves, getLambda(planetRadius), amplitude);
+
+		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
 
 		if(noise < 0)
 			noise = 0;
-
+		
 		// 0.14 % = 8 km von 6000 km
-		position.scale(1 + noise * mountainHeight);
-
+		v.scale(1 + noise * mountainHeight);
 	}
 }

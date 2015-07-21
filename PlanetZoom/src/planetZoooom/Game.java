@@ -2,6 +2,7 @@ package planetZoooom;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Matrix4f;
@@ -13,6 +14,7 @@ import planetZoooom.gameContent.BillBoard;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
 import planetZoooom.gameContent.Planet;
+import planetZoooom.geometry.MasterSphere;
 import planetZoooom.graphics.ShaderProgram;
 import planetZoooom.graphics.Texture;
 import planetZoooom.input.Keyboard;
@@ -34,6 +36,7 @@ public class Game implements IGame
 	private HeadsUpDisplay hud;
 	private BillBoard sun;
 	private BillBoard sunGlow;
+	private MasterSphere masterSphere;
 
 	// TEXTURES
 	private Texture planetTexture;
@@ -58,6 +61,7 @@ public class Game implements IGame
 	
 	//	CONTROLS
 	private boolean wireframe = false;
+	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
 	
 	public static void main(String[] args) 
@@ -71,7 +75,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 10000f);
+		Info.camera = new FreeCamera(0.0f, 0.0f, 10000);
 		Info.projectionMatrix = planetZoooom.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
 		modelViewMatrix = new Matrix4f();
@@ -125,6 +129,11 @@ public class Game implements IGame
 		
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+		
+		Matrix4f modelMatrix = new Matrix4f();
+		modelMatrix.setIdentity();
+		Matrix4f.mul(Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
+		
 		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
 		drawSun();		
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -137,14 +146,16 @@ public class Game implements IGame
 		glFrontFace(GL_CCW);
 		glEnable(GL_DEPTH_TEST);
 		
-		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getMesh().getModelMatrix(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), (Matrix4f) new Matrix4f().setIdentity(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
-		planet.update(planetCamDistance, false);
+		if(updateSphere)
+			planet.update();
 		
 		drawPlanet();
+		
 
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), planetCamDistance, planet.getActualTriangleCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 		drawHUD();
 	}
 
@@ -211,7 +222,7 @@ public class Game implements IGame
 			planetShader.loadUniform1f(planet.getRadius(), "radius");
 			planetShader.loadUniform1f(flatShading, "flatShading");
 			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
-			renderer.renderGameObject(planet.getMesh(), planetTexture, GL_TRIANGLES);
+			planet.getSphere().render(GL_TRIANGLES);
 			
 			if(wireframe)
 			{
@@ -219,9 +230,9 @@ public class Game implements IGame
 				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 				wireFrameShader.loadUniform1f(0.4f, "greytone");
-				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_LINE_STRIP);
+				planet.getSphere().render(GL_LINES);
 				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				renderer.renderGameObject(planet.getMesh(), planetTexture, GL_POINTS);
+				planet.getSphere().render(GL_POINTS);
 			}
 		}
 	}
@@ -249,10 +260,10 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = true; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ wireframe = false; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_4)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
 		
 		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
 			planet.setAmplitude(planet.getAmplitude() + 0.02f);
