@@ -45,7 +45,7 @@ public class MasterSphere
 	private int minTriangles;
 	private VA va;
 
-	private Matrix4f mv; //modelViewMatrix
+	private Matrix4f modelViewMatrix;
 	
 	public MasterSphere(float radius, int minTriangles) 
 	{
@@ -57,7 +57,7 @@ public class MasterSphere
 		lhs = new Vector3f();
 		rhs = new Vector3f();
 		normal = new Vector3f();
-		mv = new Matrix4f();
+		modelViewMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
 		v2 = new Vector3f();
@@ -79,7 +79,7 @@ public class MasterSphere
 	
 	public void update()
 	{						
-		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
+		Matrix4f.mul( Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
 		
 		positionPointer = 0;
 		//Indices - 3 make up a triangle
@@ -107,6 +107,11 @@ public class MasterSphere
 	public void render(int mode)
 	{
 		va.render(mode);
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
 	}
 	
 	public int getTriangleCount()
@@ -272,9 +277,9 @@ public class MasterSphere
 		float d = 1;
 
 		//Object space -> world space -> camera space
-		x = (mv.m00 * a) + (mv.m10 * b) + (mv.m20 * c) + (mv.m30 * d);
-		y = (mv.m01 * a) + (mv.m11 * b) + (mv.m21 * c) + (mv.m31 * d);
-		z = (mv.m02 * a) + (mv.m12 * b) + (mv.m22 * c) + (mv.m32 * d);
+		x = (modelViewMatrix.m00 * a) + (modelViewMatrix.m10 * b) + (modelViewMatrix.m20 * c) + (modelViewMatrix.m30 * d);
+		y = (modelViewMatrix.m01 * a) + (modelViewMatrix.m11 * b) + (modelViewMatrix.m21 * c) + (modelViewMatrix.m31 * d);
+		z = (modelViewMatrix.m02 * a) + (modelViewMatrix.m12 * b) + (modelViewMatrix.m22 * c) + (modelViewMatrix.m32 * d);
 
 		w= -z;
 		
@@ -308,9 +313,9 @@ public class MasterSphere
 		for(int i = 0; i < positions.length; i+=3)
 		{
 			//Object space -> world space -> camera space
-			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
-			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
-			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
+			x = (modelViewMatrix.m00 * positions[i]) + (modelViewMatrix.m10 * positions[i+1]) + (modelViewMatrix.m20 * positions[i+2]) + (modelViewMatrix.m30);
+			y = (modelViewMatrix.m01 * positions[i]) + (modelViewMatrix.m11 * positions[i+1]) + (modelViewMatrix.m21 * positions[i+2]) + (modelViewMatrix.m31);
+			z = (modelViewMatrix.m02 * positions[i]) + (modelViewMatrix.m12 * positions[i+1]) + (modelViewMatrix.m22 * positions[i+2]) + (modelViewMatrix.m32);
 			
 			w[i/3] = -z;
 			

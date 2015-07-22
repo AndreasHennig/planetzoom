@@ -50,6 +50,7 @@ void main(void)
  	float exponent = 4.0;
 	float lightSpecular = 1.0 * pow(max(dot(R,E),0.0),exponent);
 	lightSpecular = clamp(lightSpecular, 0.0, 1.0); 
+	float mul = 1.0;
 	
 	//ColorBorders
 	float snow = 0.94;
@@ -59,27 +60,27 @@ void main(void)
 	
 	if(heightGradientValue > snow)
 	{
-		float mul = heightGradientValue;
-		heightColor = vec4(0.87 * mul, 0.90 * mul, 0.89 * mul, 1.0);  //Snow
+		mul = heightGradientValue;
+		heightColor = vec4(0.87 * mul, 0.90 * mul, 0.89 * mul, 1.0);
 	}
 	else if(heightGradientValue > stone) 
 	{
-		float mul = heightGradientValue + 1 - stone;
-		heightColor = vec4(0.6 * mul, 0.56 * mul, 0.39 * mul, 1.0);   //Stone
+		mul = heightGradientValue + 1 - stone;
+		heightColor = vec4(0.6 * mul, 0.56 * mul, 0.39 * mul, 1.0);
 	}
 	else if(heightGradientValue > grass) 
 	{
-		float mul = heightGradientValue + 1 - grass;
-		heightColor = vec4(0.22 * mul, 0.58 * mul, 0.28 * mul, 1.0);  //Grass
+		mul = heightGradientValue + 1 - grass;
+		heightColor = vec4(0.22 * mul, 0.58 * mul, 0.28 * mul, 1.0);
 	}
 	else if(heightGradientValue > sand)
 	{
-		float mul = heightGradientValue + 1 - sand;
-		heightColor = vec4(0.89 * mul, 0.78 * mul, 0.41 * mul, 1.0);  //Sand
+		mul = heightGradientValue + 1 - sand;
+		heightColor = vec4(0.89 * mul, 0.78 * mul, 0.41 * mul, 1.0);
 	}
 	else
 	{
-		heightColor = vec4(0.18 + lightSpecular, 0.42 + lightSpecular, 0.57 + lightSpecular, 1.0);  //Water
+		heightColor = vec4(0.18 + lightSpecular, 0.42 + lightSpecular, 0.57 + lightSpecular, 1.0);
 	}
 	
 	finalColor(heightColor, diffuse, ambient);

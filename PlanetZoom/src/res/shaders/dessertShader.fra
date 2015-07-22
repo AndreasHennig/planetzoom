@@ -50,58 +50,13 @@ void main(void)
  	float exponent = 4.0;
 	float lightSpecular = 1.0 * pow(max(dot(R,E),0.0),exponent);
 	lightSpecular = clamp(lightSpecular, 0.0, 1.0); 
+	float mul = 1.0;
 	
 	//ColorBorders
-	float snow = 0.94;
-	float stone = 0.7;
-	float grass = 0.06;
-	float sand = 0.04;
+	float mountain = 0.2;
 	
-	if(heightGradientValue > snow)
-	{
-		float mul = heightGradientValue;
-		heightColor = vec4(0.87 * mul, 0.90 * mul, 0.89 * mul, 1.0);  //Snow
-	}
-	else if(heightGradientValue > stone) 
-	{
-		float mul = heightGradientValue + 1 - stone;
-		heightColor = vec4(0.6 * mul, 0.56 * mul, 0.39 * mul, 1.0);   //Stone
-	}
-	else if(heightGradientValue > grass) 
-	{
-		float mul = heightGradientValue + 1 - grass;
-		heightColor = vec4(0.22 * mul, 0.58 * mul, 0.28 * mul, 1.0);  //Grass
-	}
-	else if(heightGradientValue > sand)
-	{
-		float mul = heightGradientValue + 1 - sand;
-		heightColor = vec4(0.89 * mul, 0.78 * mul, 0.41 * mul, 1.0);  //Sand
-	}
-	else
-	{
-		heightColor = vec4(0.18 + lightSpecular, 0.42 + lightSpecular, 0.57 + lightSpecular, 1.0);  //Water
-	}
+	mul = (heightGradientValue + 1) / 2.0;
+	heightColor = vec4(0.89 * mul, 0.78 * mul, 0.41 * mul, 1.0);
 	
 	finalColor(heightColor, diffuse, ambient);
-	
-	/*HEIGHTLINES
-	if(	(heightGradientValue > sand && heightGradientValue < sand + 0.001) 	 || 
-		(heightGradientValue > grass && heightGradientValue < grass + 0.002) ||
-		(heightGradientValue > stone && heightGradientValue < stone + 0.003) ||
-		(heightGradientValue > snow && heightGradientValue < snow + 0.004))
-	{
-		singleColor(0.0);
-	}*/
-	
-	/*OUTLINES
-	if(dot(pass_data.viewDir, pass_data.normal) < mix(0.5, 0.1, max(0.0, dot(pass_data.normal, pass_data.lightDir))))
-	{
-		singleColor(0.0);
-	}
-	else
-	{
-		finalColor(heightColor, lightDiffuse, ambient)
-	}*/
-	
-	
 }
