@@ -1,20 +1,12 @@
 package planetZoooom.geometry;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Float;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -156,9 +148,18 @@ public class MasterSphere
 		return indices;
 	}
 	
+	Vector3f sunToPoint = new Vector3f();
+	Vector3f left = new Vector3f();
+	Vector3f up = new Vector3f();
+	Vector3f sunPos = new Vector3f(-100000.0f, 0.0f, 0.0f);
+	
 	private int writePosition(Vector3f pos)
 	{
 		notifyListeners(pos);
+		
+		//INFO: pos has now noise applied! calculate normal here!
+		sunToPoint = Vector3f.sub(pos, sunPos, sunToPoint);
+		
 		
 		this.positions[positionPointer++] = pos.x;
 		this.positions[positionPointer++] = pos.y;

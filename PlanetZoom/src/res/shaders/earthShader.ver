@@ -1,0 +1,56 @@
+//https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
+
+#version 330 
+#pragma debug(on)
+#pragma optimize(off)
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 uvCoords;
+layout (location = 2) in vec3 normal;
+layout (location = 3) in vec4 color;
+
+out DATA
+{
+	vec3 position;
+	vec3 normal;
+	vec2 uv;
+	vec3 positionVector;
+	vec3 viewDir;
+	vec3 lightDir;
+	float mountainHeight;
+} pass_data;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 normalMatrix;
+uniform vec3 cameraPosition;
+uniform vec3 lightPosition;
+uniform float radius;
+
+uniform float flatShading;
+
+uniform float mountainHeight;
+
+void main(void)
+{
+	pass_data.positionVector = position;
+	pass_data.position = vec3(modelViewMatrix * vec4(position, 1.0));
+	
+	if(flatShading > 0.5)
+	{	
+		pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
+	}
+	else
+	{
+		pass_data.normal = normalize(vec3(normalMatrix * vec4(position, 1.0)));
+	}
+	
+	pass_data.uv = uvCoords;
+
+	pass_data.viewDir = cameraPosition - position;
+	pass_data.lightDir = vec3(modelViewMatrix * vec4(lightPosition, 1.0));
+
+	pass_data.mountainHeight = mountainHeight;
+
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(position, 1.0);
+}

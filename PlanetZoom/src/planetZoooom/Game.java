@@ -44,7 +44,9 @@ public class Game implements IGame
 	private Texture sunGlowTexture;
 
 	// SHADERS
-	private ShaderProgram planetShader;
+	private ShaderProgram earthShader;
+	private ShaderProgram marsShader;
+	private ShaderProgram dessertShader;
 	private ShaderProgram wireFrameShader;	
 	private ShaderProgram hudShader;
 	private ShaderProgram sunShader;
@@ -102,7 +104,9 @@ public class Game implements IGame
 	private void initShaders() 
 	{
 		hudShader = new ShaderProgram("HUDShader");
-		planetShader = new ShaderProgram("planetShader");
+		earthShader = new ShaderProgram("earthShader");
+		marsShader = new ShaderProgram("marsShader");
+		dessertShader = new ShaderProgram("dessertShader");
 		wireFrameShader = new ShaderProgram("testShader");
 		sunShader = new ShaderProgram("sunShader");
 		sunGlowShader = new ShaderProgram("sunGlowShader");
@@ -212,16 +216,16 @@ public class Game implements IGame
 	
 	private void drawPlanet()
 	{
-		glUseProgram(planetShader.getId());
+		glUseProgram(earthShader.getId());
 		{
-			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			planetShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			planetShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-			planetShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
-			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			planetShader.loadUniform1f(planet.getRadius(), "radius");
-			planetShader.loadUniform1f(flatShading, "flatShading");
-			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
+			earthShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			earthShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			earthShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
+			earthShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+			earthShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
+			earthShader.loadUniform1f(planet.getRadius(), "radius");
+			earthShader.loadUniform1f(flatShading, "flatShading");
+			earthShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
 			planet.getSphere().render(GL_TRIANGLES);
 			
 			if(wireframe)
