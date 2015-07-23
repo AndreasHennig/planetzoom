@@ -1,4 +1,5 @@
 //https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
+//http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
 
 #version 330 
 #pragma debug(on)
