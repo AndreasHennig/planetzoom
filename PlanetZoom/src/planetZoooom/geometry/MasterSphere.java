@@ -153,18 +153,9 @@ public class MasterSphere
 		return indices;
 	}
 	
-	Vector3f sunToPoint = new Vector3f();
-	Vector3f left = new Vector3f();
-	Vector3f up = new Vector3f();
-	Vector3f sunPos = new Vector3f(-100000.0f, 0.0f, 0.0f);
-	
 	private int writePosition(Vector3f pos)
 	{
 		notifyListeners(pos);
-		
-		//INFO: pos has now noise applied! calculate normal here!
-		sunToPoint = Vector3f.sub(pos, sunPos, sunToPoint);
-		
 		
 		this.positions[positionPointer++] = pos.x;
 		this.positions[positionPointer++] = pos.y;
