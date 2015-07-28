@@ -159,7 +159,6 @@ public class Game implements IGame
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getSphere().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
-		
 		if(updateSphere)
 			planet.update();
 		
