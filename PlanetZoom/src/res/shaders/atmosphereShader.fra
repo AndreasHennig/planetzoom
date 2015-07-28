@@ -18,28 +18,9 @@ void main(void)
 	float fCos = dot(lightPosition, direction) / length(direction);
 	float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos * fCos) / pow(1.0 + g2 - 2.0 * miePhaseAsymetryFactor * fCos, 1.5);
 	
-	
-	vec4 tmp = vec4(pass_color + fMiePhase * pass_color2, 1);
-	/*
-	if(pass_color.r == 0 ) //|| isinf(pass_color.r)|| pass_color.r < 0 || isnan(pass_color.r))
-		tmp.r = 1;
-	if(pass_color.g == 0 ) //|| isinf(pass_color.g) || pass_color.g < 0.0 || isnan(pass_color.g))
-		tmp.g = 1;
-	if(pass_color.b == 0) // || isinf(pass_color.b)|| pass_color.b < 0.0 || isnan(pass_color.b))
-		tmp.b = 1;
-		
-		
-	if(pass_color2.r == 0 ) //|| isinf(pass_color2.r)|| pass_color2.r < 0 || isnan(pass_color2.r))
-		tmp.r = 1;
-	if(pass_color2.g == 0 ) //|| isinf(pass_color2.g) || pass_color2.g < 0.0 || isnan(pass_color2.g))
-		tmp.g = 1;
-	if(pass_color2.b == 0) // || isinf(pass_color2.b)|| pass_color2.b < 0.0 || isnan(pass_color2.b))
-		tmp.b = 1;
-		
-		*/
-	//out_Color = vec4(-1.4, 1123.5, 1.1, 1.0);
 
-	out_Color = vec4(pass_color, 1);
+
+	out_Color = vec4(pass_color, pass_color.x);
 	//out_Color = vec4(direction, 1);
 
 

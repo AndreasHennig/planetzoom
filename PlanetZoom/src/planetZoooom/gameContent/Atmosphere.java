@@ -17,8 +17,6 @@ public class Atmosphere
 	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.025f;
 	
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
-	private static final float RAYLEIGH_SCATTERING = 0.0025f;		// Rayleigh scattering constant (Kr)
-	private static final float MIE_SCATTERING = 0.0010f;			// Mie scattering constant (Km)
 	private static final float SUN_BRIGHTNESS = 10.0f;
 	private static final float MIE_PHASE_ASYMETRY_FACTOR = -0.990f;	// The Mie phase asymmetry factor
 	private static final float EXPOSURE = 2.0f;
@@ -28,6 +26,14 @@ public class Atmosphere
 	private static final float WAVELENGTH_RED = 0.65f;
 	private static final float WAVELENGTH_GREEN = 0.57f;
 	private static final float WAVELENGTH_BLUE = 0.475f;
+	private static final float RAYLEIGH_SCATTERING = 0.0025f;		// Rayleigh scattering constant (Kr)
+	private static final float MIE_SCATTERING = 0.0010f;			// Mie scattering constant (Km)
+	
+	private float rayleighScattering;
+	private float mieScattering;
+	private float waveLengthRed;
+	private float waveLengthGreen;
+	private float waveLengthBlue;
 	
 	private static final float[] WAVELENGTHS = new float[] 
 			{WAVELENGTH_RED, 
@@ -72,5 +78,57 @@ public class Atmosphere
 	{
 		return modelMatrix;
 	}
+
+	public float getRayleighScattering()
+	{
+		return rayleighScattering;
+	}
+
+	public void setRayleighScattering(float rayleighScattering)
+	{
+		this.rayleighScattering = rayleighScattering;
+	}
+
+	public float getMieScattering()
+	{
+		return mieScattering;
+	}
+
+	public void setMieScattering(float mieScattering)
+	{
+		this.mieScattering = mieScattering;
+	}
+
+	public float getWaveLengthRed()
+	{
+		return waveLengthRed;
+	}
+
+	public void setWaveLengthRed(float waveLengthRed)
+	{
+		this.waveLengthRed = waveLengthRed;
+	}
+
+	public float getWaveLengthGreen()
+	{
+		return waveLengthGreen;
+	}
+
+	public void setWaveLengthGreen(float waveLengthGreen)
+	{
+		this.waveLengthGreen = waveLengthGreen;
+	}
+
+	public float getWaveLengthBlue()
+	{
+		return waveLengthBlue;
+	}
+
+	public void setWaveLengthBlue(float waveLengthBlue)
+	{
+		this.waveLengthBlue = waveLengthBlue;
+	}
+	
+	
 
 }

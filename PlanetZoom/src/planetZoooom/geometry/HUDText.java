@@ -104,7 +104,7 @@ public class HUDText extends MeshObject
 			if (currentChar == '\n')
 			{
 				y += cellSize;
-				x = 0;
+				x = startPositionX - cellSize;
 			}
 
 			vertices[(i * 12) + 0] = x; 				//top left x 

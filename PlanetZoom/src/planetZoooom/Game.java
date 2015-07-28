@@ -2,7 +2,6 @@ package planetZoooom;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Matrix4f;
@@ -10,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.engine.CoreEngine;
 import planetZoooom.engine.Renderer;
+import planetZoooom.gameContent.Atmosphere;
 import planetZoooom.gameContent.BillBoard;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
@@ -64,6 +64,16 @@ public class Game implements IGame
 	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
 	
+	
+	
+	
+	private static final int HUD_MODE_OFF = 0;
+	private static final int HUD_MODE_INFO = 1;
+	private static final int HUD_MODE_NOISE = 2;
+	private static final int HUD_MODE_ATMOSPHERE = 3;
+	
+	private int hudMode;
+	
 	public static void main(String[] args) 
 	{
 		game = new CoreEngine(new Game());
@@ -90,6 +100,7 @@ public class Game implements IGame
 		initGameObjects();
 
 		Info.planet = planet;
+		hudMode = 0;
 	}
 
 	private void initTextures() 
@@ -112,7 +123,7 @@ public class Game implements IGame
 	private void initGameObjects() 
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
@@ -155,10 +166,101 @@ public class Game implements IGame
 		drawPlanet();
 		
 
-		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		updateHud(hudMode);
 		drawHUD();
 	}
+	
 
+	private void updateHud(int mode)
+	{
+
+		switch(mode)
+		{
+			case HUD_MODE_OFF:
+			{
+				hud.update("");
+				return;
+			}
+		
+			case HUD_MODE_INFO:
+			{
+				hud.update(getInfoHUDText());
+				return;
+			}
+			
+			case HUD_MODE_NOISE:
+			{
+				hud.update(getNoiseHUDText());
+				return;
+			}
+			
+			case HUD_MODE_ATMOSPHERE:
+			{
+				hud.update(getAtmosphereHUDText());
+				return;
+			}
+		}
+		
+		throw new IllegalArgumentException();
+	}
+	
+	private String getInfoHUDText()
+	{
+		//TODO Distance to surface shall consider noise
+		int triangleCount = planet.getSphere().getTriangleCount();
+		int totalTriangleCount = planet.getSphere().getTotalTriangleCount();
+		double trianglePercentage = triangleCount * 100 / (double) totalTriangleCount;
+		
+		return  String.format(
+				"General information\n\n"
+				+ "Distance: %.2f\n"
+				+ "Triangles: %d / %d (%.2f%%)\n"
+				+ "Vertices: %d\n"
+				+ "Subdivisions: %d\n"
+				+ "FPS: %d",
+				GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius(), 
+				triangleCount, totalTriangleCount, trianglePercentage,
+				planet.getSphere().getVertexCount(),
+				planet.getSphere().getSubdivisions(),
+				game.timer.getFPS());
+	}
+	
+	private String getAtmosphereHUDText()
+	{
+		Atmosphere atmosphere = planet.getAtmosphere();
+		return  String.format(
+				"Atmosphere properties\n\n"
+				+ "Mie Scattering: %.3f\n"
+				+ "Rayleigh Scattering: %.3f\n"
+				+ "Wavelength red:   %.3f\n"
+				+ "Wavelength green: %.3f\n"
+				+ "Wavelength blue:  %.3f\n",
+				atmosphere.getMieScattering(),
+				atmosphere.getRayleighScattering(),
+				atmosphere.getWaveLengthRed(),
+				atmosphere.getWaveLengthGreen(),
+				atmosphere.getWaveLengthBlue());
+				
+	}
+	
+	private String getNoiseHUDText()
+	{
+		return String.format(
+				"Noise properties\n\n" +
+				"Mountain Height: %.4f\n" + 
+				"Seed: %.2f\n" +
+				"Wavelength: %.2f\n" + 
+				"Octaves: %d\n" + 
+				"Amplitude: %.2f\n" 
+				,
+				planet.getMountainHeight(),
+				planet.getNoiseSeed(),
+				planet.getLambdaBaseFactor(),
+				planet.getOctaves(), 
+				planet.getAmplitude()
+				);
+	}
+	
 	private void drawSun()
 	{
 		glUseProgram(sunGlowShader.getId());
@@ -262,34 +364,73 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
 		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
-			planet.setAmplitude(planet.getAmplitude() + 0.02f);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
-			planet.setAmplitude(planet.getAmplitude() - 0.02f);
-		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_I))
-			planet.setOctaves(planet.getOctaves() + 1);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_K))
-			planet.setOctaves(planet.getOctaves() - 1);
-		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_U))
-			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() + 0.001f);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_J))
-			planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() - 0.001f);
-		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_Y))
-			planet.setNoiseSeed(planet.getNoiseSeed() + planet.getRadius() / 1000);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
-			planet.setNoiseSeed(planet.getNoiseSeed() - planet.getRadius() / 1000);
-		
-		if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_T))
-			planet.setMountainHeight(planet.getMountainHeight() + 0.0005f);
-		else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_G))
-			planet.setMountainHeight(planet.getMountainHeight() - 0.0005f);
+		switch(hudMode)
+		{
+			case HUD_MODE_NOISE:
+			{
+				if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_O))
+					planet.setAmplitude(planet.getAmplitude() + 0.02f);
+				else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_L))
+					planet.setAmplitude(planet.getAmplitude() - 0.02f);
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_I))
+					planet.setOctaves(planet.getOctaves() + 1);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_K))
+					planet.setOctaves(planet.getOctaves() - 1);
+				
+				if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_U))
+					planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() + 0.001f);
+				else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_J))
+					planet.setLambdaBaseFactor(planet.getLambdaBaseFactor() - 0.001f);
+				
+				if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_Y))
+					planet.setNoiseSeed(planet.getNoiseSeed() + planet.getRadius() / 1000);
+				else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
+					planet.setNoiseSeed(planet.getNoiseSeed() - planet.getRadius() / 1000);
+				
+				if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_T))
+					planet.setMountainHeight(planet.getMountainHeight() + 0.0005f);
+				else if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_G))
+					planet.setMountainHeight(planet.getMountainHeight() - 0.0005f);
+				break;
+			}
+			case HUD_MODE_ATMOSPHERE:
+			{
+				Atmosphere atmosphere = planet.getAtmosphere();
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_T))
+					atmosphere.setMieScattering(atmosphere.getMieScattering() + 0.01f);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_G))
+					atmosphere.setMieScattering(atmosphere.getMieScattering() - 0.01f);
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_Y))
+					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() + 0.01f);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_H))
+					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() - 0.01f);
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_U))
+					atmosphere.setWaveLengthRed(atmosphere.getWaveLengthRed() + 0.01f);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_J))
+					atmosphere.setWaveLengthRed(atmosphere.getWaveLengthRed() - 0.01f);
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_I))
+					atmosphere.setWaveLengthGreen(atmosphere.getWaveLengthGreen() + 0.01f);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_K))
+					atmosphere.setWaveLengthGreen(atmosphere.getWaveLengthGreen() - 0.01f);
+				
+				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_O))
+					atmosphere.setWaveLengthBlue(atmosphere.getWaveLengthBlue() + 0.01f);
+				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_L))
+					atmosphere.setWaveLengthBlue(atmosphere.getWaveLengthBlue() - 0.01f);
+				break;
+			}
+		}
+	
 	}
 }
