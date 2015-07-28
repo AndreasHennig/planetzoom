@@ -112,6 +112,11 @@ public class MasterSphere
 		va.update(positions, normals, positionPointer, indices, triangleIndexCount);
 	}
 
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
+	}
+	
 	public void render(int mode)
 	{
 		va.render(mode);
@@ -164,7 +169,12 @@ public class MasterSphere
 	
 	private int writePosition(Vector3f pos)
 	{
-		notifyListeners(pos);
+		this.tempPointToCalcNormal.x = pos.x;
+		this.tempPointToCalcNormal.y = -pos.z;
+		this.tempPointToCalcNormal.z = pos.y;
+		
+		notifyListeners(pos);			
+		
 		notifyListeners(tempPointToCalcNormal);
 		Vector3f.sub(tempPointToCalcNormal, pos, firstVectorToCalulateNormal); 
 		firstVectorToCalulateNormal.normalise(firstVectorToCalulateNormal);
@@ -387,7 +397,6 @@ public class MasterSphere
 		return isInViewFrustum(positions);
 	}
 		
-
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
@@ -404,10 +413,6 @@ public class MasterSphere
 
 		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
 		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
-		
-		this.tempPointToCalcNormal.x = v1.x;
-		this.tempPointToCalcNormal.y = v1.y;
-		this.tempPointToCalcNormal.z = v1.z;
 		
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
@@ -465,7 +470,7 @@ public class MasterSphere
 			vBuffer.put(vertices, 0, vertexCount).flip();
 			
 			FloatBuffer nBuffer = BufferUtils.createFloatBuffer(vertexCount);
-			nBuffer.put(vertices, 0, vertexCount).flip();
+			nBuffer.put(normals, 0, vertexCount).flip();
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
 			glBufferData(GL_ARRAY_BUFFER, vBuffer, GL_STATIC_DRAW);

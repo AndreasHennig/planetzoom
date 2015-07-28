@@ -146,16 +146,14 @@ public class Game implements IGame
 		glFrontFace(GL_CCW);
 		glEnable(GL_DEPTH_TEST);
 		
-		Matrix4f.mul(Info.camera.getViewMatrix(), (Matrix4f) new Matrix4f().setIdentity(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getSphere().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
 		if(updateSphere)
 			planet.update();
 		
 		drawPlanet();
-		
 
-		
 		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 		drawHUD();
 	}
