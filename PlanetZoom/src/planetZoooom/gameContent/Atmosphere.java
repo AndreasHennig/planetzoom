@@ -44,8 +44,8 @@ public class Atmosphere
 		setWaveLengthRed(0.65f);
 		setWaveLengthGreen(0.57f);
 		setWaveLengthBlue(0.475f);
-		mieScattering = 0.001f;
-		rayleighScattering = 0.0025f;
+		mieScattering = 0.0f;
+		rayleighScattering = 0.0035f;
 	}
 	
 	public void update(int mode)
@@ -56,8 +56,8 @@ public class Atmosphere
 			case Planet.STYLE_EARTH:	setWaveLengthRed(0.65f);
 										setWaveLengthGreen(0.57f);
 										setWaveLengthBlue(0.475f);
-										mieScattering = 0.001f;
-										rayleighScattering = 0.0025f;
+										mieScattering = 0.0f;
+										rayleighScattering = 0.0035f;
 										break;
 			case Planet.STYLE_UNICOLOR:
 			case Planet.STYLE_MARS:		setWaveLengthRed(0.480f);
