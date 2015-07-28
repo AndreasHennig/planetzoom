@@ -1,8 +1,6 @@
 package planetZoooom.utils;
 
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-
 import planetZoooom.gameContent.Planet;
 import planetZoooom.interfaces.ICamera;
 

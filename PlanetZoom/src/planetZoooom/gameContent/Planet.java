@@ -3,7 +3,6 @@ package planetZoooom.gameContent;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.Sphere;
-import planetZoooom.interfaces.ICamera;
 import planetZoooom.interfaces.ICameraControl;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
@@ -28,6 +27,13 @@ public class Planet implements IGameObjectListener
 	private float noiseSeed;
 	private float mountainHeight;	
 	private final float slowDownRadius;
+	private int shaderMode = 0;
+	
+	public static final int STYLE_EARTH = 0;
+	public static final int STYLE_MARS = 1;
+	public static final int STYLE_DUNE = 2;
+	public static final int STYLE_UNICOLOR = 3;
+	
 	
 	public Planet(float radius, Vector3f position)
 	{
@@ -218,5 +224,14 @@ public class Planet implements IGameObjectListener
 
 		// 0.14 % = 8 km von 6000 km
 		v.scale(1 + noise * mountainHeight);
+	}
+	
+	public void setShaderMode(int mode){
+		this.shaderMode = mode;
+		atmosphere.update(mode);
+	}
+	
+	public int getShaderMode(){
+		return shaderMode;
 	}
 }

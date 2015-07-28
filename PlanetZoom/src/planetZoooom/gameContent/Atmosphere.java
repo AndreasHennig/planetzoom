@@ -17,7 +17,7 @@ public class Atmosphere
 	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.150f;
 	
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
-	private static final float SUN_BRIGHTNESS = 10.0f;
+	private static final float SUN_BRIGHTNESS = 5.0f;
 	private static final float MIE_PHASE_ASYMETRY_FACTOR = -0.990f;	// The Mie phase asymmetry factor
 	private static final float EXPOSURE = 2.0f;
 	private static final float RAYLEIGH_SCALE_DEPTH = 0.25f;
@@ -28,7 +28,7 @@ public class Atmosphere
 	private float waveLengthRed;
 	private float waveLengthGreen;
 	private float waveLengthBlue;
-	
+
 	private float planetRadius;
 	
 	private float[] wavelengths = new float[3];
@@ -48,15 +48,35 @@ public class Atmosphere
 		rayleighScattering = 0.0025f;
 	}
 	
+	public void update(int mode)
+	{
+		switch(mode)
+		{
+			case Planet.STYLE_DUNE:
+			case Planet.STYLE_EARTH:	setWaveLengthRed(0.65f);
+										setWaveLengthGreen(0.57f);
+										setWaveLengthBlue(0.475f);
+										mieScattering = 0.001f;
+										rayleighScattering = 0.0025f;
+										break;
+			case Planet.STYLE_UNICOLOR:
+			case Planet.STYLE_MARS:		setWaveLengthRed(0.480f);
+										setWaveLengthGreen(0.78f);
+										setWaveLengthBlue(0.955f);
+										mieScattering = 0.0f;
+										rayleighScattering = 0.0035f;
+										break;
+			
+			default: 					throw new IllegalArgumentException();
+		}
+	}
 	/**
 	 * if rayleigh is true rayleigh scattering is calculated 
 	 * otherwise mie scattering is calculated
 	 * returns the "optical depth" that is the average atmospheric density across the ray from point Pa to point Pb multiplied by the length of the ray
 	 */
 	private void outScattering(boolean rayleigh, Vector3f pa, Vector3f pb, int samples)
-	{
-
-		
+	{		
 		/*
 		 * 
 		 * The scattering equations have nested integrals that are impossible to solve analytically; 
