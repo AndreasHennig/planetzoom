@@ -15,6 +15,7 @@ public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
 	private float velocity = ICameraControl.MAX_CAM_SPEED;
+	private float rollVelocity = 0.002f;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{
@@ -43,10 +44,10 @@ public class FreeCameraControl implements ICameraControl
 			cam.moveDown(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_E))
-			cam.addRoll(0.002f * velocity * deltaTime);
+			cam.addRoll(rollVelocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
-			cam.addRoll(-0.002f * velocity * deltaTime);
+			cam.addRoll(-rollVelocity * deltaTime);
 		
 		cam.addYaw((float) Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
