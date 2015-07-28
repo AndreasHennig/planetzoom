@@ -305,8 +305,9 @@ public class Game implements IGame
 	{
 		glUseProgram(atmosphereShader.getId());
 		{
+			float cameraHeight = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition());
 			planet.getAtmosphere().loadSpecificUniforms(atmosphereShader);
-			atmosphereShader.loadUniform1f(GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()), "cameraHeight");
+			atmosphereShader.loadUniform1f(cameraHeight, "cameraHeight");
 			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
@@ -315,7 +316,10 @@ public class Game implements IGame
 			atmosphereShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
+			if(cameraHeight > planet.getRadius())
+				atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
+			atmosphereShader.loadUniform1f(planet.getRadius() + planet.getRadius() * 0.09f, "planetRadius");
+				
 			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
 			
 //			if(wireframe)
@@ -422,14 +426,14 @@ public class Game implements IGame
 				Atmosphere atmosphere = planet.getAtmosphere();
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_T))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() + 0.01f);
+					atmosphere.setMieScattering(atmosphere.getMieScattering() + 0.001f);
 				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_G))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() - 0.01f);
+					atmosphere.setMieScattering(atmosphere.getMieScattering() - 0.001f);
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_Y))
-					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() + 0.01f);
+					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() + 0.001f);
 				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_H))
-					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() - 0.01f);
+					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() - 0.001f);
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_U))
 					atmosphere.setWaveLengthRed(atmosphere.getWaveLengthRed() + 0.01f);
