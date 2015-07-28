@@ -1,13 +1,6 @@
 package planetZoooom.input;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.*;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.interfaces.ICameraControl;
 
@@ -15,7 +8,8 @@ public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
 	private float velocity = ICameraControl.MAX_CAM_SPEED;
-	private float rollVelocity = 0.002f;
+	private final static float rollSpeed = 0.00025f * ICameraControl.MAX_CAM_SPEED;
+	private boolean boostEnabled;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{
@@ -25,6 +19,11 @@ public class FreeCameraControl implements ICameraControl
 	@Override
 	public FreeCamera handleInput(int deltaTime)
 	{
+		boostEnabled = Keyboard.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
+
+		if(boostEnabled)
+			velocity *= 2;
+		
 		if(Keyboard.isKeyPressed(GLFW_KEY_W))
 			cam.moveForwards(velocity * deltaTime);
 		
@@ -44,10 +43,11 @@ public class FreeCameraControl implements ICameraControl
 			cam.moveDown(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_E))
-			cam.addRoll(rollVelocity * deltaTime);
+			cam.addRoll(-rollSpeed * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
-			cam.addRoll(-rollVelocity * deltaTime);
+			cam.addRoll(rollSpeed * deltaTime);
+
 		
 		cam.addYaw((float) Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
@@ -56,7 +56,8 @@ public class FreeCameraControl implements ICameraControl
 	}
 
 	@Override
-	public void setVelocity(float velocity) {
+	public void setVelocity(float velocity) 
+	{
 		this.velocity = velocity;
 	}
 }
