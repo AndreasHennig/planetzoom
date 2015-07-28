@@ -29,12 +29,15 @@ public class Atmosphere
 	private float waveLengthGreen;
 	private float waveLengthBlue;
 	
+	private float planetRadius;
+	
 	private float[] wavelengths = new float[3];
 	
 	
 	public Atmosphere(Planet planet)
 	{
 		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() * (1 + ATMOSPHERE_PLANET_DISTANCE));
+		this.planetRadius = planet.getRadius();
 		position = planet.getPosition();
 		modelMatrix = new Matrix4f().translate(position);
 		
@@ -66,11 +69,13 @@ public class Atmosphere
 		
 		Vector3f ray = new Vector3f();
 		Vector3f segment = new Vector3f();
+		Vector3f samplePoint = new Vector3f();
 		Vector3f.sub(pb, pa, ray);
 		ray.scale(1.0f / samples);
 		float offset = (1.0f / samples) / 2.0f;
 		float segmentLength = segment.scale(1.0f / samples).length();
 		double sum = 0;
+		float height = 0;
 		//calculate out-scattering integral
 		
 		for(int i = 0; i < samples; i++)
@@ -80,8 +85,13 @@ public class Atmosphere
 			segment.z = ray.z;
 			segment.scale(offset + i * (1.0f / samples));
 		
+			samplePoint.x  = pa.x + segment.x;
+			samplePoint.y  = pa.y + segment.y;
+			samplePoint.z  = pa.z + segment.z;
+			
+			height = samplePoint.length() - planetRadius;
 			//set height parameter so 0 equals sea level and 1 is the top of the atmosphere
-			sum += calculateAtmosphericDenisity(0, rayleigh) * segmentLength; 
+			sum += calculateAtmosphericDenisity(height, rayleigh) * segmentLength; 
 		}
 	}
 	

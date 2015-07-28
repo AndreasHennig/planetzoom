@@ -308,7 +308,7 @@ public class MasterSphere
 			y/= w[i/3];
 		
 
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
 				return true;
 								
 			positions[i] = x;
@@ -341,7 +341,7 @@ public class MasterSphere
 		return false;
 	}
 	
-	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, 1, 2, 2);
+	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, -1, 2, 2);
 	private Line2D l1 = new Line2D.Float();
 	private boolean foo(float x0, float y0, float x1, float y1)
 	{
