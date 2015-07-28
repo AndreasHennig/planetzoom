@@ -33,7 +33,7 @@ public class MasterSphere
 	private static final int CHECK_INTERVAL = 4;
 	private static final int FIRST_CHECK = 3;
 	private static final int ARRAY_SIZE = 5000000;
-	private static final double VIEW_FRUSTUM_OFFSET = 2; 
+	private static final double VIEW_FRUSTUM_OFFSET = 1; 
 	
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
@@ -57,7 +57,7 @@ public class MasterSphere
 	
 	public MasterSphere(float radius, int minTriangles) 
 	{
-		positions = new float[ARRAY_SIZE];
+		positions = new float[minTriangles * 3 * 4 * 2];
 
 		listeners = new ArrayList<>();
 		
@@ -96,15 +96,15 @@ public class MasterSphere
 		triangleIndexCount = t.length;
 //		for(int depth = 0; depth < subdivisions; depth++)
 		int depth = 0;
-		while(triangleIndexCount < minTriangles * 3)
-		{
-			t = subdivide(t, triangleIndexCount, depth++);
-			if(t.length == 0)
-				break;
-		}
+//		while(triangleIndexCount < minTriangles * 3)
+//		{
+//			t = subdivide(t, triangleIndexCount, depth++);
+//			if(t.length == 0)
+//				break;
+//		}
 		
-//		for(int i = 0; i < 6; i++)
-//			t= subdivide(t, triangleIndexCount, depth++);
+		for(int i = 0; i < 2; i++)
+			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
 		va.update(positions, positionPointer, indices, triangleIndexCount);
@@ -131,28 +131,28 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
-//					0,1,2
-					2,4,1,
-					2,0,4,
-					4,3,1,
-					4,0,3,
-					5,2,1,
-					5,0,2,
-					3,5,1,
-					3,0,5
+					0,1,2
+//					2,4,1,
+//					2,0,4,
+//					4,3,1,
+//					4,0,3,
+//					5,2,1,
+//					5,0,2,
+//					3,5,1,
+//					3,0,5
 				};
 		
-//		
-//		writePosition(new Vector3f(0,0,0));
-//		writePosition(new Vector3f(1,0,0));
-//		writePosition(new Vector3f(0.5f,1,0));
-		writePosition((Vector3f) Vertex.left().scale(radius));
-		writePosition((Vector3f) Vertex.right().scale(radius));
-		writePosition((Vector3f) Vertex.up().scale(radius));
-		writePosition((Vector3f) Vertex.down().scale(radius));
-		writePosition((Vector3f) Vertex.front().scale(radius));
-		writePosition((Vector3f) Vertex.back().scale(radius));
-//		
+		
+		writePosition(new Vector3f(0,0,0));
+		writePosition(new Vector3f(1,0,0));
+		writePosition(new Vector3f(0.5f,1,0));
+//		writePosition((Vector3f) Vertex.left().scale(radius));
+//		writePosition((Vector3f) Vertex.right().scale(radius));
+//		writePosition((Vector3f) Vertex.up().scale(radius));
+//		writePosition((Vector3f) Vertex.down().scale(radius));
+//		writePosition((Vector3f) Vertex.front().scale(radius));
+//		writePosition((Vector3f) Vertex.back().scale(radius));
+	
 		return indices;
 	}
 	
@@ -189,15 +189,14 @@ public class MasterSphere
 		{
 			triangleIndices = new int[]{triangles[i], triangles[i+1], triangles[i+2]};
 			
-			if (depth % CHECK_INTERVAL == FIRST_CHECK)
-			{
-				if(!isFacingTowardsCamera(triangleIndices))
-					continue;
-				if (!isInViewFrustum(triangleIndices))
-					continue; // clip
-			}
+//			if (depth % CHECK_INTERVAL == FIRST_CHECK)
+//			{
+//				if(!isFacingTowardsCamera(triangleIndices))
+//					continue;
+//			}
 
-
+			if (!isInViewFrustum(triangleIndices))
+				continue; // clip
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -234,13 +233,13 @@ public class MasterSphere
 		n2 = Vertex.lerp(v1, v2, 0.5f);
 		n3 = Vertex.lerp(v2, v3, 0.5f);
 		
-		n1.normalise();
-		n2.normalise();
-		n3.normalise();
-		
-		n1.scale(radius);
-		n2.scale(radius);
-		n3.scale(radius);
+//		n1.normalise();
+//		n2.normalise();
+//		n3.normalise();
+//		
+//		n1.scale(radius);
+//		n2.scale(radius);
+//		n3.scale(radius);
 		
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
@@ -322,7 +321,7 @@ public class MasterSphere
 			y/= w[i/3];
 		
 			
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
 				return true;
 								
 			positions[i] = x;
@@ -330,41 +329,50 @@ public class MasterSphere
 			positions[i+2] = z;
 		}
 		
-//		if(intersectsNDCPlane(positions))
-//			return true;
+		if(intersectsNDCPlane(positions))
+			return true;
 		
 		return false;
 	}
 
-	private boolean intersectsNDCPlane(float[] ndc)
+	private boolean intersectsNDCPlane(float[] triangle)
 	{
-		float x0, x1;
-		float y0, y1;
-		for(int i = 0; i < ndc.length-3; i+=3)
+		float[] x = {-1, 1, 1, -1};
+		float[] y = {1, 1, -1, -1};
+ 
+		for(int i = 0; i < 3; i++)
 		{
-			x0 = ndc[i];
-			y0 = ndc[i+1];
-			x1 = ndc[i+3];
-			y1 = ndc[i+4];
-			if(foo(x0, y0, x1, y1))
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[0], triangle[1], triangle[3], triangle[4]))
+				return true;
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[3], triangle[4], triangle[6], triangle[7]))
+				return true;
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[0], triangle[1], triangle[6], triangle[7]))
 				return true;
 		}
-		if(foo(ndc[6], ndc[7], ndc[0], ndc[1]))
+		
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[0], triangle[1], triangle[3], triangle[4]))
+			return true;
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[3], triangle[4], triangle[6], triangle[7]))
+			return true;
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[0], triangle[1], triangle[6], triangle[7]))
 			return true;
 		
 		return false;
 	}
 	
-	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, 1, 2, 2);
-	private Line2D l1 = new Line2D.Float();
-	private boolean foo(float x0, float y0, float x1, float y1)
+	private boolean lineIntersection(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 	{
-		l1.setLine(x0,y0,x1,y1);
-		if(l1.intersects(NDCPlane))
+		double d = (x0-x1)*(y2-y3) - (y0-y1)*(x2-x3);
+		if(d == 0)
+			return false;
+		double xi = ((x2-x3)*(x0*y1-y0*x1)-(x0-x1)*(x2*y3-y2*x3)) / d;
+		double yi = ((y2-y3)*(x0*y1-y0*x1)-(y0-y1)*(x2*y3-y2*x3)) / d;
+		if(xi <= 1 && xi >= -1 && yi <= 1 && yi >= -1)
 			return true;
-		
 		return false;
 	}
+	
+	
 	
 	private boolean isInViewFrustum(int[] triangleIndices)
 	{	
