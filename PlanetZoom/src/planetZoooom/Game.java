@@ -14,7 +14,7 @@ import planetZoooom.gameContent.BillBoard;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.gameContent.HeadsUpDisplay;
 import planetZoooom.gameContent.Planet;
-import planetZoooom.geometry.MasterSphere;
+import planetZoooom.geometry.Sphere;
 import planetZoooom.graphics.ShaderProgram;
 import planetZoooom.graphics.Texture;
 import planetZoooom.input.Keyboard;
@@ -27,7 +27,6 @@ import planetZoooom.utils.MatrixUtils;
 public class Game implements IGame 
 {
 	private static CoreEngine game;
-	private Renderer renderer;
 	private ICameraControl cameraControl;
 	private float fovParam = 45.0f;
 
@@ -36,10 +35,8 @@ public class Game implements IGame
 	private HeadsUpDisplay hud;
 	private BillBoard sun;
 	private BillBoard sunGlow;
-	private MasterSphere masterSphere;
 
 	// TEXTURES
-	private Texture planetTexture;
 	private Texture sunTexture;
 	private Texture sunGlowTexture;
 
@@ -57,9 +54,7 @@ public class Game implements IGame
 	private Matrix4f modelViewMatrix;
 	private Matrix4f normalMatrix;
 	private Matrix4f orthographicProjectionMatrix;
-	
 	private Vector3f lightDirection;
-	private float planetCamDistance;
 	
 	//	CONTROLS
 	private boolean wireframe = false;
@@ -92,10 +87,9 @@ public class Game implements IGame
 		modelViewMatrix = new Matrix4f();
 		normalMatrix = new Matrix4f();
 		orthographicProjectionMatrix = MatrixUtils.orthographicProjectionMatrix(0, -game.getWindowWidth(), -game.getWindowHeight(), 0.0f, -1.0f, 1.0f);
-
-		renderer = new Renderer();		
 		lightDirection = new Vector3f();
 		
+		initOpenGL();
 		initTextures();
 		initShaders();
 		initGameObjects();
@@ -104,9 +98,19 @@ public class Game implements IGame
 		hudMode = 0;
 	}
 
+	private void initOpenGL()
+	{
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(2.5f);
+	}
+	
 	private void initTextures() 
 	{
-		planetTexture = new Texture("src/res/textures/uv_test.png");
 		sunTexture = new Texture("src/res/textures/sun.png");
 		sunGlowTexture = new Texture("src/res/textures/sunGlow3.png");
 	}

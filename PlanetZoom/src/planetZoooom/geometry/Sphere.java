@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Vector3f;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.Info;
 
-public class MasterSphere
+public class Sphere
 {
 	private static final int CHECK_INTERVAL = 4;
 	private static final int FIRST_CHECK = 3;
@@ -47,7 +47,7 @@ public class MasterSphere
 
 	private Matrix4f modelViewMatrix;
 	
-	public MasterSphere(float radius, int minTriangles) 
+	public Sphere(float radius, int minTriangles) 
 	{
 		positions = new float[minTriangles * 12 * 2];
 
