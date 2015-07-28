@@ -64,9 +64,6 @@ public class Game implements IGame
 	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
 	
-	
-	
-	
 	private static final int HUD_MODE_OFF = 0;
 	private static final int HUD_MODE_INFO = 1;
 	private static final int HUD_MODE_NOISE = 2;
