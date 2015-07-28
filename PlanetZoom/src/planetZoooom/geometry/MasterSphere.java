@@ -38,11 +38,12 @@ public class MasterSphere
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
 	private float[] positions;
+	private float[] normals;
 
 	private Matrix4f modelMatrix;
 	private int[] indices;
 
-	private	Vector3f lhs, rhs, normal, tempVectorToCalcNormal;
+	private	Vector3f lhs, rhs, normal, tempPointToCalcNormal;
 	private Vector3f v1,v2,v3,n1,n2,n3;
 	
 	private float radius;
@@ -51,21 +52,21 @@ public class MasterSphere
 	private int triangleIndexCount;
 	private boolean firstCheck;
 	private int minTriangles;
-	private VA va;
+	private SphereVertexArray va;
 
 	private Matrix4f mv; //modelViewMatrix
 	
 	public MasterSphere(float radius, int minTriangles) 
 	{
 		positions = new float[ARRAY_SIZE];
+		normals = new float[ARRAY_SIZE];
 
 		listeners = new ArrayList<>();
-		
 		
 		lhs = new Vector3f();
 		rhs = new Vector3f();
 		normal = new Vector3f();
-		tempVectorToCalcNormal = new Vector3f();
+		tempPointToCalcNormal = new Vector3f();
 		mv = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
@@ -77,7 +78,7 @@ public class MasterSphere
 		
 		positionPointer = 0;
 		this.minTriangles = minTriangles;
-		va = new VA(new float[]{}, 0, new int[]{});
+		va = new SphereVertexArray(new float[]{}, new float[]{}, 0, new int[]{});
 		this.radius = radius;
 		update();
 	}
@@ -108,7 +109,7 @@ public class MasterSphere
 //			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
-		va.update(positions, positionPointer, indices, triangleIndexCount);
+		va.update(positions, normals, positionPointer, indices, triangleIndexCount);
 	}
 
 	public void render(int mode)
@@ -158,33 +159,30 @@ public class MasterSphere
 	private Vector3f crossTempAndPos = new Vector3f();
 	private Vector3f firstVectorToCalulateNormal = new Vector3f();
 	private Vector3f secondVectorToCalulateNormal = new Vector3f();
-	
 	private Vector3f secondPointToCalulateNormal = new Vector3f();
-	
-	private Vector3f finalNormal = new Vector3f();
+	private Vector3f finalNormal = new Vector3f(0.0f,0.0f,0.0f);
 	
 	private int writePosition(Vector3f pos)
 	{
 		notifyListeners(pos);
-		//noiseMe(tempVectorToCalcNormal);
-		Vector3f.sub(tempVectorToCalcNormal, pos, firstVectorToCalulateNormal); //is already noised!!
+		notifyListeners(tempPointToCalcNormal);
+		Vector3f.sub(tempPointToCalcNormal, pos, firstVectorToCalulateNormal); 
 		firstVectorToCalulateNormal.normalise(firstVectorToCalulateNormal);
-		
 		Vector3f.cross(pos, firstVectorToCalulateNormal, crossTempAndPos);
-		
 		crossTempAndPos.normalise(crossTempAndPos);
 		Vector3f.add(pos, crossTempAndPos, secondPointToCalulateNormal);
-		//noiseMe(secondPointToCalulateNormal);
-		Vector3f.sub(secondPointToCalulateNormal, pos, secondVectorToCalulateNormal); //is already noised!!
+		notifyListeners(secondPointToCalulateNormal);
+		Vector3f.sub(secondPointToCalulateNormal, pos, secondVectorToCalulateNormal); 
 		secondVectorToCalulateNormal.normalise(secondVectorToCalulateNormal);
-		
 		Vector3f.cross(firstVectorToCalulateNormal, secondVectorToCalulateNormal, finalNormal);
-		
-		//write normal irgendwo rein!! 
+		finalNormal.normalise(finalNormal);
 		
 		this.positions[positionPointer++] = pos.x;
+		this.normals[positionPointer] = finalNormal.x;
 		this.positions[positionPointer++] = pos.y;
+		this.normals[positionPointer] = finalNormal.y;
 		this.positions[positionPointer++] = pos.z;
+		this.normals[positionPointer] = finalNormal.z;
 		
 		return (positionPointer-3) / 3;
 	}
@@ -218,8 +216,6 @@ public class MasterSphere
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
 			}
-
-
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -241,6 +237,7 @@ public class MasterSphere
 		v.y = y;
 		v.z = z;
 	}
+	
 	private int[] createChildVertices(int[] triangleIndices)
 	{	
 		float[] positions = getPositions(triangleIndices);
@@ -303,8 +300,6 @@ public class MasterSphere
 		else if (depth < 12)
 			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
 		
-		
-
 		//camera space -> clip space
 		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
 		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
@@ -410,7 +405,9 @@ public class MasterSphere
 		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
 		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
 		
-		this.tempVectorToCalcNormal = v1;
+		this.tempPointToCalcNormal.x = v1.x;
+		this.tempPointToCalcNormal.y = v1.y;
+		this.tempPointToCalcNormal.z = v1.z;
 		
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
@@ -426,7 +423,7 @@ public class MasterSphere
 		return radius;
 	}
 	
-	public class VA
+	public class SphereVertexArray
 	{
 		private int vertexCount;
 		private int indexCount;
@@ -436,20 +433,20 @@ public class MasterSphere
 		private int iboHandle;
 		
 		public static final int VERTEX_LOCATION = 0;
-		public static final int NORMAL_LOCATION = 1;
+		public static final int NORMAL_LOCATION = 2;
 		
-		public VA(float[] vertices, int vertexCount, int[] indices)
+		public SphereVertexArray(float[] vertices, float[] normals, int vertexCount, int[] indices)
 		{
 			initBufferHandles();
 			this.vertexCount = vertexCount;
-			doBufferStuff(vertices, indices);
+			doBufferStuff(vertices, normals, indices);
 		}
 		
-		public void update(float[] vertices, int vertexCount, int[] indices, int indexCount)
+		public void update(float[] vertices, float[] normals, int vertexCount, int[] indices, int indexCount)
 		{
 			this.vertexCount = vertexCount;
 			this.indexCount = indexCount;
-			doBufferStuff(vertices, indices);
+			doBufferStuff(vertices, normals, indices);
 		}
 		
 		private void initBufferHandles()
@@ -460,20 +457,23 @@ public class MasterSphere
 			iboHandle = glGenBuffers();
 		}
 		
-		private void doBufferStuff(float[] vertices, int[] indices)
+		private void doBufferStuff(float[] vertices, float[] normals, int[] indices)
 		{		
 			glBindVertexArray(vaoHandle);
 			
-			FloatBuffer buffer = BufferUtils.createFloatBuffer(vertexCount);
-			buffer.put(vertices, 0, vertexCount).flip();
+			FloatBuffer vBuffer = BufferUtils.createFloatBuffer(vertexCount);
+			vBuffer.put(vertices, 0, vertexCount).flip();
+			
+			FloatBuffer nBuffer = BufferUtils.createFloatBuffer(vertexCount);
+			nBuffer.put(vertices, 0, vertexCount).flip();
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, vBuffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, false, 0, 0);
 			glEnableVertexAttribArray(VERTEX_LOCATION);
 
 			glBindBuffer(GL_ARRAY_BUFFER, nboHandle);
-			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nBuffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, true, 0, 0);
 			glEnableVertexAttribArray(NORMAL_LOCATION);
 			

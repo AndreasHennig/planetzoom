@@ -35,16 +35,8 @@ void main(void)
 {
 	pass_data.positionVector = position;
 	pass_data.position = vec3(modelViewMatrix * vec4(position, 1.0));
-	
-	if(flatShading > 0.5)
-	{	
-		pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
-	}
-	else
-	{
-		pass_data.normal = normalize(vec3(normalMatrix * vec4(position, 1.0)));
-	}
-	
+	pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
+		
 	pass_data.uv = uvCoords;
 
 	pass_data.viewDir = cameraPosition - position;

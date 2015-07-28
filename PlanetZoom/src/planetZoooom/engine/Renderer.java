@@ -1,8 +1,6 @@
 package planetZoooom.engine;
 
 import static org.lwjgl.opengl.GL11.*;
-import planetZoooom.geometry.GameObject;
-import planetZoooom.graphics.Texture;
 
 public class Renderer 
 {		
@@ -10,19 +8,7 @@ public class Renderer
 	{
 		init();
 	}		
-	
-	public void renderGameObject(GameObject gameObject, Texture texture, int renderMode)
-	{
-		if(texture != null)
-			texture.bind();
 		
-		gameObject.draw(renderMode);
-		
-        //Clean up
-		if(texture != null)
-			texture.unbind();
-	}
-	
 	private void init()
     {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -31,6 +17,6 @@ public class Renderer
         glEnable(GL_BLEND);
         glEnable(GL_LINE_SMOOTH);
         glEnable(GL_POINT_SMOOTH);
-        glPointSize(4.0f);
+        glPointSize(3.0f);
     }    
 }
