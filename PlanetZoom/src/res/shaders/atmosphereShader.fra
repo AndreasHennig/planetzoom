@@ -9,18 +9,24 @@ in vec3 pass_color;
 in vec3 pass_color2;
 in vec3 direction;
 
+//Henyey-Greenstein phase function
+float phase(float scatteringSymetrie) // parameter = g
+{
+	float gSquared = scatteringSymetrie * scatteringSymetrie;
+	float cos = dot(lightPosition, direction) / length(direction); //cos(theta); 
+	float fMiePhase = 1.5 * ((1.0 - gSquared) / (2.0 + gSquared)) * (1.0 + cos * cos); 
+	fMiePhase /= pow(1.0 + gSquared - 2.0 * scatteringSymetrie * cos, 1.5);
+	
+	return fMiePhase;
+}
 
 void main(void)
 {
+	float fMiePhase = phase(miePhaseAsymetryFactor);
 
-	
-	float g2 = miePhaseAsymetryFactor * miePhaseAsymetryFactor;
-	float fCos = dot(lightPosition, direction) / length(direction);
-	float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos * fCos) / pow(1.0 + g2 - 2.0 * miePhaseAsymetryFactor * fCos, 1.5);
-	
+	vec3 tmp = pass_color + fMiePhase * pass_color2;
+	out_Color = vec4(tmp, tmp.x * 2);
 
-
-	out_Color = vec4(pass_color, pass_color.x);
 	//out_Color = vec4(direction, 1);
 
 
