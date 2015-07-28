@@ -42,7 +42,7 @@ public class MasterSphere
 	private Matrix4f modelMatrix;
 	private int[] indices;
 
-	private	Vector3f lhs, rhs, normal;
+	private	Vector3f lhs, rhs, normal, tempVectorToCalcNormal;
 	private Vector3f v1,v2,v3,n1,n2,n3;
 	
 	private float radius;
@@ -65,6 +65,7 @@ public class MasterSphere
 		lhs = new Vector3f();
 		rhs = new Vector3f();
 		normal = new Vector3f();
+		tempVectorToCalcNormal = new Vector3f();
 		mv = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
@@ -109,9 +110,7 @@ public class MasterSphere
 
 		va.update(positions, positionPointer, indices, triangleIndexCount);
 	}
-	
-	
-	
+
 	public void render(int mode)
 	{
 		va.render(mode);
@@ -152,13 +151,36 @@ public class MasterSphere
 		writePosition((Vector3f) Vertex.down().scale(radius));
 		writePosition((Vector3f) Vertex.front().scale(radius));
 		writePosition((Vector3f) Vertex.back().scale(radius));
-//		
+		
 		return indices;
 	}
+	
+	private Vector3f crossTempAndPos = new Vector3f();
+	private Vector3f firstVectorToCalulateNormal = new Vector3f();
+	private Vector3f secondVectorToCalulateNormal = new Vector3f();
+	
+	private Vector3f secondPointToCalulateNormal = new Vector3f();
+	
+	private Vector3f finalNormal = new Vector3f();
 	
 	private int writePosition(Vector3f pos)
 	{
 		notifyListeners(pos);
+		//noiseMe(tempVectorToCalcNormal);
+		Vector3f.sub(tempVectorToCalcNormal, pos, firstVectorToCalulateNormal); //is already noised!!
+		firstVectorToCalulateNormal.normalise(firstVectorToCalulateNormal);
+		
+		Vector3f.cross(pos, firstVectorToCalulateNormal, crossTempAndPos);
+		
+		crossTempAndPos.normalise(crossTempAndPos);
+		Vector3f.add(pos, crossTempAndPos, secondPointToCalulateNormal);
+		//noiseMe(secondPointToCalulateNormal);
+		Vector3f.sub(secondPointToCalulateNormal, pos, secondVectorToCalulateNormal); //is already noised!!
+		secondVectorToCalulateNormal.normalise(secondVectorToCalulateNormal);
+		
+		Vector3f.cross(firstVectorToCalulateNormal, secondVectorToCalulateNormal, finalNormal);
+		
+		//write normal irgendwo rein!! 
 		
 		this.positions[positionPointer++] = pos.x;
 		this.positions[positionPointer++] = pos.y;
@@ -212,9 +234,6 @@ public class MasterSphere
 		this.triangleIndexCount = trianglePointer;
 		return newTriangles;
 	}
-	
-	
-
 	
 	private void setVec(Vector3f v, float x, float y, float z)
 	{
@@ -390,7 +409,9 @@ public class MasterSphere
 
 		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
 		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
-
+		
+		this.tempVectorToCalcNormal = v1;
+		
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
 	

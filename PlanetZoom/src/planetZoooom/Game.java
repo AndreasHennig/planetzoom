@@ -155,6 +155,7 @@ public class Game implements IGame
 		drawPlanet();
 		
 
+		
 		hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
 		drawHUD();
 	}
