@@ -3,6 +3,8 @@ package planetZoooom.gameContent;
 import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.MasterSphere;
+import planetZoooom.interfaces.ICamera;
+import planetZoooom.interfaces.ICameraControl;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
@@ -26,6 +28,8 @@ public class Planet implements IGameObjectListener
 	private float noiseSeed;
 	private float mountainHeight;
 	
+	private final float slowDownRadius;
+	
 	public Planet(float radius, Vector3f position) 
 	{
 		this.position = position;
@@ -39,13 +43,21 @@ public class Planet implements IGameObjectListener
 		amplitude = 1.77f;
 		noiseSeed = 0;
 		mountainHeight = MIN_MOUNTAIN_HEIGHT;
+		
+		slowDownRadius = getRadius() * 1.15f;
 	}
 
 	public void update()
 	{
 		sphere.update();
 		
-		handleCollision();
+		Vector3f planetToCam = new Vector3f();
+		Vector3f.sub(Info.camera.getPosition(), getPosition(), planetToCam);
+		
+		float camSphereDistance = planetToCam.length() - getRadius();
+		adjustCamSpeed(camSphereDistance);
+		
+		handleCollision(planetToCam);
 	}
 	
 	public float getAmplitude() {
@@ -57,8 +69,6 @@ public class Planet implements IGameObjectListener
 			this.amplitude = MIN_AMPLITUDE;
 		else
 			this.amplitude = amplitude;
-		
-		System.out.printf("Noise Amplitude: %.2f\n", this.amplitude);
 	}
 
 	public int getOctaves() {
@@ -114,35 +124,25 @@ public class Planet implements IGameObjectListener
 		System.out.printf("Mountain Height: %.4f %%\n", this.mountainHeight);
 	}
 	
+	private void adjustCamSpeed(float camSphereDistance) {
+		ICameraControl camControl = Info.camera.getCameraControl();
+		
+//		System.out.printf("%.2f / %.2f\n", slowDownRadius, camSphereDistance);
+		
+		if(camSphereDistance < slowDownRadius) {
+			float camSpeed = ICameraControl.MAX_CAM_SPEED / slowDownRadius * camSphereDistance;
+			
+			if(camSpeed < ICameraControl.MIN_CAM_SPEED)
+				camSpeed = ICameraControl.MIN_CAM_SPEED;
 
-
-//	public void update(int subdivisions)
-//	{
-//		sphere.update(subdivisions, Info.camera.getLookAt());
-//	}
-//
-//	public void update(float planetCamDistance, boolean adjustCamSpeed) 
-//	{
-//		float subdivisionCoefficient = GameUtils.getDistanceCoefficient(planetCamDistance);
-//
-//		int subdivisions = (int) (subdivisionCoefficient / 1.2 * Sphere.MAX_SUBDIVISIONS);
-//
-//		// clamp
-//		subdivisions = subdivisions < Sphere.MIN_SUBDIVISIONS ? Sphere.MIN_SUBDIVISIONS : subdivisions;
-//		this.update(subdivisions);
-//
-//		// TODO: adjust cam speed with subdivisionCoefficient 
-//		// if adjustCamSpeed is true
-//		
-//		handleCollision();
-//	}
+			camControl.setVelocity(camSpeed);
+		} else 
+			camControl.setVelocity(ICameraControl.MAX_CAM_SPEED);
+	}
 	
-	private void handleCollision() {
+	private void handleCollision(Vector3f planetToCam) {
 		Vector3f cam = Info.camera.getPosition();
 		Vector3f planet = getPosition();
-		Vector3f planetToCam = new Vector3f();
-		
-		Vector3f.sub(cam, planet, planetToCam);
 		
 		float actualCamDistance = planetToCam.length();
 		planetToCam.normalise().scale(this.getRadius());
@@ -183,7 +183,7 @@ public class Planet implements IGameObjectListener
 	{
 		return sphere.getTriangleCount();
 	}
-	
+
 	public int getVertexCount() 
 	{
 		return sphere.getVertexCount();
