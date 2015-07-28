@@ -27,7 +27,4 @@ void main(void)
 	vec3 tmp = (pass_color + fMiePhase * pass_color2)/2;
 	out_Color = vec4(tmp, tmp.x + tmp.y + tmp.z);
 
-	//out_Color = vec4(direction, 1);
-
-
 }

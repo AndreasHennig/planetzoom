@@ -1,20 +1,12 @@
 package planetZoooom.geometry;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Float;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -53,7 +45,7 @@ public class MasterSphere
 	private int minTriangles;
 	private VA va;
 
-	private Matrix4f mv; //modelViewMatrix
+	private Matrix4f modelViewMatrix;
 	
 	public MasterSphere(float radius, int minTriangles) 
 	{
@@ -65,7 +57,7 @@ public class MasterSphere
 		lhs = new Vector3f();
 		rhs = new Vector3f();
 		normal = new Vector3f();
-		mv = new Matrix4f();
+		modelViewMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
 		v2 = new Vector3f();
@@ -87,7 +79,7 @@ public class MasterSphere
 	
 	public void update()
 	{						
-		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
+		Matrix4f.mul( Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
 		
 		positionPointer = 0;
 		
@@ -124,6 +116,11 @@ public class MasterSphere
 	public void render(int mode)
 	{
 		va.render(mode);
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
 	}
 	
 	public int getTriangleCount()
@@ -276,6 +273,37 @@ public class MasterSphere
 					new int[] {childIndices[0], childIndices[1], childIndices[2]}
 				};
 	}
+
+	private boolean isInViewFrustum(float a, float b, float c, int depth) 
+	{
+		Matrix4f p = Info.projectionMatrix;
+		float x,y,z,w;
+		float d = 1;
+
+		//Object space -> world space -> camera space
+		x = (modelViewMatrix.m00 * a) + (modelViewMatrix.m10 * b) + (modelViewMatrix.m20 * c) + (modelViewMatrix.m30 * d);
+		y = (modelViewMatrix.m01 * a) + (modelViewMatrix.m11 * b) + (modelViewMatrix.m21 * c) + (modelViewMatrix.m31 * d);
+		z = (modelViewMatrix.m02 * a) + (modelViewMatrix.m12 * b) + (modelViewMatrix.m22 * c) + (modelViewMatrix.m32 * d);
+
+		w= -z;
+		
+		if(depth < 2)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/1;
+		else if (depth < 8)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/1.5;
+		else if (depth < 12)
+			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
+		
+		
+
+		//camera space -> clip space
+		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
+		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
+		z = (p.m02 * x) + (p.m12 * y) + (p.m22 * z) + (p.m32 * d);
+
+		return (x <= w && x >= -w) && (y <= w && y >= -w);
+	}
+
 	
 	//TODO implement correct frustum culling maybe sutherland hodgen style
 	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
@@ -293,9 +321,9 @@ public class MasterSphere
 		for(int i = 0; i < positions.length; i+=3)
 		{
 			//Object space -> world space -> camera space
-			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
-			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
-			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
+			x = (modelViewMatrix.m00 * positions[i]) + (modelViewMatrix.m10 * positions[i+1]) + (modelViewMatrix.m20 * positions[i+2]) + (modelViewMatrix.m30);
+			y = (modelViewMatrix.m01 * positions[i]) + (modelViewMatrix.m11 * positions[i+1]) + (modelViewMatrix.m21 * positions[i+2]) + (modelViewMatrix.m31);
+			z = (modelViewMatrix.m02 * positions[i]) + (modelViewMatrix.m12 * positions[i+1]) + (modelViewMatrix.m22 * positions[i+2]) + (modelViewMatrix.m32);
 			
 			w[i/3] = -z;
 			

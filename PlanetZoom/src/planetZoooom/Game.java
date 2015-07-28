@@ -44,7 +44,9 @@ public class Game implements IGame
 	private Texture sunGlowTexture;
 
 	// SHADERS
-	private ShaderProgram planetShader;
+	private ShaderProgram earthShader;
+	private ShaderProgram marsShader;
+	private ShaderProgram dessertShader;
 	private ShaderProgram wireFrameShader;	
 	private ShaderProgram hudShader;
 	private ShaderProgram sunShader;
@@ -63,6 +65,8 @@ public class Game implements IGame
 	private boolean wireframe = false;
 	private boolean updateSphere = true;
 	private float flatShading = 0.0f;
+	private int shaderSwitch = 0;
+	private boolean renderAtmosphere;
 	
 	private static final int HUD_MODE_OFF = 0;
 	private static final int HUD_MODE_INFO = 1;
@@ -110,7 +114,9 @@ public class Game implements IGame
 	private void initShaders() 
 	{
 		hudShader = new ShaderProgram("HUDShader");
-		planetShader = new ShaderProgram("planetShader");
+		earthShader = new ShaderProgram("earthShader");
+		marsShader = new ShaderProgram("marsShader");
+		dessertShader = new ShaderProgram("dessertShader");
 		wireFrameShader = new ShaderProgram("testShader");
 		sunShader = new ShaderProgram("sunShader");
 		sunGlowShader = new ShaderProgram("sunGlowShader");
@@ -127,7 +133,6 @@ public class Game implements IGame
 		sunGlow.setTexture(sunGlowTexture);
 	}
 
-	
 	@Override
 	public void update(int deltaTime) 
 	{
@@ -136,32 +141,29 @@ public class Game implements IGame
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //DO NOT MOVE THIS LINE! ....THERE IS A REASON THAT IT IS NOT IN RENDERER;
 		
 		glDisable(GL_DEPTH_TEST);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-		
-		Matrix4f modelMatrix = new Matrix4f();
-		modelMatrix.setIdentity();
-		Matrix4f.mul(Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
-		
-		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
 		drawSun();		
 		
-		glFrontFace(GL_CW);
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
 		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
 		lightDirection.normalise();
-		drawAtmosphere();
-		glFrontFace(GL_CCW);
+
+		if(renderAtmosphere)
+		{
+			glFrontFace(GL_CW);
+			drawAtmosphere();
+			glFrontFace(GL_CCW);
+		}
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		Matrix4f.mul(Info.camera.getViewMatrix(), (Matrix4f) new Matrix4f().setIdentity(), modelViewMatrix);
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getSphere().getModelMatrix(), modelViewMatrix);
 		Matrix4f.invert(modelViewMatrix, normalMatrix);
+		
 		
 		if(updateSphere)
 			planet.update();
 		
 		drawPlanet();
-		
 
 		updateHud(hudMode);
 		drawHUD();
@@ -170,7 +172,6 @@ public class Game implements IGame
 
 	private void updateHud(int mode)
 	{
-
 		switch(mode)
 		{
 			case HUD_MODE_OFF:
@@ -260,6 +261,8 @@ public class Game implements IGame
 	
 	private void drawSun()
 	{
+		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
+		
 		glUseProgram(sunGlowShader.getId());
 		{
 			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
@@ -281,6 +284,10 @@ public class Game implements IGame
 	
 	private void drawAtmosphere()
 	{
+		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getAtmosphere().getModelMatrix(), modelViewMatrix);
+		Vector3f.sub(sun.getPosition(), planet.getAtmosphere().getPosition(), lightDirection);
+		lightDirection.normalise();
+		
 		glUseProgram(atmosphereShader.getId());
 		{
 			float cameraHeight = GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition());
@@ -299,51 +306,65 @@ public class Game implements IGame
 			atmosphereShader.loadUniform1f(planet.getRadius() + planet.getRadius() * 0.09f, "planetRadius");
 				
 			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
-			
-//			if(wireframe)
-//			{
-//				glUseProgram(wireFrameShader.getId());
-//				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-//				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-//				wireFrameShader.loadUniform1f(0.4f, "greytone");
-//				planet.getAtmosphere().getSphere().render(GL_LINE_STRIP);
-//				wireFrameShader.loadUniform1f(1.0f, "greytone");
-//				planet.getAtmosphere().getSphere().render(GL_POINTS);
-//			}
+	
 		}
+	}
+	
+	private void loadPlanetShaderUniforms(ShaderProgram shader)
+	{
+		glUseProgram(shader.getId());
+		shader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+		shader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+		shader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
+		shader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+		shader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
+		shader.loadUniform1f(planet.getRadius(), "radius");
+		shader.loadUniform1f(flatShading, "flatShading");
+		shader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
 	}
 	
 	private void drawPlanet()
 	{
-		glUseProgram(planetShader.getId());
+		Matrix4f.mul(Info.camera.getViewMatrix(), Info.planet.getSphere().getModelMatrix(), modelViewMatrix);
+		Matrix4f.invert(modelViewMatrix, normalMatrix);		
+		if(updateSphere)
+			planet.update();
+		
+		switch(shaderSwitch)
 		{
-			planetShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			planetShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			planetShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-			planetShader.loadUniformVec3f(sun.getPosition(), "lightPosition");
-			planetShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-			planetShader.loadUniform1f(planet.getRadius(), "radius");
-			planetShader.loadUniform1f(flatShading, "flatShading");
-			planetShader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
-			planet.getSphere().render(GL_TRIANGLES);
-			
-			if(wireframe)
-			{
-				glDepthFunc(GL_LEQUAL);
-				glUseProgram(wireFrameShader.getId());
-				wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-				wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-				wireFrameShader.loadUniform1f(0.5f, "greytone");
-				planet.getSphere().render(GL_LINES);
-				wireFrameShader.loadUniform1f(1.0f, "greytone");
-				planet.getSphere().render(GL_POINTS);
-				glDepthFunc(GL_LESS);
-			}
+		case 0:	loadPlanetShaderUniforms(earthShader);
+				renderAtmosphere = true;
+				break;
+		case 1: loadPlanetShaderUniforms(marsShader);
+				renderAtmosphere = false;
+				break;
+		case 2: loadPlanetShaderUniforms(dessertShader);
+				renderAtmosphere = true;
+				break;
+		default: 	loadPlanetShaderUniforms(earthShader);
+					renderAtmosphere = true;
+		}
+		
+		planet.getSphere().render(GL_TRIANGLES);
+		
+		if(wireframe)
+		{
+			glDepthFunc(GL_LEQUAL);
+			glUseProgram(wireFrameShader.getId());
+			wireFrameShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			wireFrameShader.loadUniform1f(0.5f, "greytone");
+			planet.getSphere().render(GL_LINES);
+			wireFrameShader.loadUniform1f(1.0f, "greytone");
+			planet.getSphere().render(GL_POINTS);
+			glDepthFunc(GL_LESS);
 		}
 	}
 	
 	private void drawHUD()
 	{
+		//hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
+		
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
@@ -369,7 +390,10 @@ public class Game implements IGame
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_2)){ flatShading = 1.0f; }	
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_3)){ flatShading = 0.0f; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
+
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
+
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_8)){ shaderSwitch = (shaderSwitch + 1) % 3; }
 		
 		switch(hudMode)
 		{
