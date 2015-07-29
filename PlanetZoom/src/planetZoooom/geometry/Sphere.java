@@ -1,4 +1,5 @@
 package planetZoooom.geometry;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -22,7 +23,7 @@ import planetZoooom.utils.Info;
 
 public class Sphere
 {
-	private static final int CHECK_INTERVAL = 4;
+	private static final int CHECK_INTERVAL = 1;
 	private static final int FIRST_CHECK = 3;
 	private static final double VIEW_FRUSTUM_OFFSET = 2; 
 	
