@@ -29,12 +29,12 @@ public class Rectangle2D extends MeshObject
 		
 		uvCoords = new float[]{0};
 		normals = new float[]{0};
-		
-		mesh = new VertexArray(new float[]{}, normals, uvCoords, new float[]{}, new int[]{});
+		createMesh();
+		mesh = new VertexArray(vertices, normals, uvCoords, colors, indices);
 		update();
 	}
 	
-	public void update()
+	private void createMesh()
 	{
 		vertices[0] = x;
 		vertices[1] = y;
@@ -68,9 +68,14 @@ public class Rectangle2D extends MeshObject
 			colors[i+2] = color[2];
 			colors[i+3] = color[3];
 		}
-		
+	}
+	
+	public void update()
+	{		
+		createMesh();
 		mesh.update(vertices, normals, uvCoords, colors, indices);
 	}
+	
 	public void setColor(float[] color)
 	{
 		this.color = color;

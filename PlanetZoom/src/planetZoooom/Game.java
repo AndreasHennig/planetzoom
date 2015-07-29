@@ -267,12 +267,10 @@ public class Game implements IGame
 	
 	private void drawHUD()
 	{
-		//hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
-		
 		glUseProgram(colorShader.getId());
 		{
-			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
-			hudShader.loadUniformMat4f(hud.getModelMatrix(), "modelViewMatrix", false);
+			colorShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
+			colorShader.loadUniformMat4f(hud.getModelMatrix(), "modelViewMatrix", false);
 			hud.getBackgroundMesh().render(GL_TRIANGLES);
 		}
 		glUseProgram(0);
@@ -284,7 +282,6 @@ public class Game implements IGame
 			hud.getTextMesh().render(GL_TRIANGLES);
 		}
 		glUseProgram(0);
-		
 	}
 	
 	private void updateHud(int mode)

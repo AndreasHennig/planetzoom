@@ -52,6 +52,7 @@ public class HeadsUpDisplay
 	{
 	    return text;
 	}
+	
 	public Rectangle2D getBackgroundMesh()
 	{
 		return background;
