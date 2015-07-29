@@ -129,10 +129,9 @@ public class Game implements IGame
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
-
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
-		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
+		sunGlow = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 1.0f);
 		sunGlow.setTexture(sunGlowTexture);
 	}
 
@@ -174,13 +173,6 @@ public class Game implements IGame
 	{
 		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
 		
-		glUseProgram(sunGlowShader.getId());
-		{
-			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
-			sunGlow.render(GL_TRIANGLES);
-		}
 
 		glUseProgram(sunShader.getId());
 		{
@@ -190,6 +182,14 @@ public class Game implements IGame
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
 			sun.render(GL_TRIANGLES);
+		}
+
+		glUseProgram(sunGlowShader.getId());
+		{
+			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
+			sunGlow.render(GL_TRIANGLES);
 		}
 	}
 	
