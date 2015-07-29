@@ -251,7 +251,7 @@ public class Game implements IGame
 			wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			wireFrameShader.loadUniform1f(0.5f, "greytone");
 			planet.getSphere().render(GL_LINES);
-			wireFrameShader.loadUniform1f(1.0f, "greytone");
+			wireFrameShader.loadUniform1f(0.8f, "greytone");
 			planet.getSphere().render(GL_POINTS);
 			glDepthFunc(GL_LESS);
 		}
