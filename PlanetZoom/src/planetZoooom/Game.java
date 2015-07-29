@@ -373,11 +373,12 @@ public class Game implements IGame
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_5)){ wireframe = !wireframe; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_8)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_6)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_ENTER)){ planet.setNoiseSeed((float) (Math.random() * Integer.MAX_VALUE)); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_BACKSPACE)){ planet.setNoiseSeed(0);/*reset();*/ }
 		
 		switch(hudMode)
 		{
