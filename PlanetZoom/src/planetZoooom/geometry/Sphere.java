@@ -160,15 +160,49 @@ public class Sphere
 		return indices;
 	}
 	
+	Vector3f finalNormal = new Vector3f();
+	Vector3f orthoVec1 = new Vector3f();
+	Vector3f orthoVec2 = new Vector3f();
+	
+	Vector3f normalizedPos = new Vector3f();
+	Vector3f sunToPos = new Vector3f();
+	Vector3f crossSunPos = new Vector3f(); //firstVector to noise
+	Vector3f crossPosAndCrossSunPos = new Vector3f(); //secondVector to noise
+	
 	private int writePosition(Vector3f pos)
 	{
+		//Lenz Edition
 		notifyListeners(pos);
+		orthoVec1.x = -pos.y;
+		orthoVec1.y = pos.x;
+		orthoVec1.z = 0;
 		
-		this.normals[positionPointer] = pos.x;
+		Vector3f.cross(orthoVec1, pos, orthoVec2);
+		orthoVec1.normalise(orthoVec1);
+		orthoVec2.normalise(orthoVec2);
+		orthoVec1.scale(0.1f);
+		orthoVec2.scale(0.1f);
+		float orthoLength1 = orthoVec1.length();
+		float orthoLength2 = orthoVec2.length();
+		Vector3f.add(orthoVec1, pos, orthoVec1);
+		Vector3f.add(orthoVec2, pos, orthoVec2);
+		orthoVec1.normalise(orthoVec1);
+		orthoVec2.normalise(orthoVec2);
+		orthoVec1.scale(6500.0f);
+		orthoVec2.scale(6500.0f);
+		notifyListeners(orthoVec1);
+		notifyListeners(orthoVec2);
+		Vector3f.sub(orthoVec1, pos, orthoVec1);
+		Vector3f.sub(orthoVec2, pos, orthoVec2);
+		orthoVec1.scale(1/orthoLength1);
+		orthoVec2.scale(1/orthoLength2);
+		Vector3f.cross(orthoVec2, orthoVec1, finalNormal);
+		
+		this.normals[positionPointer] = finalNormal.x;
 		this.positions[positionPointer++] = pos.x;
-		this.normals[positionPointer] = pos.y;
+		this.normals[positionPointer] = finalNormal.y;
 		this.positions[positionPointer++] = pos.y;
-		this.normals[positionPointer] = pos.z;
+		this.normals[positionPointer] = finalNormal.z;
 		this.positions[positionPointer++] = pos.z;
 		
 		return (positionPointer-3) / 3;
