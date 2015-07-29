@@ -146,7 +146,8 @@ public class Game implements IGame
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
 
-		if(!freezeUpdate) {
+		if(!freezeUpdate) 
+		{
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			
 			drawSun();		
@@ -155,7 +156,9 @@ public class Game implements IGame
 			glFrontFace(GL_CW);
 			drawAtmosphere();
 			glFrontFace(GL_CCW);
-		} else {
+		}
+		else 
+		{
 			glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 		}
 		glEnable(GL_DEPTH_TEST);
@@ -204,13 +207,10 @@ public class Game implements IGame
 			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
-//			atmosphereShader.loadUniform1f(planet.getAtmosphere().getSphere().getRadius() * 0.25f, "fScale");
 			atmosphereShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			atmosphereShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-//			if(cameraHeight > planet.getRadius())
-//			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
 			atmosphereShader.loadUniform1f(planet.getRadius() + planet.getRadius() * 0.09f, "planetRadius");
 				
 			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
@@ -265,9 +265,7 @@ public class Game implements IGame
 	}
 	
 	private void drawHUD()
-	{
-		//hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
-		
+	{	
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
