@@ -207,8 +207,6 @@ public class Sphere
 					continue; // clip
 			}
 
-
-			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
 			for (int j = 0; j < childIndices.length; j++)
@@ -223,9 +221,7 @@ public class Sphere
 		return newTriangles;
 	}
 	
-	
 
-	
 	private void setVec(Vector3f v, float x, float y, float z)
 	{
 		v.x = x;
