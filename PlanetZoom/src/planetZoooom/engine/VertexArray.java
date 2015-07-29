@@ -18,11 +18,13 @@ public class VertexArray
 	private int vboHandle;
 	private int uvboHandle;
 	private int nboHandle;
+	private int colorHandle;
 	private int iboHandle;
 	
 	public static final int VERTEX_LOCATION = 0;
 	public static final int UV_LOCATION = 1;
 	public static final int NORMAL_LOCATION = 2;
+	public static final int COLOR_LOCATION = 3;
 	
 	public VertexArray(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
 	{
@@ -30,9 +32,20 @@ public class VertexArray
 		doBufferStuff(vertices, normals, uvCoords, indices);
 	}
 	
+	public VertexArray(float[] vertices, float[] normals, float[] uvCoords, float[] colors, int[] indices)
+	{
+		initBufferHandles();
+		doBufferStuff(vertices, normals, uvCoords, colors, indices);
+	}
+	
 	public void update(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
 	{
 		doBufferStuff(vertices, normals, uvCoords, indices);
+	}
+	
+	public void update(float[] vertices, float[] normals, float[] uvCoords, float[] colors, int[] indices)
+	{
+		doBufferStuff(vertices, normals, uvCoords, colors, indices);
 	}
 	
 	private void initBufferHandles()
@@ -41,6 +54,7 @@ public class VertexArray
 		vboHandle = glGenBuffers();
 		nboHandle = glGenBuffers();
 		uvboHandle = glGenBuffers();
+		colorHandle = glGenBuffers();
 		iboHandle = glGenBuffers();
 	}
 	
@@ -54,6 +68,15 @@ public class VertexArray
 		glEnableVertexAttribArray(location);
 	}
 	
+	private void doBufferStuff(float[] vertices, float[] normals, float[] uvCoords, float[] colors, int[] indices)
+	{
+
+		glBindVertexArray(vaoHandle);	
+		fillFloatBuffer(colorHandle, colors, COLOR_LOCATION, 4, false);
+		glBindVertexArray(0);
+		doBufferStuff(vertices, normals, uvCoords, indices);
+		
+	}
 	private void doBufferStuff(float[] vertices, float[] normals, float[] uvCoords, int[] indices)
 	{
 		count = indices.length;
