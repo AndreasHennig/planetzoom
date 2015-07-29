@@ -419,7 +419,7 @@ public class Sphere
 		private int iboHandle;
 		
 		public static final int VERTEX_LOCATION = 0;
-		public static final int NORMAL_LOCATION = 1;
+		public static final int NORMAL_LOCATION = 2;
 		
 		public VA(float[] vertices, int vertexCount, int[] indices)
 		{

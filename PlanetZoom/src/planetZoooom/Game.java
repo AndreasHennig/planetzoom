@@ -58,7 +58,6 @@ public class Game implements IGame
 	// CONTROLS
 	private boolean wireframe = false;
 	private boolean updateSphere = true;
-	private float flatShading = 0.0f;
 	
 	private static final int HUD_MODE_OFF = 0;
 	private static final int HUD_MODE_INFO = 1;
@@ -222,7 +221,6 @@ public class Game implements IGame
 		shader.loadUniformVec3f(sun.getPosition(), "lightPosition");
 		shader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 		shader.loadUniform1f(planet.getRadius(), "radius");
-		shader.loadUniform1f(flatShading, "flatShading");
 		shader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
 	}
 	
