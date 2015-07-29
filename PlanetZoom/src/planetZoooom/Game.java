@@ -57,7 +57,7 @@ public class Game implements IGame
 	
 	// CONTROLS
 	private boolean wireframe = false;
-	private boolean updateSphere = true;
+	private boolean freezeUpdate = false;
 	private float flatShading = 0.0f;
 	
 	private static final int HUD_MODE_OFF = 0;
@@ -146,15 +146,21 @@ public class Game implements IGame
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
 		drawSun();		
 	
-		glFrontFace(GL_CW);
-		drawAtmosphere();
-		glFrontFace(GL_CCW);
 		
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
-		if(updateSphere)
+		if(!freezeUpdate) {
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			
 			planet.update();
+		
+			glFrontFace(GL_CW);
+			drawAtmosphere();
+			glFrontFace(GL_CCW);
+		} else {
+			glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+		}
 		
 		drawPlanet();
 
@@ -374,7 +380,7 @@ public class Game implements IGame
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_5)){ wireframe = !wireframe; }
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ freezeUpdate = !freezeUpdate; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_6)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_ENTER)){ planet.setNoiseSeed((float) (Math.random() * Integer.MAX_VALUE)); }
