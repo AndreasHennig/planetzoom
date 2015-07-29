@@ -83,7 +83,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 10000);
+		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
 		Info.projectionMatrix = planetZoooom.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
 		modelViewMatrix = new Matrix4f();
@@ -387,6 +387,15 @@ public class Game implements IGame
 		System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
 	}
 	
+	private void reset()
+	{
+		planet.setNoiseSeed(0);
+		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
+		planet.setShaderMode(0);
+		wireframe = false;
+		freezeUpdate = false;
+	}
+	
 	private void processKeyboardInputs(int deltaTime) {
 		
 		cameraControl = Info.camera.getCameraControl();
@@ -397,7 +406,7 @@ public class Game implements IGame
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_6)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_ENTER)){ planet.setNoiseSeed((float) (Math.random() * Integer.MAX_VALUE)); }
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_BACKSPACE)){ planet.setNoiseSeed(0);/*reset();*/ }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_BACKSPACE)){ reset(); }
 		
 		switch(hudMode)
 		{

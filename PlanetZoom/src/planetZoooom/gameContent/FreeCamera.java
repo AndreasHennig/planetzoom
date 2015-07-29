@@ -19,9 +19,9 @@ public class FreeCamera implements ICamera
 	private Matrix4f view;
 	private ICameraControl cameraControl;
 	
-	public FreeCamera(float x, float y, float z)
+	public FreeCamera(Vector3f _position)
 	{
-		position = new Vector3f(x, y ,z);
+		position = _position;
 
 		orientation = new Quaternion();
 		view = new Matrix4f();
@@ -211,5 +211,11 @@ public class FreeCamera implements ICamera
 		Vector3f.add(movement, v1, movement);
 		Vector3f.add(movement, v2, movement);
 		return movement;
+	}
+
+	@Override
+	public void setPosition(Vector3f position) 
+	{
+		this.position = position;
 	}
 }

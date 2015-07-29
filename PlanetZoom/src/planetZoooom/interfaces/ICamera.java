@@ -11,4 +11,5 @@ public interface ICamera
 	public Vector3f getLookAt();
 	public Vector3f getLocalRightVector();
 	public Vector3f getLocalUpVector();
+	public void setPosition(Vector3f position);
 }
