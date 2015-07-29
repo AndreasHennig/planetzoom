@@ -1,0 +1,12 @@
+#version 330
+#pragma debug(on)
+#pragma optimize(off)
+
+uniform float greytone;
+
+out vec4 out_Color;
+
+void main(void)
+{
+	out_Color = vec4(greytone, greytone, greytone, 1.0);
+}
