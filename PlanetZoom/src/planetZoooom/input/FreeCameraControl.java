@@ -42,10 +42,10 @@ public class FreeCameraControl implements ICameraControl
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
 			cam.moveDown(velocity * deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW_KEY_E))
+		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
 			cam.addRoll(-rollSpeed * deltaTime);
 		
-		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
+		if(Keyboard.isKeyPressed(GLFW_KEY_E))
 			cam.addRoll(rollSpeed * deltaTime);
 
 		
