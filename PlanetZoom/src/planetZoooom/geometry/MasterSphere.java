@@ -196,8 +196,6 @@ public class MasterSphere
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
 			}
-
-
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -212,9 +210,6 @@ public class MasterSphere
 		this.triangleIndexCount = trianglePointer;
 		return newTriangles;
 	}
-	
-	
-
 	
 	private void setVec(Vector3f v, float x, float y, float z)
 	{
@@ -372,7 +367,6 @@ public class MasterSphere
 		
 		return isInViewFrustum(positions);
 	}
-		
 
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
