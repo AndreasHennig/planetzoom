@@ -1,20 +1,12 @@
 package planetZoooom.geometry;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Float;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -28,46 +20,44 @@ import org.lwjgl.util.vector.Vector3f;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.Info;
 
-public class MasterSphere
+public class Sphere
 {
 	private static final int CHECK_INTERVAL = 4;
 	private static final int FIRST_CHECK = 3;
-	private static final int ARRAY_SIZE = 5000000;
 	private static final double VIEW_FRUSTUM_OFFSET = 2; 
 	
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
 	private float[] positions;
-	private float[] normals;
 
 	private Matrix4f modelMatrix;
 	private int[] indices;
 
-	private	Vector3f lhs, rhs, normal, tempPointToCalcNormal;
+	private	Vector3f lhs, rhs, normal;
 	private Vector3f v1,v2,v3,n1,n2,n3;
 	
 	private float radius;
 	
 	private int positionPointer; 
 	private int triangleIndexCount;
-	private boolean firstCheck;
-	private int minTriangles;
-	private SphereVertexArray va;
 
-	private Matrix4f mv; //modelViewMatrix
+	private int currentDepth;
+	private int minTriangles;
+	private VA va;
+
+	private Matrix4f modelViewMatrix;
 	
-	public MasterSphere(float radius, int minTriangles) 
+	public Sphere(float radius, int minTriangles) 
 	{
-		positions = new float[ARRAY_SIZE];
-		normals = new float[ARRAY_SIZE];
+		positions = new float[minTriangles * 12 * 2];
 
 		listeners = new ArrayList<>();
+		
 		
 		lhs = new Vector3f();
 		rhs = new Vector3f();
 		normal = new Vector3f();
-		tempPointToCalcNormal = new Vector3f();
-		mv = new Matrix4f();
+		modelViewMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
 		v2 = new Vector3f();
@@ -78,7 +68,7 @@ public class MasterSphere
 		
 		positionPointer = 0;
 		this.minTriangles = minTriangles;
-		va = new SphereVertexArray(new float[]{}, new float[]{}, 0, new int[]{});
+		va = new VA(new float[]{}, 0, new int[]{});
 		this.radius = radius;
 		update();
 	}
@@ -89,37 +79,48 @@ public class MasterSphere
 	
 	public void update()
 	{						
-		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
+		Matrix4f.mul( Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
 		
 		positionPointer = 0;
-		//Indices - 3 make up a triangle
-		firstCheck = true;
+		
 		int[] t = createOctahedron();
 		triangleIndexCount = t.length;
-//		for(int depth = 0; depth < subdivisions; depth++)
+		
 		int depth = 0;
-		while(triangleIndexCount < minTriangles * 3)
+		while(triangleIndexCount < (minTriangles * 3))
 		{
 			t = subdivide(t, triangleIndexCount, depth++);
 			if(t.length == 0)
 				break;
 		}
+		currentDepth = depth;
 		
-//		for(int i = 0; i < 6; i++)
-//			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
-		va.update(positions, normals, positionPointer, indices, triangleIndexCount);
+		va.update(positions, positionPointer, indices, triangleIndexCount);
 	}
-
-	public Matrix4f getModelMatrix()
+	
+	public int getSubdivisions()
 	{
-		return modelMatrix;
+		return currentDepth;
+	}
+	public int getTotalTriangleCount()
+	{
+		int totalTriangles = 8;
+		for(int i = 0; i < currentDepth; i++)
+			totalTriangles = totalTriangles << 2;
+				
+		return totalTriangles;
 	}
 	
 	public void render(int mode)
 	{
 		va.render(mode);
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
 	}
 	
 	public int getTriangleCount()
@@ -136,7 +137,6 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
-//					0,1,2
 					2,4,1,
 					2,0,4,
 					4,3,1,
@@ -147,52 +147,23 @@ public class MasterSphere
 					3,0,5
 				};
 		
-//		
-//		writePosition(new Vector3f(0,0,0));
-//		writePosition(new Vector3f(1,0,0));
-//		writePosition(new Vector3f(0.5f,1,0));
 		writePosition((Vector3f) Vertex.left().scale(radius));
 		writePosition((Vector3f) Vertex.right().scale(radius));
 		writePosition((Vector3f) Vertex.up().scale(radius));
 		writePosition((Vector3f) Vertex.down().scale(radius));
 		writePosition((Vector3f) Vertex.front().scale(radius));
 		writePosition((Vector3f) Vertex.back().scale(radius));
-		
+
 		return indices;
 	}
 	
-	private Vector3f crossTempAndPos = new Vector3f();
-	private Vector3f firstVectorToCalulateNormal = new Vector3f();
-	private Vector3f secondVectorToCalulateNormal = new Vector3f();
-	private Vector3f secondPointToCalulateNormal = new Vector3f();
-	private Vector3f finalNormal = new Vector3f(0.0f,0.0f,0.0f);
-	
 	private int writePosition(Vector3f pos)
 	{
-		this.tempPointToCalcNormal.x = pos.x;
-		this.tempPointToCalcNormal.y = -pos.z;
-		this.tempPointToCalcNormal.z = pos.y;
-		
-		notifyListeners(pos);			
-		
-		notifyListeners(tempPointToCalcNormal);
-		Vector3f.sub(tempPointToCalcNormal, pos, firstVectorToCalulateNormal); 
-		firstVectorToCalulateNormal.normalise(firstVectorToCalulateNormal);
-		Vector3f.cross(pos, firstVectorToCalulateNormal, crossTempAndPos);
-		crossTempAndPos.normalise(crossTempAndPos);
-		Vector3f.add(pos, crossTempAndPos, secondPointToCalulateNormal);
-		notifyListeners(secondPointToCalulateNormal);
-		Vector3f.sub(secondPointToCalulateNormal, pos, secondVectorToCalulateNormal); 
-		secondVectorToCalulateNormal.normalise(secondVectorToCalulateNormal);
-		Vector3f.cross(firstVectorToCalulateNormal, secondVectorToCalulateNormal, finalNormal);
-		finalNormal.normalise(finalNormal);
+		notifyListeners(pos);
 		
 		this.positions[positionPointer++] = pos.x;
-		this.normals[positionPointer] = finalNormal.x;
 		this.positions[positionPointer++] = pos.y;
-		this.normals[positionPointer] = finalNormal.y;
 		this.positions[positionPointer++] = pos.z;
-		this.normals[positionPointer] = finalNormal.z;
 		
 		return (positionPointer-3) / 3;
 	}
@@ -219,13 +190,24 @@ public class MasterSphere
 		{
 			triangleIndices = new int[]{triangles[i], triangles[i+1], triangles[i+2]};
 			
-			if (depth % CHECK_INTERVAL == FIRST_CHECK)
+//			if(newTriangles.length > minTriangles) //Most likely last subdivide
+//			{
+//				if(!isFacingTowardsCamera(triangleIndices))
+//					continue;
+//				if (!isInViewFrustum(triangleIndices))
+//					continue; // clip
+//			}
+//			
+			if (depth % CHECK_INTERVAL == 0 || depth == FIRST_CHECK)
 			{
+				
 				if(!isFacingTowardsCamera(triangleIndices))
 					continue;
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
 			}
+
+
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -241,13 +223,15 @@ public class MasterSphere
 		return newTriangles;
 	}
 	
+	
+
+	
 	private void setVec(Vector3f v, float x, float y, float z)
 	{
 		v.x = x;
 		v.y = y;
 		v.z = z;
 	}
-	
 	private int[] createChildVertices(int[] triangleIndices)
 	{	
 		float[] positions = getPositions(triangleIndices);
@@ -297,9 +281,9 @@ public class MasterSphere
 		float d = 1;
 
 		//Object space -> world space -> camera space
-		x = (mv.m00 * a) + (mv.m10 * b) + (mv.m20 * c) + (mv.m30 * d);
-		y = (mv.m01 * a) + (mv.m11 * b) + (mv.m21 * c) + (mv.m31 * d);
-		z = (mv.m02 * a) + (mv.m12 * b) + (mv.m22 * c) + (mv.m32 * d);
+		x = (modelViewMatrix.m00 * a) + (modelViewMatrix.m10 * b) + (modelViewMatrix.m20 * c) + (modelViewMatrix.m30 * d);
+		y = (modelViewMatrix.m01 * a) + (modelViewMatrix.m11 * b) + (modelViewMatrix.m21 * c) + (modelViewMatrix.m31 * d);
+		z = (modelViewMatrix.m02 * a) + (modelViewMatrix.m12 * b) + (modelViewMatrix.m22 * c) + (modelViewMatrix.m32 * d);
 
 		w= -z;
 		
@@ -310,6 +294,8 @@ public class MasterSphere
 		else if (depth < 12)
 			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
 		
+		
+
 		//camera space -> clip space
 		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
 		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
@@ -317,12 +303,16 @@ public class MasterSphere
 
 		return (x <= w && x >= -w) && (y <= w && y >= -w);
 	}
+
 	
 	//TODO implement correct frustum culling maybe sutherland hodgen style
 	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
 	
-	private boolean isInViewFrustum(float[] positions) 
+	private boolean isInViewFrustum(int[] triangleIndices) 
 	{
+		
+		float[] positions = getPositions(triangleIndices);
+		
 		Matrix4f p = Info.projectionMatrix;
 		float x,y,z;
 
@@ -331,9 +321,9 @@ public class MasterSphere
 		for(int i = 0; i < positions.length; i+=3)
 		{
 			//Object space -> world space -> camera space
-			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
-			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
-			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
+			x = (modelViewMatrix.m00 * positions[i]) + (modelViewMatrix.m10 * positions[i+1]) + (modelViewMatrix.m20 * positions[i+2]) + (modelViewMatrix.m30);
+			y = (modelViewMatrix.m01 * positions[i]) + (modelViewMatrix.m11 * positions[i+1]) + (modelViewMatrix.m21 * positions[i+2]) + (modelViewMatrix.m31);
+			z = (modelViewMatrix.m02 * positions[i]) + (modelViewMatrix.m12 * positions[i+1]) + (modelViewMatrix.m22 * positions[i+2]) + (modelViewMatrix.m32);
 			
 			w[i/3] = -z;
 			
@@ -345,8 +335,8 @@ public class MasterSphere
 			x/= w[i/3];
 			y/= w[i/3];
 		
-			
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET))
+
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
 				return true;
 								
 			positions[i] = x;
@@ -379,7 +369,7 @@ public class MasterSphere
 		return false;
 	}
 	
-	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, 1, 2, 2);
+	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, -1, 2, 2);
 	private Line2D l1 = new Line2D.Float();
 	private boolean foo(float x0, float y0, float x1, float y1)
 	{
@@ -389,14 +379,8 @@ public class MasterSphere
 		
 		return false;
 	}
-	
-	private boolean isInViewFrustum(int[] triangleIndices)
-	{	
-		float[] positions = getPositions(triangleIndices);
 		
-		return isInViewFrustum(positions);
-	}
-		
+
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
@@ -411,9 +395,10 @@ public class MasterSphere
 		Vector3f.sub(v1, Info.camera.getPosition(), n1);
 		double angle = Vector3f.angle(n1, normal) * 180 / Math.PI;
 
+		
 		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
 		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
-		
+
 		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
 	}
 	
@@ -428,7 +413,7 @@ public class MasterSphere
 		return radius;
 	}
 	
-	public class SphereVertexArray
+	public class VA
 	{
 		private int vertexCount;
 		private int indexCount;
@@ -438,20 +423,20 @@ public class MasterSphere
 		private int iboHandle;
 		
 		public static final int VERTEX_LOCATION = 0;
-		public static final int NORMAL_LOCATION = 2;
+		public static final int NORMAL_LOCATION = 1;
 		
-		public SphereVertexArray(float[] vertices, float[] normals, int vertexCount, int[] indices)
+		public VA(float[] vertices, int vertexCount, int[] indices)
 		{
 			initBufferHandles();
 			this.vertexCount = vertexCount;
-			doBufferStuff(vertices, normals, indices);
+			doBufferStuff(vertices, indices);
 		}
 		
-		public void update(float[] vertices, float[] normals, int vertexCount, int[] indices, int indexCount)
+		public void update(float[] vertices, int vertexCount, int[] indices, int indexCount)
 		{
 			this.vertexCount = vertexCount;
 			this.indexCount = indexCount;
-			doBufferStuff(vertices, normals, indices);
+			doBufferStuff(vertices, indices);
 		}
 		
 		private void initBufferHandles()
@@ -462,23 +447,20 @@ public class MasterSphere
 			iboHandle = glGenBuffers();
 		}
 		
-		private void doBufferStuff(float[] vertices, float[] normals, int[] indices)
+		private void doBufferStuff(float[] vertices, int[] indices)
 		{		
 			glBindVertexArray(vaoHandle);
 			
-			FloatBuffer vBuffer = BufferUtils.createFloatBuffer(vertexCount);
-			vBuffer.put(vertices, 0, vertexCount).flip();
-			
-			FloatBuffer nBuffer = BufferUtils.createFloatBuffer(vertexCount);
-			nBuffer.put(normals, 0, vertexCount).flip();
+			FloatBuffer buffer = BufferUtils.createFloatBuffer(vertexCount);
+			buffer.put(vertices, 0, vertexCount).flip();
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-			glBufferData(GL_ARRAY_BUFFER, vBuffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, false, 0, 0);
 			glEnableVertexAttribArray(VERTEX_LOCATION);
 
 			glBindBuffer(GL_ARRAY_BUFFER, nboHandle);
-			glBufferData(GL_ARRAY_BUFFER, nBuffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, true, 0, 0);
 			glEnableVertexAttribArray(NORMAL_LOCATION);
 			
