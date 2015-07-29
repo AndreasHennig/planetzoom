@@ -129,6 +129,7 @@ public class Game implements IGame
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
+
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
 		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
@@ -144,15 +145,11 @@ public class Game implements IGame
 		
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-		drawSun();		
-	
-		
-		glEnable(GL_DEPTH_TEST);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		if(!freezeUpdate) {
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			
+			drawSun();		
 			planet.update();
 		
 			glFrontFace(GL_CW);
@@ -161,7 +158,9 @@ public class Game implements IGame
 		} else {
 			glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 		}
-		
+		glEnable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 		drawPlanet();
 
 		updateHud(hudMode);
@@ -312,7 +311,6 @@ public class Game implements IGame
 	
 	private String getInfoHUDText()
 	{
-		//TODO Distance to surface shall consider noise
 		int triangleCount = planet.getSphere().getTriangleCount();
 		int totalTriangleCount = planet.getSphere().getTotalTriangleCount();
 		double trianglePercentage = triangleCount * 100 / (double) totalTriangleCount;
