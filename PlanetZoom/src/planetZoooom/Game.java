@@ -332,11 +332,11 @@ public class Game implements IGame
 		
 		return  String.format(
 				"General information\n\n"
-				+ "Distance: %.2f\n"
-				+ "Triangles: %d / %d (%.2f%%)\n"
-				+ "Vertices: %d\n"
+				+ "Distance:     %.2f\n"
+				+ "Triangles:    %d / %d (%.2f%%)\n"
+				+ "Vertices:     %d\n"
 				+ "Subdivisions: %d\n"
-				+ "FPS: %d",
+				+ "FPS:          %d",
 				GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius(), 
 				triangleCount, totalTriangleCount, trianglePercentage,
 				planet.getSphere().getVertexCount(),
@@ -349,12 +349,12 @@ public class Game implements IGame
 		Atmosphere atmosphere = planet.getAtmosphere();
 		return  String.format(
 				"Atmosphere properties\n\n"
-				+ "Mie Scattering: %.4f\n"
-				+ "Rayleigh Scattering: %.4f\n"
-				+ "Wavelength red:   %.3f\n"
-				+ "Wavelength green: %.3f\n"
-				+ "Wavelength blue:  %.3f\n",
-				atmosphere.getMieScattering(),
+				+ "Sunbrightness: %.1f\n"
+				+ "Scattering:    %.4f\n"
+				+ "Wavelength 1:  %.3f\n"
+				+ "Wavelength 2:  %.3f\n"
+				+ "Wavelength 3:  %.3f\n",
+				atmosphere.getSunBrightness(),
 				atmosphere.getRayleighScattering(),
 				atmosphere.getWaveLengthRed(),
 				atmosphere.getWaveLengthGreen(),
@@ -366,11 +366,11 @@ public class Game implements IGame
 	{
 		return String.format(
 				"Noise properties\n\n" +
-				"Mountain Height: %.4f\n" + 
-				"Seed: %.2f\n" +
-				"Wavelength: %.2f\n" + 
-				"Octaves: %d\n" + 
-				"Amplitude: %.2f\n" 
+				"Mountain height: %.4f\n" + 
+				"Seed:            %.2f\n" +
+				"Wavelength:      %.2f\n" + 
+				"Octaves:         %d\n" + 
+				"Amplitude:       %.2f\n" 
 				,
 				planet.getMountainHeight(),
 				planet.getNoiseSeed(),
@@ -434,9 +434,9 @@ public class Game implements IGame
 				Atmosphere atmosphere = planet.getAtmosphere();
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_T))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() + 0.0001f);
+					atmosphere.setSunBrightness(atmosphere.getSunBrightness() + 0.5f);
 				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_G))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() - 0.0001f);
+					atmosphere.setSunBrightness(atmosphere.getSunBrightness() - 0.5f);
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_Y))
 					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() + 0.0001f);

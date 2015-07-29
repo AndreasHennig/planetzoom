@@ -17,17 +17,18 @@ public class Atmosphere
 	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.150f;
 	
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
-	private static final float SUN_BRIGHTNESS = 5.0f;
+	
 	private static final float MIE_PHASE_ASYMETRY_FACTOR = -0.990f;	// The Mie phase asymmetry factor
 	//private static final float EXPOSURE = 2.0f;
 	private static final float RAYLEIGH_SCALE_DEPTH = 0.15f;
 	private static final float MIE_SCALE_DEPTH = 0.15f;
+	private static final float MIE_SCATTERING = 0.0001f;
 			
 	private float rayleighScattering;
-	private float mieScattering;
 	private float waveLengthRed;
 	private float waveLengthGreen;
 	private float waveLengthBlue;
+	private float sunBrightness;
 
 	private float planetRadius;
 	
@@ -44,7 +45,7 @@ public class Atmosphere
 		setWaveLengthRed(0.95f);
 		setWaveLengthGreen(0.75f);
 		setWaveLengthBlue(0.555f);
-		mieScattering = 0.0001f;
+		sunBrightness = 5.0f;
 		rayleighScattering = 0.0035f;
 	}
 	
@@ -56,14 +57,14 @@ public class Atmosphere
 			case Planet.STYLE_EARTH:	setWaveLengthRed(0.95f);
 										setWaveLengthGreen(0.75f);
 										setWaveLengthBlue(0.555f);
-										mieScattering = 0.0001f;
+										sunBrightness = 5.0f;
 										rayleighScattering = 0.0035f;
 										break;
 			case Planet.STYLE_UNICOLOR:
 			case Planet.STYLE_MARS:		setWaveLengthRed(0.670f);
 										setWaveLengthGreen(1.030f);
 										setWaveLengthBlue(1.275f);
-										mieScattering = 0.0001f;
+										sunBrightness = 5.0f;
 										rayleighScattering = 0.0035f;
 										break;
 			
@@ -131,9 +132,9 @@ public class Atmosphere
 	public void loadSpecificUniforms(ShaderProgram atmosphereShader)
 	{
 		atmosphereShader.loadUniformVec3f(new Vector3f(wavelengths[0],wavelengths[1], wavelengths[2]), "inverseWavelength");
-		atmosphereShader.loadUniform1f(mieScattering * SUN_BRIGHTNESS, "mieScattering");
-		atmosphereShader.loadUniform1f((float)(mieScattering * 4 * Math.PI), "mieScattering4Pi");
-		atmosphereShader.loadUniform1f(rayleighScattering * SUN_BRIGHTNESS, "rayleighScattering");
+		atmosphereShader.loadUniform1f(MIE_SCATTERING * sunBrightness, "mieScattering");
+		atmosphereShader.loadUniform1f((float)(MIE_SCATTERING * 4 * Math.PI), "mieScattering4Pi");
+		atmosphereShader.loadUniform1f(rayleighScattering * sunBrightness, "rayleighScattering");
 		atmosphereShader.loadUniform1f((float)(rayleighScattering * 4 * Math.PI), "rayleighScattering4Pi");
 		atmosphereShader.loadUniform1f(sphere.getRadius(), "atmosphereRadius");
 		atmosphereShader.loadUniform1f(RAYLEIGH_SCALE_DEPTH, "scaleDepth");
@@ -166,14 +167,14 @@ public class Atmosphere
 		this.rayleighScattering = rayleighScattering;
 	}
 
-	public float getMieScattering()
+	public float getSunBrightness()
 	{
-		return mieScattering;
+		return sunBrightness;
 	}
 
-	public void setMieScattering(float mieScattering)
+	public void setSunBrightness(float brightness)
 	{
-		this.mieScattering = mieScattering;
+		this.sunBrightness = brightness;
 	}
 
 	public float getWaveLengthRed()
