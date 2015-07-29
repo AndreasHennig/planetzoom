@@ -19,9 +19,9 @@ public class Atmosphere
 	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
 	private static final float SUN_BRIGHTNESS = 5.0f;
 	private static final float MIE_PHASE_ASYMETRY_FACTOR = -0.990f;	// The Mie phase asymmetry factor
-	private static final float EXPOSURE = 2.0f;
-	private static final float RAYLEIGH_SCALE_DEPTH = 0.25f;
-	private static final float MIE_SCALE_DEPTH = 0.1f;
+	//private static final float EXPOSURE = 2.0f;
+	private static final float RAYLEIGH_SCALE_DEPTH = 0.15f;
+	private static final float MIE_SCALE_DEPTH = 0.15f;
 			
 	private float rayleighScattering;
 	private float mieScattering;
@@ -41,10 +41,10 @@ public class Atmosphere
 		position = planet.getPosition();
 		modelMatrix = new Matrix4f().translate(position);
 		
-		setWaveLengthRed(0.65f);
-		setWaveLengthGreen(0.57f);
-		setWaveLengthBlue(0.475f);
-		mieScattering = 0.0f;
+		setWaveLengthRed(0.95f);
+		setWaveLengthGreen(0.75f);
+		setWaveLengthBlue(0.555f);
+		mieScattering = 0.0001f;
 		rayleighScattering = 0.0035f;
 	}
 	
@@ -53,17 +53,17 @@ public class Atmosphere
 		switch(mode)
 		{
 			case Planet.STYLE_DUNE:
-			case Planet.STYLE_EARTH:	setWaveLengthRed(0.65f);
-										setWaveLengthGreen(0.57f);
-										setWaveLengthBlue(0.475f);
-										mieScattering = 0.0f;
+			case Planet.STYLE_EARTH:	setWaveLengthRed(0.95f);
+										setWaveLengthGreen(0.75f);
+										setWaveLengthBlue(0.555f);
+										mieScattering = 0.0001f;
 										rayleighScattering = 0.0035f;
 										break;
 			case Planet.STYLE_UNICOLOR:
-			case Planet.STYLE_MARS:		setWaveLengthRed(0.480f);
-										setWaveLengthGreen(0.78f);
-										setWaveLengthBlue(0.955f);
-										mieScattering = 0.0f;
+			case Planet.STYLE_MARS:		setWaveLengthRed(0.670f);
+										setWaveLengthGreen(1.030f);
+										setWaveLengthBlue(1.275f);
+										mieScattering = 0.0001f;
 										rayleighScattering = 0.0035f;
 										break;
 			
