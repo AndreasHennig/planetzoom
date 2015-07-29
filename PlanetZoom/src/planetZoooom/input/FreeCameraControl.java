@@ -52,6 +52,9 @@ public class FreeCameraControl implements ICameraControl
 		cam.addYaw((float) Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
 			
+		if(boostEnabled)
+			velocity /= 2;
+		
 		return cam;	
 	}
 
