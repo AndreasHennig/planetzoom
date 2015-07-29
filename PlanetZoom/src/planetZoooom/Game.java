@@ -377,6 +377,7 @@ public class Game implements IGame
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_8)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_ENTER)){ planet.setNoiseSeed((float) (Math.random() * Integer.MAX_VALUE)); }
 		
 		switch(hudMode)
 		{
@@ -439,6 +440,5 @@ public class Game implements IGame
 				break;
 			}
 		}
-	
 	}
 }
