@@ -48,6 +48,7 @@ public class Game implements IGame
 	private ShaderProgram sunShader;
 	private ShaderProgram sunGlowShader;
 	private ShaderProgram atmosphereShader;
+	private ShaderProgram colorShader;
 
 	// MATRICES
 	private Matrix4f modelViewMatrix;
@@ -64,6 +65,10 @@ public class Game implements IGame
 	private static final int HUD_MODE_INFO = 1;
 	private static final int HUD_MODE_NOISE = 2;
 	private static final int HUD_MODE_ATMOSPHERE = 3;
+	
+	private static final float[] HUD_BG_YELLOW = new float[] {1, 211.0f/255.0f, 42.0f/255.0f, 0.5f};
+	private static final float[] HUD_BG_WHITE = new float[] {1, 1, 1, 0.5f};
+	private static final float[] HUD_BG_PURPLE = new float[] {238.0f/255.0f, 170.0f/255.0f, 1f, 0.5f};
 	
 	private int hudMode;
 	
@@ -119,16 +124,17 @@ public class Game implements IGame
 		marsShader = new ShaderProgram("marsShader");
 		dessertShader = new ShaderProgram("dessertShader");
 		uniColorPlanetShader = new ShaderProgram("uniColorPlanetShader");
-		wireFrameShader = new ShaderProgram("testShader");
+		wireFrameShader = new ShaderProgram("wireFrameShader");
 		sunShader = new ShaderProgram("sunShader");
 		sunGlowShader = new ShaderProgram("sunGlowShader");
 		atmosphereShader = new ShaderProgram("atmosphereShader");
+		colorShader = new ShaderProgram("testShader");
 	}
 
 	private void initGameObjects() 
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", HUD_BG_WHITE);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
 		sunGlow = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 1.0f);
@@ -265,7 +271,15 @@ public class Game implements IGame
 	}
 	
 	private void drawHUD()
-	{	
+	{
+		glUseProgram(colorShader.getId());
+		{
+			colorShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
+			colorShader.loadUniformMat4f(hud.getModelMatrix(), "modelViewMatrix", false);
+			hud.getBackgroundMesh().render(GL_TRIANGLES);
+		}
+		glUseProgram(0);
+
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
@@ -287,18 +301,21 @@ public class Game implements IGame
 		
 			case HUD_MODE_INFO:
 			{
+				hud.setBackgroundColor(HUD_BG_WHITE);
 				hud.update(getInfoHUDText());
 				return;
 			}
 			
 			case HUD_MODE_NOISE:
 			{
+				hud.setBackgroundColor(HUD_BG_YELLOW);
 				hud.update(getNoiseHUDText());
 				return;
 			}
 			
 			case HUD_MODE_ATMOSPHERE:
 			{
+				hud.setBackgroundColor(HUD_BG_PURPLE);
 				hud.update(getAtmosphereHUDText());
 				return;
 			}
