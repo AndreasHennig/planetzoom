@@ -131,27 +131,27 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
-					0,1,2
-//					2,4,1,
-//					2,0,4,
-//					4,3,1,
-//					4,0,3,
-//					5,2,1,
-//					5,0,2,
-//					3,5,1,
-//					3,0,5
+//					0,1,2
+					2,4,1,
+					2,0,4,
+					4,3,1,
+					4,0,3,
+					5,2,1,
+					5,0,2,
+					3,5,1,
+					3,0,5
 				};
 		
 		
-		writePosition(new Vector3f(0,0,0));
-		writePosition(new Vector3f(1,0,0));
-		writePosition(new Vector3f(0.5f,1,0));
-//		writePosition((Vector3f) Vertex.left().scale(radius));
-//		writePosition((Vector3f) Vertex.right().scale(radius));
-//		writePosition((Vector3f) Vertex.up().scale(radius));
-//		writePosition((Vector3f) Vertex.down().scale(radius));
-//		writePosition((Vector3f) Vertex.front().scale(radius));
-//		writePosition((Vector3f) Vertex.back().scale(radius));
+//		writePosition(new Vector3f(0,0,0));
+//		writePosition(new Vector3f(1,0,0));
+//		writePosition(new Vector3f(0.5f,1,0));
+		writePosition((Vector3f) Vertex.left().scale(radius));
+		writePosition((Vector3f) Vertex.right().scale(radius));
+		writePosition((Vector3f) Vertex.up().scale(radius));
+		writePosition((Vector3f) Vertex.down().scale(radius));
+		writePosition((Vector3f) Vertex.front().scale(radius));
+		writePosition((Vector3f) Vertex.back().scale(radius));
 	
 		return indices;
 	}
@@ -233,13 +233,13 @@ public class MasterSphere
 		n2 = Vertex.lerp(v1, v2, 0.5f);
 		n3 = Vertex.lerp(v2, v3, 0.5f);
 		
-//		n1.normalise();
-//		n2.normalise();
-//		n3.normalise();
-//		
-//		n1.scale(radius);
-//		n2.scale(radius);
-//		n3.scale(radius);
+		n1.normalise();
+		n2.normalise();
+		n3.normalise();
+		
+		n1.scale(radius);
+		n2.scale(radius);
+		n3.scale(radius);
 		
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
@@ -363,7 +363,7 @@ public class MasterSphere
 	private boolean lineIntersection(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 	{
 		double d = (x0-x1)*(y2-y3) - (y0-y1)*(x2-x3);
-		if(d == 0)
+		if(d == 0) //parallel oder kollinear?
 			return false;
 		double xi = ((x2-x3)*(x0*y1-y0*x1)-(x0-x1)*(x2*y3-y2*x3)) / d;
 		double yi = ((y2-y3)*(x0*y1-y0*x1)-(y0-y1)*(x2*y3-y2*x3)) / d;
@@ -382,9 +382,11 @@ public class MasterSphere
 		float minY = Math.min(y0, y1);
 		float maxY = Math.max(y0, y1);
 		
-		if(xi <= maxX && xi >= minX)
-			if(yi <=maxY && yi >= minY)
+		if(xi <= maxX && xi >= minX) {
+			if(yi <=maxY && yi >= minY) {
 				return true;
+			}
+		}
 		
 		return false;
 	}
