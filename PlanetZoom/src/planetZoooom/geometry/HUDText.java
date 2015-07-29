@@ -21,7 +21,10 @@ public class HUDText extends MeshObject
 	private int startPositionX;
 	private int startPositionY;
 	private int cellSize;
-
+	
+	private int maxWidth;
+	private int maxHeight;
+	
 	private int textLength;
 
 	/**
@@ -79,7 +82,8 @@ public class HUDText extends MeshObject
 		//updates++;
 		//System.out.println("updates: " + updates + " / creations: " + creations);
 		index = 0;
-		
+		maxWidth = 0;
+		maxHeight = 0;
 		uvCellHeight = 1.0f / colCount;
 		uvCellWidth = 1.0f / rowCount;
 		x = startPositionX; 
@@ -106,6 +110,10 @@ public class HUDText extends MeshObject
 				y += cellSize;
 				x = startPositionX - cellSize;
 			}
+			if(x > maxWidth - cellSize)
+				maxWidth = x + cellSize;
+			if(y > maxHeight - cellSize)
+				maxHeight = y + cellSize;
 
 			vertices[(i * 12) + 0] = x; 				//top left x 
 			vertices[(i * 12) + 1] = (y + cellSize); 	//top left y
@@ -166,5 +174,13 @@ public class HUDText extends MeshObject
 	public void setFont(String font)
 	{
 	    this.fontTexture = new Texture("src/res/textures/fonts/" + font);
+	}
+	public int getMaxWidth()
+	{
+		return maxWidth;
+	}
+	public int getMaxHeight()
+	{
+		return maxHeight;
 	}
 }
