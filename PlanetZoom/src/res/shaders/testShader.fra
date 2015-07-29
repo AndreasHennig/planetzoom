@@ -2,11 +2,10 @@
 #pragma debug(on)
 #pragma optimize(off)
 
-uniform float greytone;
-
 out vec4 out_Color;
+in vec4 pass_color;
 
 void main(void)
 {
-	out_Color = vec4(greytone, greytone, greytone, 1.0);
+	out_Color = pass_color;
 }
