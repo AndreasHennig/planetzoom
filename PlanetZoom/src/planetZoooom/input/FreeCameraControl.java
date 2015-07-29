@@ -1,21 +1,15 @@
 package planetZoooom.input;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.*;
 import planetZoooom.gameContent.FreeCamera;
 import planetZoooom.interfaces.ICameraControl;
 
 public class FreeCameraControl implements ICameraControl
 {
 	private FreeCamera cam;
-
-	private float inputSensitivity = 1.5f;
+	private float velocity = ICameraControl.MAX_CAM_SPEED;
+	private final static float rollSpeed = 0.00025f * ICameraControl.MAX_CAM_SPEED;
+	private boolean boostEnabled;
 	
 	public FreeCameraControl(FreeCamera cam)
 	{
@@ -25,33 +19,45 @@ public class FreeCameraControl implements ICameraControl
 	@Override
 	public FreeCamera handleInput(int deltaTime)
 	{
+		boostEnabled = Keyboard.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
+
+		if(boostEnabled)
+			velocity *= 2;
+		
 		if(Keyboard.isKeyPressed(GLFW_KEY_W))
-			cam.moveForwards(inputSensitivity * deltaTime);
+			cam.moveForwards(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_S))
-			cam.moveBackwards(inputSensitivity * deltaTime);
+			cam.moveBackwards(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_A))
-			cam.strafeLeft(inputSensitivity * deltaTime);
+			cam.strafeLeft(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_D))
-			cam.strafeRight(inputSensitivity * deltaTime);
+			cam.strafeRight(velocity * deltaTime);
 			
 		if(Keyboard.isKeyPressed(GLFW_KEY_SPACE))
-			cam.moveUp(inputSensitivity * deltaTime);
+			cam.moveUp(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
-			cam.moveDown(inputSensitivity * deltaTime);
+			cam.moveDown(velocity * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_E))
-			cam.addRoll(0.1f * inputSensitivity * deltaTime);
+			cam.addRoll(-rollSpeed * deltaTime);
 		
 		if(Keyboard.isKeyPressed(GLFW_KEY_Q))
-			cam.addRoll(-0.1f * inputSensitivity * deltaTime);
+			cam.addRoll(rollSpeed * deltaTime);
+
 		
 		cam.addYaw((float) Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
 			
 		return cam;	
+	}
+
+	@Override
+	public void setVelocity(float velocity) 
+	{
+		this.velocity = velocity;
 	}
 }

@@ -11,14 +11,13 @@ import planetZoooom.interfaces.ICameraControl;
 
 public class FreeCamera implements ICamera
 {
-
 	private Vector3f position;
 	private Quaternion orientation;
 	private boolean invertedYAxis;
 	private static final float MOUSE_SENSITIVITY = 1.0f;
 
 	private Matrix4f view;
-	
+	private ICameraControl cameraControl;
 	
 	public FreeCamera(float x, float y, float z)
 	{
@@ -26,6 +25,8 @@ public class FreeCamera implements ICamera
 
 		orientation = new Quaternion();
 		view = new Matrix4f();
+		
+		cameraControl = new FreeCameraControl(this);
 	}
 	
 	public void rotate(Vector3f axis, float theta)
@@ -84,7 +85,7 @@ public class FreeCamera implements ICamera
 	@Override
 	public ICameraControl getCameraControl()
 	{
-		return new FreeCameraControl(this);
+		return cameraControl;
 	}
 	
 	public Vector3f getPosition()

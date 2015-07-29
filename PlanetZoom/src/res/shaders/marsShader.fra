@@ -1,0 +1,107 @@
+//https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/lighting.php
+//http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+
+#version 330
+#pragma debug(on)
+#pragma optimize(off)
+
+in DATA
+{
+	vec3 position;
+	vec3 normal;
+	vec2 uv;
+	vec3 positionVector;
+	vec3 viewDir;
+	vec3 lightDir;
+	float mountainHeight;
+} pass_data;
+
+uniform float radius;
+
+out vec4 out_Color;
+
+void singleColor(float value)
+{
+	out_Color = vec4(value, value, value, 1.0);
+}
+
+void finalColor(vec4 color, float diffuse, float ambient)
+{
+	out_Color = color;
+	out_Color.xyz *= (diffuse + ambient);
+}
+
+float rand(vec2 co)
+{
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main(void)
+{	
+	vec4 heightColor;
+	
+	float height = length(pass_data.positionVector) - radius;
+	float maxHeight = radius * pass_data.mountainHeight;
+
+	float heightGradientValue = height / maxHeight;
+ 
+ 	vec3 L = normalize(pass_data.lightDir - pass_data.position);   
+	vec3 E = normalize(-pass_data.position);  
+	vec3 R = normalize(-reflect(L,pass_data.normal));  
+ 
+ 	float ambient = 0.08;
+	float diffuse = max(dot(pass_data.normal,L), 0.0);
+   	diffuse = clamp(diffuse, 0.0, 1.0);     
+
+ 	float exponent = 4.0;
+	float lightSpecular = 1.0 * pow(max(dot(R,E),0.0),exponent);
+	lightSpecular = clamp(lightSpecular, 0.0, 1.0); 
+	float mul = 1.0;
+	
+	//ColorBorders
+	float mountainTop = 0.84 + (sin(height) / 30);
+	float mountainHigh = 0.65;
+	float mountainStripe = 0.6;
+	float mountainLow = 0.4;
+	float hill = 0.2 + (sin(height) / 30);
+	float shore = 0.05;
+	
+	
+	if(heightGradientValue > mountainTop)
+	{
+		mul = heightGradientValue;
+		heightColor = vec4(0.75 * mul, 0.35 * mul, 0.15 * mul, 1.0);
+	}
+	else if(heightGradientValue > mountainHigh) 
+	{
+		mul = heightGradientValue + 1 - mountainHigh;
+		heightColor = vec4(0.31 * mul, 0.07 * mul, 0.02 * mul, 1.0);
+	}
+	else if(heightGradientValue > mountainStripe)
+	{
+		mul = heightGradientValue + 1 - mountainStripe;
+		heightColor = vec4(0.88 * mul, 0.63 * mul, 0.35 * mul, 1.0);
+	}
+	else if(heightGradientValue > mountainLow) 
+	{
+		mul = heightGradientValue + 1 - mountainLow;
+		heightColor = vec4(0.73 * mul, 0.33 * mul, 0.14 * mul, 1.0);
+	}
+	else if(heightGradientValue > hill) 
+	{
+		mul = heightGradientValue + 1 - hill;
+		heightColor = vec4(0.60 * mul, 0.20 * mul, 0.10 * mul, 1.0);
+	}
+	else if(heightGradientValue > shore)
+	{
+		mul = heightGradientValue + 1 - shore;
+		heightColor = vec4(0.31 * mul, 0.07 * mul, 0.02 * mul, 1.0);
+	}
+	else
+	{
+		mul = 1.0;
+		heightColor = vec4(0.60 * mul, 0.20 * mul, 0.10 * mul, 1.0);
+	}
+	
+	finalColor(heightColor, diffuse, ambient);
+}

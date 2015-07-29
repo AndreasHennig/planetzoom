@@ -7,7 +7,7 @@ import planetZoooom.interfaces.ICameraControl;
 public class FirstPersonCameraControl implements ICameraControl
 {
 	private FirstPersonCamera cam;
-	private float inputSensitivity = 0.01f;
+	private float velocity = 0.01f;
 
 	public FirstPersonCameraControl(FirstPersonCamera cam)
 	{
@@ -18,26 +18,31 @@ public class FirstPersonCameraControl implements ICameraControl
 	public FirstPersonCamera handleInput(int deltaTime)
 	{
 		if(Keyboard.isKeyPressed(GLFW_KEY_W))
-			cam.moveForwards(inputSensitivity * deltaTime);
+			cam.moveForwards(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_S))
-			cam.moveBackwards(inputSensitivity * deltaTime);
+			cam.moveBackwards(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_A))
-			cam.strafeLeft(inputSensitivity * deltaTime);
+			cam.strafeLeft(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_D))
-			cam.strafeRight(inputSensitivity * deltaTime);
+			cam.strafeRight(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_SPACE))
-			cam.moveUp(inputSensitivity * deltaTime);
+			cam.moveUp(velocity * deltaTime);
 
 		if(Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
-			cam.moveDown(inputSensitivity * deltaTime);
+			cam.moveDown(velocity * deltaTime);
 
 		cam.addYaw((float) -Cursor.getDx() / 250.0f);
 		cam.addPitch((float) Cursor.getDy() / 250.0f);
 
 		return cam;
+	}
+
+	@Override
+	public void setVelocity(float velocity) {
+		this.velocity = velocity;
 	}
 }
