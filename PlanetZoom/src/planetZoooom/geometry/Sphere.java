@@ -29,6 +29,7 @@ public class Sphere
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
 	private float[] positions;
+	private float[] normals;
 
 	private Matrix4f modelMatrix;
 	private int[] indices;
@@ -43,16 +44,16 @@ public class Sphere
 
 	private int currentDepth;
 	private int minTriangles;
-	private VA va;
+	private SphereVertexArray va;
 
 	private Matrix4f modelViewMatrix;
 	
 	public Sphere(float radius, int minTriangles) 
 	{
 		positions = new float[minTriangles * 12 * 2];
+		normals = new float[minTriangles * 12 * 2];
 
 		listeners = new ArrayList<>();
-		
 		
 		lhs = new Vector3f();
 		rhs = new Vector3f();
@@ -68,7 +69,7 @@ public class Sphere
 		
 		positionPointer = 0;
 		this.minTriangles = minTriangles;
-		va = new VA(new float[]{}, 0, new int[]{});
+		va = new SphereVertexArray(positions, normals, 0, new int[]{});
 		this.radius = radius;
 		update();
 	}
@@ -97,13 +98,14 @@ public class Sphere
 		
 		indices = t;
 
-		va.update(positions, positionPointer, indices, triangleIndexCount);
+		va.update(positions, normals, positionPointer, indices, triangleIndexCount);
 	}
 	
 	public int getSubdivisions()
 	{
 		return currentDepth;
 	}
+	
 	public int getTotalTriangleCount()
 	{
 		int totalTriangles = 8;
@@ -161,8 +163,11 @@ public class Sphere
 	{
 		notifyListeners(pos);
 		
+		this.normals[positionPointer] = pos.x;
 		this.positions[positionPointer++] = pos.x;
+		this.normals[positionPointer] = pos.y;
 		this.positions[positionPointer++] = pos.y;
+		this.normals[positionPointer] = pos.z;
 		this.positions[positionPointer++] = pos.z;
 		
 		return (positionPointer-3) / 3;
@@ -221,13 +226,13 @@ public class Sphere
 		return newTriangles;
 	}
 	
-
 	private void setVec(Vector3f v, float x, float y, float z)
 	{
 		v.x = x;
 		v.y = y;
 		v.z = z;
 	}
+	
 	private int[] createChildVertices(int[] triangleIndices)
 	{	
 		float[] positions = getPositions(triangleIndices);
@@ -290,8 +295,6 @@ public class Sphere
 		else if (depth < 12)
 			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
 		
-		
-
 		//camera space -> clip space
 		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
 		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
@@ -300,10 +303,8 @@ public class Sphere
 		return (x <= w && x >= -w) && (y <= w && y >= -w);
 	}
 
-	
 	//TODO implement correct frustum culling maybe sutherland hodgen style
 	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
-	
 	private boolean isInViewFrustum(int[] triangleIndices) 
 	{
 		
@@ -367,6 +368,7 @@ public class Sphere
 	
 	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, -1, 2, 2);
 	private Line2D l1 = new Line2D.Float();
+	
 	private boolean foo(float x0, float y0, float x1, float y1)
 	{
 		l1.setLine(x0,y0,x1,y1);
@@ -376,7 +378,6 @@ public class Sphere
 		return false;
 	}
 		
-
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
@@ -409,7 +410,7 @@ public class Sphere
 		return radius;
 	}
 	
-	public class VA
+	public class SphereVertexArray
 	{
 		private int vertexCount;
 		private int indexCount;
@@ -421,18 +422,18 @@ public class Sphere
 		public static final int VERTEX_LOCATION = 0;
 		public static final int NORMAL_LOCATION = 2;
 		
-		public VA(float[] vertices, int vertexCount, int[] indices)
+		public SphereVertexArray(float[] vertices, float[] normals, int vertexCount, int[] indices)
 		{
 			initBufferHandles();
 			this.vertexCount = vertexCount;
-			doBufferStuff(vertices, indices);
+			doBufferStuff(vertices, normals, indices);
 		}
 		
-		public void update(float[] vertices, int vertexCount, int[] indices, int indexCount)
+		public void update(float[] vertices, float[] normals, int vertexCount, int[] indices, int indexCount)
 		{
 			this.vertexCount = vertexCount;
 			this.indexCount = indexCount;
-			doBufferStuff(vertices, indices);
+			doBufferStuff(vertices, normals, indices);
 		}
 		
 		private void initBufferHandles()
@@ -443,20 +444,23 @@ public class Sphere
 			iboHandle = glGenBuffers();
 		}
 		
-		private void doBufferStuff(float[] vertices, int[] indices)
+		private void doBufferStuff(float[] vertices, float[] normals, int[] indices)
 		{		
 			glBindVertexArray(vaoHandle);
 			
-			FloatBuffer buffer = BufferUtils.createFloatBuffer(vertexCount);
-			buffer.put(vertices, 0, vertexCount).flip();
+			FloatBuffer vBuffer = BufferUtils.createFloatBuffer(vertexCount);
+			vBuffer.put(vertices, 0, vertexCount).flip();
+		
+			FloatBuffer nBuffer = BufferUtils.createFloatBuffer(vertexCount);
+			nBuffer.put(normals, 0, vertexCount).flip();
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
-			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, vBuffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, false, 0, 0);
 			glEnableVertexAttribArray(VERTEX_LOCATION);
 
 			glBindBuffer(GL_ARRAY_BUFFER, nboHandle);
-			glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nBuffer, GL_STATIC_DRAW);
 			glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, true, 0, 0);
 			glEnableVertexAttribArray(NORMAL_LOCATION);
 			

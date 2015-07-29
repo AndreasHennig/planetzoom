@@ -152,7 +152,6 @@ public class Game implements IGame
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		
 		if(updateSphere)
 			planet.update();
 		
@@ -227,7 +226,7 @@ public class Game implements IGame
 	private void drawPlanet()
 	{
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getSphere().getModelMatrix(), modelViewMatrix);
-		Matrix4f.invert(modelViewMatrix, normalMatrix);		
+		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
 		switch(planet.getShaderMode())
 		{
