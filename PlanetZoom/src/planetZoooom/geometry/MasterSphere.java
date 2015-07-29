@@ -30,10 +30,10 @@ import planetZoooom.utils.Info;
 
 public class MasterSphere
 {
-	private static final int CHECK_INTERVAL = 4;
-	private static final int FIRST_CHECK = 3;
-	private static final int ARRAY_SIZE = 5000000;
-	private static final double VIEW_FRUSTUM_OFFSET = 1; 
+	private static final int FIRST_CHECK = 4;
+	private static final double VIEW_FRUSTUM_OFFSET = 1;
+	private static final float VIEW_FRUSTUM_CHECK_OFFSET = 0.2f;
+	static private final int ANGLE_TOLERANCE = 50;
 	
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
@@ -49,7 +49,6 @@ public class MasterSphere
 	
 	private int positionPointer; 
 	private int triangleIndexCount;
-	private boolean firstCheck;
 	private int minTriangles;
 	private VA va;
 
@@ -91,20 +90,17 @@ public class MasterSphere
 		
 		positionPointer = 0;
 		//Indices - 3 make up a triangle
-		firstCheck = true;
+
 		int[] t = createOctahedron();
 		triangleIndexCount = t.length;
-//		for(int depth = 0; depth < subdivisions; depth++)
 		int depth = 0;
-//		while(triangleIndexCount < minTriangles * 3)
-//		{
-//			t = subdivide(t, triangleIndexCount, depth++);
-//			if(t.length == 0)
-//				break;
-//		}
-		
-		for(int i = 0; i < 6; i++)
-			t= subdivide(t, triangleIndexCount, depth++);
+		while(triangleIndexCount < minTriangles * 3)
+		{
+			t = subdivide(t, triangleIndexCount, depth++);
+			if(t.length == 0)
+				break;
+		}
+
 		indices = t;
 
 		va.update(positions, positionPointer, indices, triangleIndexCount);
@@ -131,7 +127,6 @@ public class MasterSphere
 	{
 		int[] indices = new int[]
 				{
-//					0,1,2
 					2,4,1,
 					2,0,4,
 					4,3,1,
@@ -142,10 +137,6 @@ public class MasterSphere
 					3,0,5
 				};
 		
-		
-//		writePosition(new Vector3f(0,0,0));
-//		writePosition(new Vector3f(1,0,0));
-//		writePosition(new Vector3f(0.5f,1,0));
 		writePosition((Vector3f) Vertex.left().scale(radius));
 		writePosition((Vector3f) Vertex.right().scale(radius));
 		writePosition((Vector3f) Vertex.up().scale(radius));
@@ -189,14 +180,14 @@ public class MasterSphere
 		{
 			triangleIndices = new int[]{triangles[i], triangles[i+1], triangles[i+2]};
 			
-//			if (depth % CHECK_INTERVAL == FIRST_CHECK)
-//			{
-//				if(!isFacingTowardsCamera(triangleIndices))
-//					continue;
-//			}
+			if (depth > FIRST_CHECK)
+			{
+				if(!isFacingTowardsCamera(triangleIndices))
+					continue;
+				if (!isInViewFrustum(triangleIndices))
+					continue; // clip
+			}
 
-			if (!isInViewFrustum(triangleIndices))
-				continue; // clip
 			
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
@@ -244,10 +235,6 @@ public class MasterSphere
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
 		newIndices[2] = writePosition(n3);
-				
-//		uvs[0] = new Vector2f((v3.getUv().x + v1.getUv().x)/2.0f, (v3.getUv().y + v1.getUv().y)/2.0f);
-//		uvs[1] = new Vector2f((v1.getUv().x + v2.getUv().x)/2.0f, (v1.getUv().y + v2.getUv().y)/2.0f);
-//		uvs[2] = new Vector2f((v3.getUv().x + v2.getUv().x)/2.0f, (v3.getUv().y + v2.getUv().y)/2.0f);
 		
 		return newIndices;
 	} 
@@ -263,38 +250,7 @@ public class MasterSphere
 				};
 	}
 
-	private boolean isInViewFrustum(float a, float b, float c, int depth) 
-	{
-		Matrix4f p = Info.projectionMatrix;
-		float x,y,z,w;
-		float d = 1;
 
-		//Object space -> world space -> camera space
-		x = (mv.m00 * a) + (mv.m10 * b) + (mv.m20 * c) + (mv.m30 * d);
-		y = (mv.m01 * a) + (mv.m11 * b) + (mv.m21 * c) + (mv.m31 * d);
-		z = (mv.m02 * a) + (mv.m12 * b) + (mv.m22 * c) + (mv.m32 * d);
-
-		w= -z;
-		
-		if(depth < 2)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1;
-		else if (depth < 8)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1.5;
-		else if (depth < 12)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
-		
-		
-
-		//camera space -> clip space
-		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
-		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
-		z = (p.m02 * x) + (p.m12 * y) + (p.m22 * z) + (p.m32 * d);
-
-		return (x <= w && x >= -w) && (y <= w && y >= -w);
-	}
-	
-	//TODO implement correct frustum culling maybe sutherland hodgen style
-	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
 	
 	private boolean isInViewFrustum(float[] positions) 
 	{
@@ -321,7 +277,7 @@ public class MasterSphere
 			y/= w[i/3];
 		
 			
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z >= 0)
 				return true;
 								
 			positions[i] = x;
@@ -376,14 +332,19 @@ public class MasterSphere
 	
 	private boolean inIntervall(double xi, double yi, float x0, float y0, float x1, float y1)
 	{
+		
 		float minX = Math.min(x0, x1);
 		float maxX = Math.max(x0, x1);
 
+		float deltaX = maxX - minX;
+		
 		float minY = Math.min(y0, y1);
 		float maxY = Math.max(y0, y1);
 		
-		if(xi <= maxX && xi >= minX) {
-			if(yi <=maxY && yi >= minY) {
+		float deltaY = maxY - minY;
+		
+		if(xi <= maxX + deltaX * VIEW_FRUSTUM_CHECK_OFFSET && xi >= minX - deltaX * VIEW_FRUSTUM_CHECK_OFFSET) {
+			if(yi <=maxY  + deltaY * VIEW_FRUSTUM_CHECK_OFFSET && yi >= minY - deltaY * VIEW_FRUSTUM_CHECK_OFFSET) {
 				return true;
 			}
 		}
@@ -403,20 +364,15 @@ public class MasterSphere
 	{
 		float[] a = getPositions(triangleIndices);
 		setVec(v1, a[0], a[1], a[2]);
-		setVec(v2, a[3], a[4], a[5]);
-		setVec(v3, a[6], a[7], a[8]);
 		
-		Vector3f.sub(v3, v1, lhs);
-		Vector3f.sub(v2, v1, rhs);
-		Vector3f.cross(lhs, rhs, normal);
+		Vector3f.sub(Info.camera.getPosition(), v1, n1);
+		double angle = Vector3f.angle(n1, v1) * 180 / Math.PI;
 		
-		Vector3f.sub(v1, Info.camera.getPosition(), n1);
-		double angle = Vector3f.angle(n1, normal) * 180 / Math.PI;
+		if (angle > 180)
+			angle = 360 - angle;
+		
 
-		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
-		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
-
-		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
+		return angle < 90 + ANGLE_TOLERANCE;
 	}
 	
 	public void notifyListeners(Vector3f v) 

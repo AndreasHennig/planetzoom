@@ -16,7 +16,7 @@ public class Planet implements IGameObjectListener
 	private final static int MIN_OCTAVES = 1;
 	private final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
 	private final static int MIN_TRIANGLES = 10000;
-	final static float CAM_COLLISION_OFFSET = 30;
+	final static float CAM_COLLISION_OFFSET = 50;
 	
 	private MasterSphere sphere;
 	private Vector3f position;
