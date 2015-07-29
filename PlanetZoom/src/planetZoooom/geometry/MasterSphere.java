@@ -103,7 +103,7 @@ public class MasterSphere
 //				break;
 //		}
 		
-		for(int i = 0; i < 2; i++)
+		for(int i = 0; i < 6; i++)
 			t= subdivide(t, triangleIndexCount, depth++);
 		indices = t;
 
@@ -346,7 +346,7 @@ public class MasterSphere
 				return true;
 			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[3], triangle[4], triangle[6], triangle[7]))
 				return true;
-			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[0], triangle[1], triangle[6], triangle[7]))
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[6], triangle[7], triangle[0], triangle[1]))
 				return true;
 		}
 		
@@ -354,7 +354,7 @@ public class MasterSphere
 			return true;
 		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[3], triangle[4], triangle[6], triangle[7]))
 			return true;
-		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[0], triangle[1], triangle[6], triangle[7]))
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[6], triangle[7], triangle[0], triangle[1]))
 			return true;
 		
 		return false;
@@ -367,12 +367,27 @@ public class MasterSphere
 			return false;
 		double xi = ((x2-x3)*(x0*y1-y0*x1)-(x0-x1)*(x2*y3-y2*x3)) / d;
 		double yi = ((y2-y3)*(x0*y1-y0*x1)-(y0-y1)*(x2*y3-y2*x3)) / d;
-		if(xi <= 1 && xi >= -1 && yi <= 1 && yi >= -1)
-			return true;
+		if(inIntervall(xi, yi, x0, y0, x1, y1))
+			if(inIntervall(xi, yi, x2, y2, x3, y3))
+				return true;
+		
 		return false;
 	}
 	
-	
+	private boolean inIntervall(double xi, double yi, float x0, float y0, float x1, float y1)
+	{
+		float minX = Math.min(x0, x1);
+		float maxX = Math.max(x0, x1);
+
+		float minY = Math.min(y0, y1);
+		float maxY = Math.max(y0, y1);
+		
+		if(xi <= maxX && xi >= minX)
+			if(yi <=maxY && yi >= minY)
+				return true;
+		
+		return false;
+	}
 	
 	private boolean isInViewFrustum(int[] triangleIndices)
 	{	

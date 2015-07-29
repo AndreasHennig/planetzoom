@@ -113,7 +113,7 @@ public class Game implements IGame
 	private void initGameObjects() 
 	{
 //		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		masterSphere = new MasterSphere(1, 1000);
+		masterSphere = new MasterSphere(1, 10000);
 		
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", Info.camera.getPosition(), new Vector3f(0.0f, 0.0f, 0.0f), 0f, 0, 0, 0);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
