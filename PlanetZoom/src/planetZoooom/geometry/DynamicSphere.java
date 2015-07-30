@@ -191,7 +191,6 @@ public class DynamicSphere
 			triangle[i] = positions[(triangleIndices[i / 3] * 3) + (i % 3)];
 		
 		return triangle;
-		
 	}
 	
 	private int[] subdivide(int[] triangles, int triangleCount, int depth)
@@ -263,16 +262,14 @@ public class DynamicSphere
 	private int[][] createChildTriangleIndices(int[] parentIndices, int[] childIndices)
 	{
 		return new int[][]
-				{
-					new int[] {parentIndices[0], childIndices[1], childIndices[0]},
-					new int[] {childIndices[1], parentIndices[1], childIndices[2]},
-					new int[] {childIndices[0], childIndices[2], parentIndices[2]},
-					new int[] {childIndices[0], childIndices[1], childIndices[2]}
-				};
+			{
+				new int[] {parentIndices[0], childIndices[1], childIndices[0]},
+				new int[] {childIndices[1], parentIndices[1], childIndices[2]},
+				new int[] {childIndices[0], childIndices[2], parentIndices[2]},
+				new int[] {childIndices[0], childIndices[1], childIndices[2]}
+			};
 	}
 
-
-	
 	private boolean isInViewFrustum(float[] positions) 
 	{
 		Matrix4f p = Info.projectionMatrix;
@@ -391,7 +388,6 @@ public class DynamicSphere
 		if (angle > 180)
 			angle = 360 - angle;
 		
-
 		return angle < 90 + ANGLE_TOLERANCE;
 	}
 	
