@@ -8,7 +8,7 @@ import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
 
-public class Planet implements IGameObjectListener
+public class Planet //implements IGameObjectListener
 {
 	private final static float MIN_AMPLITUDE = 1;
 	private final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
@@ -28,6 +28,7 @@ public class Planet implements IGameObjectListener
 	private float mountainHeight;	
 	private final float slowDownRadius;
 	private int shaderMode = 0;
+	private boolean hasWater;
 	
 	public static final int STYLE_EARTH = 0;
 	public static final int STYLE_MARS = 1;
@@ -40,7 +41,7 @@ public class Planet implements IGameObjectListener
 		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES, this);
 		this.atmosphere = new Atmosphere(this);
 
-		sphere.addListener(this);
+		//sphere.addListener(this);
 
 		lambdaBaseFactor = 0.75f;
 		octaves = 3;
@@ -62,6 +63,16 @@ public class Planet implements IGameObjectListener
 		adjustCamSpeed(camSphereDistance);
 		
 		handleCollision(planetToCam);
+	}
+	
+	public void setHasWater(boolean water)
+	{
+		hasWater = water;
+	}
+	
+	public boolean getHasWater()
+	{
+		return hasWater;
 	}
 
 	public float getAmplitude()
@@ -207,21 +218,21 @@ public class Planet implements IGameObjectListener
 		return lambdaBaseFactor * planetRadius;
 	}
 
-	@Override
-	public void vertexCreated(Vector3f v)
-	{
-		float planetRadius = this.getRadius();
-
-		final float lambda = lambdaBaseFactor * planetRadius;
-
-		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
-
-		if (noise < 0)
-			noise = 0;
-
-		// 0.14 % = 8 km von 6000 km
-		v.scale(1 + noise * mountainHeight);
-	}
+//	@Override
+//	public void vertexCreated(Vector3f v)
+//	{
+//		float planetRadius = this.getRadius();
+//
+//		final float lambda = lambdaBaseFactor * planetRadius;
+//
+//		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
+//
+//		if (noise < 0)
+//			noise = 0;
+//
+//		// 0.14 % = 8 km von 6000 km
+//		v.scale(1 + noise * mountainHeight);
+//	}
 		
 	public void vertexCreatedPeteEdition(Vector3f v)
 	{

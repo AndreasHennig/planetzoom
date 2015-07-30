@@ -243,12 +243,16 @@ public class Game implements IGame
 		switch(planet.getShaderMode())
 		{
 		case Planet.STYLE_EARTH:	loadPlanetShaderUniforms(earthShader);
+									planet.setHasWater(true);
 									break;
 		case Planet.STYLE_MARS:		loadPlanetShaderUniforms(marsShader);
+									planet.setHasWater(false);
 									break;
 		case Planet.STYLE_DUNE: 	loadPlanetShaderUniforms(dessertShader);
+									planet.setHasWater(false);
 									break;
 		case Planet.STYLE_UNICOLOR: loadPlanetShaderUniforms(uniColorPlanetShader);
+									planet.setHasWater(false);
 									break;
 		default: 					throw new IllegalArgumentException();
 		}
