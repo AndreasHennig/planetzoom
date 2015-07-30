@@ -33,12 +33,12 @@ void finalColor(vec4 color, float diffuse, float ambient, float specular)
 
 void main(void)
 {	
- 	vec3 L = normalize(pass_data.lightDir - pass_data.position);   
+ 	vec3 L = normalize(pass_data.lightDir);  
 	vec3 E = normalize(-pass_data.position);  
 	vec3 R = normalize(-reflect(L,pass_data.normal));  
 	vec4 baseColor = vec4(0.5, 0.5, 0.5, 1.0);
  
- 	float ambient = 0.08;
+ 	float ambient = 0.1;
 	float diffuse = max(dot(pass_data.normal,L), 0.0);
    	diffuse = clamp(diffuse, 0.0, 1.0);     
 

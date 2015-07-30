@@ -6,15 +6,10 @@ import static org.lwjgl.opengl.GL30.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
-
 import planetZoooom.gameContent.Planet;
-import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
 
@@ -26,7 +21,6 @@ public class DynamicSphere
 	static private final int ANGLE_TOLERANCE = 50;
 	
 	//To be inherited by superclass
-	//protected List<IGameObjectListener> listeners;
 	private float[] positions;
 	private float[] normals;
 	private Planet planet;
@@ -51,7 +45,6 @@ public class DynamicSphere
 		positions = new float[minTriangles * 3 * 4 * 2];
 		normals = new float[minTriangles * 3 * 4 * 2];
 		planet = _planet; 
-		//listeners = new ArrayList<>();
 		
 		modelViewMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
@@ -68,10 +61,6 @@ public class DynamicSphere
 		this.radius = radius;
 		update();
 	}
-	
-//	public void addListener(IGameObjectListener listener) {
-//		listeners.add(listener);
-//	}
 	
 	public void update()
 	{						
@@ -394,12 +383,6 @@ public class DynamicSphere
 		return angle < 90 + ANGLE_TOLERANCE;
 	}
 	
-//	public void notifyListeners(Vector3f v) 
-//	{
-//		for(IGameObjectListener listener : listeners)
-//			listener.vertexCreated(v);
-//	}
-	
 	public float getRadius()
 	{
 		return radius;
@@ -439,7 +422,7 @@ public class DynamicSphere
 		{
 			if (noise < 0)
 			{
-				noise = 0.0f;
+				noise = 0;
 				wasWater = true;
 			}
 		}
