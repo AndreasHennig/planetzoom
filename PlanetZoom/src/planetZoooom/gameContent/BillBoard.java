@@ -8,19 +8,20 @@ import planetZoooom.engine.VertexArray;
 public class BillBoard extends MeshObject
 {
 
-	public BillBoard(Vector3f position, float size)
+	public BillBoard(Vector3f position, float sizeX, float sizeY)
 	{
-		float localSize = size / 2.0f;
+		float localSizeX = sizeX / 2.0f;
+		float localSizeY = sizeY / 2.0f;
 		this.position = position;
 		modelMatrix = new Matrix4f();
 		setPosition(position);
 		
 		vertices = new float[] 
 		{
-			-localSize, -localSize, 0,
-			-localSize,  localSize, 0,
-			 localSize,  localSize, 0,
-			 localSize, -localSize, 0
+			-localSizeX, -localSizeY, 0,
+			-localSizeX,  localSizeY, 0,
+			localSizeX,  localSizeY, 0,
+			localSizeX, -localSizeY, 0
 		};
 		
 		normals = new float[]

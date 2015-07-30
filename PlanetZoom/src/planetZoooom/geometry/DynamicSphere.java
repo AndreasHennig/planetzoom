@@ -44,7 +44,7 @@ public class DynamicSphere
 	private int minTriangles;
 	private SphereVertexArray va;
 
-	private Matrix4f mv; //modelViewMatrix
+	private Matrix4f modelViewMatrix;
 	
 	public DynamicSphere(float radius, int minTriangles, Planet _planet) 
 	{
@@ -53,7 +53,7 @@ public class DynamicSphere
 		planet = _planet; 
 		//listeners = new ArrayList<>();
 		
-		mv = new Matrix4f();
+		modelViewMatrix = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
 		v2 = new Vector3f();
@@ -75,7 +75,7 @@ public class DynamicSphere
 	
 	public void update()
 	{						
-		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
+		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, modelViewMatrix);
 		
 		positionPointer = 0;
 
@@ -283,9 +283,9 @@ public class DynamicSphere
 		for(int i = 0; i < positions.length; i+=3)
 		{
 			//Object space -> world space -> camera space
-			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
-			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
-			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
+			x = (modelViewMatrix.m00 * positions[i]) + (modelViewMatrix.m10 * positions[i+1]) + (modelViewMatrix.m20 * positions[i+2]) + (modelViewMatrix.m30);
+			y = (modelViewMatrix.m01 * positions[i]) + (modelViewMatrix.m11 * positions[i+1]) + (modelViewMatrix.m21 * positions[i+2]) + (modelViewMatrix.m31);
+			z = (modelViewMatrix.m02 * positions[i]) + (modelViewMatrix.m12 * positions[i+1]) + (modelViewMatrix.m22 * positions[i+2]) + (modelViewMatrix.m32);
 			
 			w[i/3] = -z;
 			
@@ -439,7 +439,7 @@ public class DynamicSphere
 		{
 			if (noise < 0)
 			{
-				noise = 0;
+				noise = 0.0f;
 				wasWater = true;
 			}
 		}
