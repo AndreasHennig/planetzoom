@@ -34,11 +34,10 @@ public class Planet implements IGameObjectListener
 	public static final int STYLE_DUNE = 2;
 	public static final int STYLE_UNICOLOR = 3;
 	
-	
 	public Planet(float radius, Vector3f position)
 	{
 		this.position = position;
-		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES);
+		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES, this);
 		this.atmosphere = new Atmosphere(this);
 
 		sphere.addListener(this);
@@ -132,7 +131,6 @@ public class Planet implements IGameObjectListener
 			this.mountainHeight = mountainHeight;
 	}
 
-	
 	private void adjustCamSpeed(float camSphereDistance) {
 		ICameraControl camControl = Info.camera.getCameraControl();
 		
@@ -215,6 +213,21 @@ public class Planet implements IGameObjectListener
 		float planetRadius = this.getRadius();
 
 		final float lambda = lambdaBaseFactor * planetRadius;
+
+		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
+
+		if (noise < 0)
+			noise = 0;
+
+		// 0.14 % = 8 km von 6000 km
+		v.scale(1 + noise * mountainHeight);
+	}
+		
+	public void vertexCreatedPeteEdition(Vector3f v)
+	{
+		//float planetRadius = this.getRadius();
+
+		final float lambda = lambdaBaseFactor * sphere.getRadius();//planetRadius;
 
 		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
 

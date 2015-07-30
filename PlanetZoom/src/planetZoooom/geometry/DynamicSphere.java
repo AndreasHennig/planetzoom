@@ -1,17 +1,8 @@
 package planetZoooom.geometry;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -22,7 +13,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import planetZoooom.gameContent.Planet;
 import planetZoooom.interfaces.IGameObjectListener;
+import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
 
 public class DynamicSphere
@@ -36,6 +29,7 @@ public class DynamicSphere
 	protected List<IGameObjectListener> listeners;
 	private float[] positions;
 	private float[] normals;
+	private Planet planet;
 
 	private Matrix4f modelMatrix;
 	private int[] indices;
@@ -52,11 +46,11 @@ public class DynamicSphere
 
 	private Matrix4f mv; //modelViewMatrix
 	
-	public DynamicSphere(float radius, int minTriangles) 
+	public DynamicSphere(float radius, int minTriangles, Planet _planet) 
 	{
 		positions = new float[minTriangles * 3 * 4 * 2];
 		normals = new float[minTriangles * 3 * 4 * 2];
-
+		planet = _planet; 
 		listeners = new ArrayList<>();
 		
 		mv = new Matrix4f();
@@ -153,7 +147,7 @@ public class DynamicSphere
 	private int writePosition(Vector3f pos)
 	{
 		//Lenz Edition
-		notifyListeners(pos);
+		createNoise(pos);
 		orthoVec1.x = -pos.y;
 		orthoVec1.y = pos.x;
 		orthoVec1.z = 0;
@@ -171,8 +165,8 @@ public class DynamicSphere
 		orthoVec2.normalise(orthoVec2);
 		orthoVec1.scale(6500.0f);
 		orthoVec2.scale(6500.0f);
-		notifyListeners(orthoVec1);
-		notifyListeners(orthoVec2);
+		createNoise(orthoVec1);
+		createNoise(orthoVec2);
 		Vector3f.sub(orthoVec1, pos, orthoVec1);
 		Vector3f.sub(orthoVec2, pos, orthoVec2);
 		orthoVec1.scale(1/orthoLength1);
@@ -429,6 +423,22 @@ public class DynamicSphere
 			totalTriangles = totalTriangles << 2;
 				
 		return totalTriangles;
+	}
+	
+	public void createNoise(Vector3f v)
+	{
+		double lambda = planet.getLambdaBaseFactor() * getRadius();
+		double noiseSeed = planet.getNoiseSeed();
+		int octaves = planet.getOctaves();
+		double amplitude = planet.getAmplitude();
+		
+		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
+
+		if (noise < 0)
+			noise = 0;
+
+		// 0.14 % = 8 km von 6000 km
+		v.scale(1 + noise * planet.getMountainHeight());
 	}
 	
 	public class SphereVertexArray
