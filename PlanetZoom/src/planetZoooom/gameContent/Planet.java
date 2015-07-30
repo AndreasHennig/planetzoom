@@ -2,7 +2,7 @@ package planetZoooom.gameContent;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import planetZoooom.geometry.Sphere;
+import planetZoooom.geometry.DynamicSphere;
 import planetZoooom.interfaces.ICameraControl;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
@@ -17,7 +17,7 @@ public class Planet implements IGameObjectListener
 	private final static int MIN_TRIANGLES = 10000;
 	final static float CAM_COLLISION_OFFSET = 30;
 
-	private Sphere sphere;
+	private DynamicSphere sphere;
 	private Vector3f position;
 	private Atmosphere atmosphere;
 
@@ -38,7 +38,7 @@ public class Planet implements IGameObjectListener
 	public Planet(float radius, Vector3f position)
 	{
 		this.position = position;
-		this.sphere = new Sphere(radius, MIN_TRIANGLES);
+		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES);
 		this.atmosphere = new Atmosphere(this);
 
 		sphere.addListener(this);
@@ -152,7 +152,6 @@ public class Planet implements IGameObjectListener
 	private void handleCollision(Vector3f planetToCam) 
 	{
 		Vector3f cam = Info.camera.getPosition();
-		Vector3f planet = getPosition();
 
 		float actualCamDistance = planetToCam.length();
 		planetToCam.normalise().scale(this.getRadius());
@@ -200,7 +199,7 @@ public class Planet implements IGameObjectListener
 		return atmosphere;
 	}
 
-	public Sphere getSphere()
+	public DynamicSphere getSphere()
 	{
 		return sphere;
 	}

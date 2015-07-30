@@ -1,14 +1,18 @@
 package planetZoooom.geometry;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -21,11 +25,12 @@ import org.lwjgl.util.vector.Vector3f;
 import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.Info;
 
-public class Sphere
+public class DynamicSphere
 {
-	private static final int CHECK_INTERVAL = 1;
-	private static final int FIRST_CHECK = 3;
-	private static final double VIEW_FRUSTUM_OFFSET = 2; 
+	private static final int FIRST_CHECK = 4;
+	private static final double VIEW_FRUSTUM_OFFSET = 1;
+	private static final float VIEW_FRUSTUM_CHECK_OFFSET = 0.2f;
+	static private final int ANGLE_TOLERANCE = 50;
 	
 	//To be inherited by superclass
 	protected List<IGameObjectListener> listeners;
@@ -34,32 +39,27 @@ public class Sphere
 
 	private Matrix4f modelMatrix;
 	private int[] indices;
+	private int currentDepth;
 
-	private	Vector3f lhs, rhs, normal;
 	private Vector3f v1,v2,v3,n1,n2,n3;
 	
 	private float radius;
 	
 	private int positionPointer; 
 	private int triangleIndexCount;
-
-	private int currentDepth;
 	private int minTriangles;
 	private SphereVertexArray va;
 
-	private Matrix4f modelViewMatrix;
+	private Matrix4f mv; //modelViewMatrix
 	
-	public Sphere(float radius, int minTriangles) 
+	public DynamicSphere(float radius, int minTriangles) 
 	{
-		positions = new float[minTriangles * 12 * 2];
-		normals = new float[minTriangles * 12 * 2];
+		positions = new float[minTriangles * 3 * 4 * 2];
+		normals = new float[minTriangles * 3 * 4 * 2];
 
 		listeners = new ArrayList<>();
 		
-		lhs = new Vector3f();
-		rhs = new Vector3f();
-		normal = new Vector3f();
-		modelViewMatrix = new Matrix4f();
+		mv = new Matrix4f();
 		modelMatrix = new Matrix4f();
 		v1 = new Vector3f();
 		v2 = new Vector3f();
@@ -81,49 +81,30 @@ public class Sphere
 	
 	public void update()
 	{						
-		Matrix4f.mul( Info.camera.getViewMatrix(), modelMatrix, modelViewMatrix);
+		Matrix4f.mul( Info.camera.getViewMatrix(),modelMatrix, mv);
 		
 		positionPointer = 0;
-		
+
 		int[] t = createOctahedron();
 		triangleIndexCount = t.length;
-		
 		int depth = 0;
-		while(triangleIndexCount < (minTriangles * 3))
+		while(triangleIndexCount < minTriangles * 3)
 		{
 			t = subdivide(t, triangleIndexCount, depth++);
 			if(t.length == 0)
 				break;
 		}
 		currentDepth = depth;
-		
 		indices = t;
 
 		va.update(positions, normals, positionPointer, indices, triangleIndexCount);
 	}
 	
-	public int getSubdivisions()
-	{
-		return currentDepth;
-	}
 	
-	public int getTotalTriangleCount()
-	{
-		int totalTriangles = 8;
-		for(int i = 0; i < currentDepth; i++)
-			totalTriangles = totalTriangles << 2;
-				
-		return totalTriangles;
-	}
 	
 	public void render(int mode)
 	{
 		va.render(mode);
-	}
-	
-	public Matrix4f getModelMatrix()
-	{
-		return modelMatrix;
 	}
 	
 	public int getTriangleCount()
@@ -156,7 +137,7 @@ public class Sphere
 		writePosition((Vector3f) Vertex.down().scale(radius));
 		writePosition((Vector3f) Vertex.front().scale(radius));
 		writePosition((Vector3f) Vertex.back().scale(radius));
-
+	
 		return indices;
 	}
 	
@@ -230,23 +211,14 @@ public class Sphere
 		{
 			triangleIndices = new int[]{triangles[i], triangles[i+1], triangles[i+2]};
 			
-//			if(newTriangles.length > minTriangles) //Most likely last subdivide
-//			{
-//				if(!isFacingTowardsCamera(triangleIndices))
-//					continue;
-//				if (!isInViewFrustum(triangleIndices))
-//					continue; // clip
-//			}
-//			
-			if (depth % CHECK_INTERVAL == 0 || depth == FIRST_CHECK)
+			if (depth > FIRST_CHECK)
 			{
-				
 				if(!isFacingTowardsCamera(triangleIndices))
 					continue;
 				if (!isInViewFrustum(triangleIndices))
 					continue; // clip
 			}
-
+	
 			childIndices = createChildTriangleIndices(triangleIndices, createChildVertices(triangleIndices));
 
 			for (int j = 0; j < childIndices.length; j++)
@@ -267,7 +239,6 @@ public class Sphere
 		v.y = y;
 		v.z = z;
 	}
-	
 	private int[] createChildVertices(int[] triangleIndices)
 	{	
 		float[] positions = getPositions(triangleIndices);
@@ -291,10 +262,6 @@ public class Sphere
 		newIndices[0] = writePosition(n1);
 		newIndices[1] = writePosition(n2);
 		newIndices[2] = writePosition(n3);
-				
-//		uvs[0] = new Vector2f((v3.getUv().x + v1.getUv().x)/2.0f, (v3.getUv().y + v1.getUv().y)/2.0f);
-//		uvs[1] = new Vector2f((v1.getUv().x + v2.getUv().x)/2.0f, (v1.getUv().y + v2.getUv().y)/2.0f);
-//		uvs[2] = new Vector2f((v3.getUv().x + v2.getUv().x)/2.0f, (v3.getUv().y + v2.getUv().y)/2.0f);
 		
 		return newIndices;
 	} 
@@ -310,41 +277,10 @@ public class Sphere
 				};
 	}
 
-	private boolean isInViewFrustum(float a, float b, float c, int depth) 
+
+	
+	private boolean isInViewFrustum(float[] positions) 
 	{
-		Matrix4f p = Info.projectionMatrix;
-		float x,y,z,w;
-		float d = 1;
-
-		//Object space -> world space -> camera space
-		x = (modelViewMatrix.m00 * a) + (modelViewMatrix.m10 * b) + (modelViewMatrix.m20 * c) + (modelViewMatrix.m30 * d);
-		y = (modelViewMatrix.m01 * a) + (modelViewMatrix.m11 * b) + (modelViewMatrix.m21 * c) + (modelViewMatrix.m31 * d);
-		z = (modelViewMatrix.m02 * a) + (modelViewMatrix.m12 * b) + (modelViewMatrix.m22 * c) + (modelViewMatrix.m32 * d);
-
-		w= -z;
-		
-		if(depth < 2)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1;
-		else if (depth < 8)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/1.5;
-		else if (depth < 12)
-			w*= 1 + VIEW_FRUSTUM_OFFSET/3;
-		
-		//camera space -> clip space
-		x = (p.m00 * x) + (p.m10 * y) + (p.m20 * z) + (p.m30 * d);
-		y = (p.m01 * x) + (p.m11 * y) + (p.m21 * z) + (p.m31 * d);
-		z = (p.m02 * x) + (p.m12 * y) + (p.m22 * z) + (p.m32 * d);
-
-		return (x <= w && x >= -w) && (y <= w && y >= -w);
-	}
-
-	//TODO implement correct frustum culling maybe sutherland hodgen style
-	//http://de.slideshare.net/Tejasmistry19/clipping-algorithm-in-computer-graphics
-	private boolean isInViewFrustum(int[] triangleIndices) 
-	{
-		
-		float[] positions = getPositions(triangleIndices);
-		
 		Matrix4f p = Info.projectionMatrix;
 		float x,y,z;
 
@@ -353,9 +289,9 @@ public class Sphere
 		for(int i = 0; i < positions.length; i+=3)
 		{
 			//Object space -> world space -> camera space
-			x = (modelViewMatrix.m00 * positions[i]) + (modelViewMatrix.m10 * positions[i+1]) + (modelViewMatrix.m20 * positions[i+2]) + (modelViewMatrix.m30);
-			y = (modelViewMatrix.m01 * positions[i]) + (modelViewMatrix.m11 * positions[i+1]) + (modelViewMatrix.m21 * positions[i+2]) + (modelViewMatrix.m31);
-			z = (modelViewMatrix.m02 * positions[i]) + (modelViewMatrix.m12 * positions[i+1]) + (modelViewMatrix.m22 * positions[i+2]) + (modelViewMatrix.m32);
+			x = (mv.m00 * positions[i]) + (mv.m10 * positions[i+1]) + (mv.m20 * positions[i+2]) + (mv.m30);
+			y = (mv.m01 * positions[i]) + (mv.m11 * positions[i+1]) + (mv.m21 * positions[i+2]) + (mv.m31);
+			z = (mv.m02 * positions[i]) + (mv.m12 * positions[i+1]) + (mv.m22 * positions[i+2]) + (mv.m32);
 			
 			w[i/3] = -z;
 			
@@ -367,8 +303,8 @@ public class Sphere
 			x/= w[i/3];
 			y/= w[i/3];
 		
-
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
+			
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z >= 0)
 				return true;
 								
 			positions[i] = x;
@@ -376,62 +312,93 @@ public class Sphere
 			positions[i+2] = z;
 		}
 		
-//		if(intersectsNDCPlane(positions))
-//			return true;
+		if(intersectsNDCPlane(positions))
+			return true;
 		
 		return false;
 	}
 
-	private boolean intersectsNDCPlane(float[] ndc)
+	private boolean intersectsNDCPlane(float[] triangle)
 	{
-		float x0, x1;
-		float y0, y1;
-		for(int i = 0; i < ndc.length-3; i+=3)
+		float[] x = {-1, 1, 1, -1};
+		float[] y = {1, 1, -1, -1};
+ 
+		for(int i = 0; i < 3; i++)
 		{
-			x0 = ndc[i];
-			y0 = ndc[i+1];
-			x1 = ndc[i+3];
-			y1 = ndc[i+4];
-			if(foo(x0, y0, x1, y1))
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[0], triangle[1], triangle[3], triangle[4]))
+				return true;
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[3], triangle[4], triangle[6], triangle[7]))
+				return true;
+			if(lineIntersection(x[i], y[i], x[i+1], y[i+1], triangle[6], triangle[7], triangle[0], triangle[1]))
 				return true;
 		}
-		if(foo(ndc[6], ndc[7], ndc[0], ndc[1]))
+		
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[0], triangle[1], triangle[3], triangle[4]))
+			return true;
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[3], triangle[4], triangle[6], triangle[7]))
+			return true;
+		if(lineIntersection(x[3], y[3], x[0], y[0], triangle[6], triangle[7], triangle[0], triangle[1]))
 			return true;
 		
 		return false;
 	}
 	
-	private Rectangle2D NDCPlane = new Rectangle2D.Float(-1, -1, 2, 2);
-	private Line2D l1 = new Line2D.Float();
-	
-	private boolean foo(float x0, float y0, float x1, float y1)
+	private boolean lineIntersection(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 	{
-		l1.setLine(x0,y0,x1,y1);
-		if(l1.intersects(NDCPlane))
-			return true;
+		double d = (x0-x1)*(y2-y3) - (y0-y1)*(x2-x3);
+		if(d == 0) //parallel oder kollinear?
+			return false;
+		double xi = ((x2-x3)*(x0*y1-y0*x1)-(x0-x1)*(x2*y3-y2*x3)) / d;
+		double yi = ((y2-y3)*(x0*y1-y0*x1)-(y0-y1)*(x2*y3-y2*x3)) / d;
+		if(inIntervall(xi, yi, x0, y0, x1, y1))
+			if(inIntervall(xi, yi, x2, y2, x3, y3))
+				return true;
 		
 		return false;
 	}
+	
+	private boolean inIntervall(double xi, double yi, float x0, float y0, float x1, float y1)
+	{
 		
+		float minX = Math.min(x0, x1);
+		float maxX = Math.max(x0, x1);
+
+		float deltaX = maxX - minX;
+		
+		float minY = Math.min(y0, y1);
+		float maxY = Math.max(y0, y1);
+		
+		float deltaY = maxY - minY;
+		
+		if(xi <= maxX + deltaX * VIEW_FRUSTUM_CHECK_OFFSET && xi >= minX - deltaX * VIEW_FRUSTUM_CHECK_OFFSET) {
+			if(yi <=maxY  + deltaY * VIEW_FRUSTUM_CHECK_OFFSET && yi >= minY - deltaY * VIEW_FRUSTUM_CHECK_OFFSET) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private boolean isInViewFrustum(int[] triangleIndices)
+	{	
+		float[] positions = getPositions(triangleIndices);
+		
+		return isInViewFrustum(positions);
+	}
+
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
 		setVec(v1, a[0], a[1], a[2]);
-		setVec(v2, a[3], a[4], a[5]);
-		setVec(v3, a[6], a[7], a[8]);
 		
-		Vector3f.sub(v3, v1, lhs);
-		Vector3f.sub(v2, v1, rhs);
-		Vector3f.cross(lhs, rhs, normal);
+		Vector3f.sub(Info.camera.getPosition(), v1, n1);
+		double angle = Vector3f.angle(n1, v1) * 180 / Math.PI;
 		
-		Vector3f.sub(v1, Info.camera.getPosition(), n1);
-		double angle = Vector3f.angle(n1, normal) * 180 / Math.PI;
+		if (angle > 180)
+			angle = 360 - angle;
+		
 
-		
-		//float angleTolerance = 90 / (subdivions + 2); //as we go deeper, we need less tolerance 
-		float angleTolerance = 10; //everything behind 90 degrees gets cut off. problems with noise?
-
-		return !(angle > 90 + angleTolerance && angle < 270 - angleTolerance);
+		return angle < 90 + ANGLE_TOLERANCE;
 	}
 	
 	public void notifyListeners(Vector3f v) 
@@ -443,6 +410,25 @@ public class Sphere
 	public float getRadius()
 	{
 		return radius;
+	}
+	
+	public Matrix4f getModelMatrix()
+	{
+		return modelMatrix;
+	}
+
+	public int getSubdivisions()
+	{
+		return currentDepth;
+	}
+	
+	public int getTotalTriangleCount()
+	{
+		int totalTriangles = 8;
+		for(int i = 0; i < currentDepth; i++)
+			totalTriangles = totalTriangles << 2;
+				
+		return totalTriangles;
 	}
 	
 	public class SphereVertexArray

@@ -48,6 +48,7 @@ public class Game implements IGame
 	private ShaderProgram sunShader;
 	private ShaderProgram sunGlowShader;
 	private ShaderProgram atmosphereShader;
+	private ShaderProgram colorShader;
 
 	// MATRICES
 	private Matrix4f modelViewMatrix;
@@ -58,11 +59,16 @@ public class Game implements IGame
 	// CONTROLS
 	private boolean wireframe = false;
 	private boolean updateSphere = true;
-	
+	private boolean freezeUpdate = false;
+
 	private static final int HUD_MODE_OFF = 0;
 	private static final int HUD_MODE_INFO = 1;
 	private static final int HUD_MODE_NOISE = 2;
 	private static final int HUD_MODE_ATMOSPHERE = 3;
+	
+	private static final float[] HUD_BG_YELLOW = new float[] {1, 211.0f/255.0f, 42.0f/255.0f, 0.5f};
+	private static final float[] HUD_BG_WHITE = new float[] {1, 1, 1, 0.5f};
+	private static final float[] HUD_BG_PURPLE = new float[] {238.0f/255.0f, 170.0f/255.0f, 1f, 0.5f};
 	
 	private int hudMode;
 	
@@ -77,7 +83,7 @@ public class Game implements IGame
 	{
 		printVersionInfo();
 
-		Info.camera = new FreeCamera(0.0f, 0.0f, 10000);
+		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
 		Info.projectionMatrix = planetZoooom.utils.MatrixUtils.perspectiveProjectionMatrix(fovParam, game.getWindowWidth(), game.getWindowHeight());
 		
 		modelViewMatrix = new Matrix4f();
@@ -118,19 +124,20 @@ public class Game implements IGame
 		marsShader = new ShaderProgram("marsShader");
 		dessertShader = new ShaderProgram("dessertShader");
 		uniColorPlanetShader = new ShaderProgram("uniColorPlanetShader");
-		wireFrameShader = new ShaderProgram("testShader");
+		wireFrameShader = new ShaderProgram("wireFrameShader");
 		sunShader = new ShaderProgram("sunShader");
 		sunGlowShader = new ShaderProgram("sunGlowShader");
 		atmosphereShader = new ShaderProgram("atmosphereShader");
+		colorShader = new ShaderProgram("testShader");
 	}
 
 	private void initGameObjects() 
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
-		hud = new HeadsUpDisplay(0, 0, "arial_nm.png");
+		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", HUD_BG_WHITE);
 		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
 		sun.setTexture(sunTexture);
-		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 1.0f);
+		sunGlow = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 1.0f);
 		sunGlow.setTexture(sunGlowTexture);
 	}
 
@@ -143,18 +150,25 @@ public class Game implements IGame
 		
 		glDisable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-		drawSun();		
-	
-		glFrontFace(GL_CW);
-		drawAtmosphere();
-		glFrontFace(GL_CCW);
-		
-		glEnable(GL_DEPTH_TEST);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		if(updateSphere)
+		if(!freezeUpdate) 
+		{
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			
+			drawSun();		
 			planet.update();
 		
+			glFrontFace(GL_CW);
+			drawAtmosphere();
+			glFrontFace(GL_CCW);
+		}
+		else 
+		{
+			glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+		}
+		glEnable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 		drawPlanet();
 
 		updateHud(hudMode);
@@ -165,13 +179,6 @@ public class Game implements IGame
 	{
 		Matrix4f.mul(Info.camera.getViewMatrix(), sun.getModelMatrix(), modelViewMatrix);
 		
-		glUseProgram(sunGlowShader.getId());
-		{
-			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
-			sunGlow.render(GL_TRIANGLES);
-		}
 
 		glUseProgram(sunShader.getId());
 		{
@@ -181,6 +188,14 @@ public class Game implements IGame
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
 			sun.render(GL_TRIANGLES);
+		}
+
+		glUseProgram(sunGlowShader.getId());
+		{
+			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
+			sunGlow.render(GL_TRIANGLES);
 		}
 	}
 	
@@ -198,13 +213,10 @@ public class Game implements IGame
 			atmosphereShader.loadUniformVec3f(lightDirection, "lightDirection");
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 			atmosphereShader.loadUniform1f(1.0f / (planet.getAtmosphere().getSphere().getRadius() - planet.getRadius()), "fScale");
-//			atmosphereShader.loadUniform1f(planet.getAtmosphere().getSphere().getRadius() * 0.25f, "fScale");
 			atmosphereShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 			atmosphereShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			atmosphereShader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
 			atmosphereShader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
-//			if(cameraHeight > planet.getRadius())
-//			atmosphereShader.loadUniform1f(planet.getRadius(), "planetRadius");
 			atmosphereShader.loadUniform1f(planet.getRadius() + planet.getRadius() * 0.09f, "planetRadius");
 				
 			planet.getAtmosphere().getSphere().render(GL_TRIANGLES);
@@ -259,8 +271,14 @@ public class Game implements IGame
 	
 	private void drawHUD()
 	{
-		//hud.update(Info.camera.getPosition(), Info.camera.getLookAt(), 0, planet.getVertexCount(), planet.getTotalTriangleCount(), game.timer.getFPS());
-		
+		glUseProgram(colorShader.getId());
+		{
+			colorShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
+			colorShader.loadUniformMat4f(hud.getModelMatrix(), "modelViewMatrix", false);
+			hud.getBackgroundMesh().render(GL_TRIANGLES);
+		}
+		glUseProgram(0);
+
 		glUseProgram(hudShader.getId());
 		{
 			hudShader.loadUniformMat4f(orthographicProjectionMatrix, "projectionMatrix", false);
@@ -282,18 +300,21 @@ public class Game implements IGame
 		
 			case HUD_MODE_INFO:
 			{
+				hud.setBackgroundColor(HUD_BG_WHITE);
 				hud.update(getInfoHUDText());
 				return;
 			}
 			
 			case HUD_MODE_NOISE:
 			{
+				hud.setBackgroundColor(HUD_BG_YELLOW);
 				hud.update(getNoiseHUDText());
 				return;
 			}
 			
 			case HUD_MODE_ATMOSPHERE:
 			{
+				hud.setBackgroundColor(HUD_BG_PURPLE);
 				hud.update(getAtmosphereHUDText());
 				return;
 			}
@@ -304,18 +325,17 @@ public class Game implements IGame
 	
 	private String getInfoHUDText()
 	{
-		//TODO Distance to surface shall consider noise
 		int triangleCount = planet.getSphere().getTriangleCount();
 		int totalTriangleCount = planet.getSphere().getTotalTriangleCount();
 		double trianglePercentage = triangleCount * 100 / (double) totalTriangleCount;
 		
 		return  String.format(
 				"General information\n\n"
-				+ "Distance: %.2f\n"
-				+ "Triangles: %d / %d (%.2f%%)\n"
-				+ "Vertices: %d\n"
+				+ "Distance:     %.2f\n"
+				+ "Triangles:    %d / %d (%.2f%%)\n"
+				+ "Vertices:     %d\n"
 				+ "Subdivisions: %d\n"
-				+ "FPS: %d",
+				+ "FPS:          %d",
 				GameUtils.getDistanceBetween(planet.getPosition(), Info.camera.getPosition()) - planet.getRadius(), 
 				triangleCount, totalTriangleCount, trianglePercentage,
 				planet.getSphere().getVertexCount(),
@@ -328,12 +348,12 @@ public class Game implements IGame
 		Atmosphere atmosphere = planet.getAtmosphere();
 		return  String.format(
 				"Atmosphere properties\n\n"
-				+ "Mie Scattering: %.4f\n"
-				+ "Rayleigh Scattering: %.4f\n"
-				+ "Wavelength red:   %.3f\n"
-				+ "Wavelength green: %.3f\n"
-				+ "Wavelength blue:  %.3f\n",
-				atmosphere.getMieScattering(),
+				+ "Sunbrightness: %.1f\n"
+				+ "Scattering:    %.4f\n"
+				+ "Wavelength 1:  %.3f\n"
+				+ "Wavelength 2:  %.3f\n"
+				+ "Wavelength 3:  %.3f\n",
+				atmosphere.getSunBrightness(),
 				atmosphere.getRayleighScattering(),
 				atmosphere.getWaveLengthRed(),
 				atmosphere.getWaveLengthGreen(),
@@ -345,11 +365,11 @@ public class Game implements IGame
 	{
 		return String.format(
 				"Noise properties\n\n" +
-				"Mountain Height: %.4f\n" + 
-				"Seed: %.2f\n" +
-				"Wavelength: %.2f\n" + 
-				"Octaves: %d\n" + 
-				"Amplitude: %.2f\n" 
+				"Mountain height: %.4f\n" + 
+				"Seed:            %.2f\n" +
+				"Wavelength:      %.2f\n" + 
+				"Octaves:         %d\n" + 
+				"Amplitude:       %.2f\n" 
 				,
 				planet.getMountainHeight(),
 				planet.getNoiseSeed(),
@@ -366,15 +386,26 @@ public class Game implements IGame
 		System.out.println("GLSL version: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
 	}
 	
+	private void reset()
+	{
+		planet.setNoiseSeed(0);
+		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
+		planet.setShaderMode(0);
+		wireframe = false;
+		freezeUpdate = false;
+	}
+	
 	private void processKeyboardInputs(int deltaTime) {
 		
 		cameraControl = Info.camera.getCameraControl();
 		Info.camera = cameraControl.handleInput(deltaTime);
 		
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_1)){ wireframe = !wireframe; }
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ updateSphere = !updateSphere; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_5)){ wireframe = !wireframe; }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_9)){ freezeUpdate = !freezeUpdate; }
 		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_TAB)){ hudMode = (hudMode + 1) % 4; }
-		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_8)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_6)){ planet.setShaderMode((planet.getShaderMode() + 1) % 4); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_ENTER)){ planet.setNoiseSeed((float) (Math.random() * Integer.MAX_VALUE)); }
+		if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_BACKSPACE)){ reset(); }
 		
 		switch(hudMode)
 		{
@@ -411,9 +442,9 @@ public class Game implements IGame
 				Atmosphere atmosphere = planet.getAtmosphere();
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_T))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() + 0.0001f);
+					atmosphere.setSunBrightness(atmosphere.getSunBrightness() + 0.5f);
 				else if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_G))
-					atmosphere.setMieScattering(atmosphere.getMieScattering() - 0.0001f);
+					atmosphere.setSunBrightness(atmosphere.getSunBrightness() - 0.5f);
 				
 				if(Keyboard.isKeyPressedWithReset(GLFW.GLFW_KEY_Y))
 					atmosphere.setRayleighScattering(atmosphere.getRayleighScattering() + 0.0001f);
@@ -437,6 +468,5 @@ public class Game implements IGame
 				break;
 			}
 		}
-	
 	}
 }
