@@ -252,7 +252,7 @@ public class Game implements IGame
 									planet.setHasWater(false);
 									break;
 		case Planet.STYLE_UNICOLOR: loadPlanetShaderUniforms(uniColorPlanetShader);
-									planet.setHasWater(false);
+									planet.setHasWater(true);
 									break;
 		default: 					throw new IllegalArgumentException();
 		}
