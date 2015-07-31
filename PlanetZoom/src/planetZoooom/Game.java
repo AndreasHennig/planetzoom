@@ -135,9 +135,9 @@ public class Game implements IGame
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", HUD_BG_WHITE);
-		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f, 100000.0f);
+		sun = new BillBoard(new Vector3f(-25000.0f, 0.0f, 0.0f), 30000.0f, 30000.0f);
 		sun.setTexture(sunTexture);
-		sunGlow = new BillBoard(new Vector3f(-99000.0f, 0.0f, 0.0f), 120000.0f, 100000.0f);
+		sunGlow = new BillBoard(new Vector3f(-24900.0f, 0.0f, 0.0f), 40000.0f, 30000.0f);
 		sunGlow.setTexture(sunGlowTexture);
 	}
 
