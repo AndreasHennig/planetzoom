@@ -32,6 +32,7 @@ uniform float mountainHeight;
 
 void main(void)
 {
+	lightPosition * 10.0;
 	pass_data.positionVector = position;
 	pass_data.position = vec3(modelViewMatrix * vec4(position, 1.0));
 	pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));

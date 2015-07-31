@@ -229,7 +229,7 @@ public class Game implements IGame
 		shader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 		shader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 		shader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-		shader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+		shader.loadUniformVec3f(new Vector3f(-100000.0f, 0.0f, 0.0f), "lightPosition");
 		shader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 		shader.loadUniform1f(planet.getRadius(), "radius");
 		shader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
