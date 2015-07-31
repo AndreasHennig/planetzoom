@@ -15,11 +15,10 @@ import planetZoooom.utils.Info;
 
 public class DynamicSphere
 {
-	private static final int FIRST_CHECK = 4;
-	private static final double VIEW_FRUSTUM_OFFSET = 1;
-	private static final float VIEW_FRUSTUM_CHECK_OFFSET = 0.2f;
-	static private final int ANGLE_TOLERANCE = 50;
-	
+	private static final int FIRST_CHECK = 3;
+	private static final double VIEW_FRUSTUM_OFFSET = 1.5;
+	private static final float VIEW_FRUSTUM_CHECK_OFFSET = 0.01f;
+	private static final int ANGLE_TOLERANCE = 40;	
 	//To be inherited by superclass
 	private float[] positions;
 	private float[] normals;
@@ -287,7 +286,7 @@ public class DynamicSphere
 			y/= w[i/3];
 		
 			
-			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z >= 0)
+			if ((x <= VIEW_FRUSTUM_OFFSET && x >= -VIEW_FRUSTUM_OFFSET) && (y <= VIEW_FRUSTUM_OFFSET && y >= -VIEW_FRUSTUM_OFFSET) && z > 0)
 				return true;
 								
 			positions[i] = x;
@@ -298,6 +297,11 @@ public class DynamicSphere
 		if(intersectsNDCPlane(positions))
 			return true;
 		
+		if(frustumCompletlyInTriangle(positions))
+		{
+			if(positions[2] > 0 && positions[5] > 0 && positions[8] > 0)
+			return true;
+		}
 		return false;
 	}
 
@@ -360,6 +364,16 @@ public class DynamicSphere
 		}
 		
 		return false;
+	}
+	
+	private boolean frustumCompletlyInTriangle(float[] triangle)
+	{
+		float minX = Math.min(Math.min(triangle[0], triangle[3]), triangle[6]);
+		float minY = Math.min(Math.min(triangle[1], triangle[4]), triangle[7]);
+		float maxX = Math.max(Math.max(triangle[0], triangle[3]), triangle[6]);
+		float maxY = Math.max(Math.max(triangle[1], triangle[4]), triangle[7]);
+			
+		return (minX <= -1 && maxX >= 1 && minY <= -1 && maxY >= 1);
 	}
 	
 	private boolean isInViewFrustum(int[] triangleIndices)

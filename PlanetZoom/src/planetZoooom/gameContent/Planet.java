@@ -13,9 +13,10 @@ public class Planet //implements IGameObjectListener
 	private final static float MIN_AMPLITUDE = 1;
 	private final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
 	private final static int MIN_OCTAVES = 1;
+	private final static int MAX_OCTAVES = 10;
 	private final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
 	private final static int MIN_TRIANGLES = 10000;
-	final static float CAM_COLLISION_OFFSET = 30;
+	final static float CAM_COLLISION_OFFSET = 200;
 
 	private DynamicSphere sphere;
 	private Vector3f position;
@@ -101,6 +102,8 @@ public class Planet //implements IGameObjectListener
 	{
 		if (octaves < MIN_OCTAVES)
 			this.octaves = MIN_OCTAVES;
+		else if(octaves > MAX_OCTAVES)
+			octaves = MAX_OCTAVES;
 		else
 			this.octaves = octaves;
 	}

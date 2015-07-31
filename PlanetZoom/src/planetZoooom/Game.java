@@ -65,9 +65,10 @@ public class Game implements IGame
 	private static final int HUD_MODE_NOISE = 2;
 	private static final int HUD_MODE_ATMOSPHERE = 3;
 	
-	private static final float[] HUD_BG_YELLOW = new float[] {1, 211.0f/255.0f, 42.0f/255.0f, 0.5f};
-	private static final float[] HUD_BG_WHITE = new float[] {1, 1, 1, 0.5f};
-	private static final float[] HUD_BG_PURPLE = new float[] {238.0f/255.0f, 170.0f/255.0f, 1f, 0.5f};
+	private static final float[] HUD_BG_YELLOW = new float[] {0.8f, 0.62f, 0.00f, 0.9f};
+	private static final float[] HUD_BG_WHITE = new float[] {0.6f, 0.6f, 0.6f, 0.9f};
+	private static final float[] HUD_BG_GREY = new float[] {0.6f, 0.6f, 0.6f, 0.9f};
+	private static final float[] HUD_BG_PURPLE = new float[] {0.73f, 0.47f, 0.8f, 0.9f};
 	
 	private int hudMode;
 	
@@ -303,7 +304,10 @@ public class Game implements IGame
 		
 			case HUD_MODE_INFO:
 			{
-				hud.setBackgroundColor(HUD_BG_WHITE);
+				if(freezeUpdate)
+					hud.setBackgroundColor(HUD_BG_GREY);
+				else
+					hud.setBackgroundColor(HUD_BG_WHITE);
 				hud.update(getInfoHUDText());
 				return;
 			}
