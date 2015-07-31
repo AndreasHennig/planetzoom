@@ -43,13 +43,17 @@ public class Planet //implements IGameObjectListener
 
 		//sphere.addListener(this);
 
+		resetPlanet();
+		
+		slowDownRadius = getRadius() * 1.15f;
+	}
+
+	public void resetPlanet() {
 		lambdaBaseFactor = 0.75f;
 		octaves = 3;
 		amplitude = 1.77f;
 		noiseSeed = 0;
 		mountainHeight = MIN_MOUNTAIN_HEIGHT;
-		
-		slowDownRadius = getRadius() * 1.15f;
 	}
 
 	public void update()

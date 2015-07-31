@@ -392,6 +392,7 @@ public class Game implements IGame
 	private void reset()
 	{
 		planet.setNoiseSeed(0);
+		planet.resetPlanet();
 		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
 		planet.setShaderMode(0);
 		wireframe = false;
