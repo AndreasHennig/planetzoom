@@ -4,7 +4,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import planetZoooom.geometry.DynamicSphere;
 import planetZoooom.interfaces.ICameraControl;
-import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
 
