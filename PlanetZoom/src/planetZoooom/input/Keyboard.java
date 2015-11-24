@@ -10,7 +10,7 @@ public class Keyboard extends GLFWKeyCallback
 	@Override
 	public void invoke(long window, int key, int scancode, int action, int mods)
 	{
-		if(!(key >= keys.length))
+		if(!(key >= keys.length) && key > 0)
 			keys[key] = (action != GLFW_RELEASE);	
 	}
 	

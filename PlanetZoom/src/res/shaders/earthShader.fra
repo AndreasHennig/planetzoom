@@ -40,11 +40,11 @@ void main(void)
 
 	float heightGradientValue = height / maxHeight;
  
- 	vec3 L = normalize(pass_data.lightDir - pass_data.position);   
+ 	vec3 L = normalize(pass_data.lightDir);   
 	vec3 E = normalize(-pass_data.position);  
 	vec3 R = normalize(-reflect(L,pass_data.normal));  
  
- 	float ambient = 0.08;
+ 	float ambient = 0.1;
 	float diffuse = max(dot(pass_data.normal,L), 0.0);
    	diffuse = clamp(diffuse, 0.0, 1.0);     
 

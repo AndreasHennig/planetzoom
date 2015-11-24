@@ -28,23 +28,14 @@ uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform float radius;
 
-uniform float flatShading;
-
 uniform float mountainHeight;
 
 void main(void)
 {
+	lightPosition * 10.0;
 	pass_data.positionVector = position;
 	pass_data.position = vec3(modelViewMatrix * vec4(position, 1.0));
-	
-	if(flatShading > 0.5)
-	{	
-		pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
-	}
-	else
-	{
-		pass_data.normal = normalize(vec3(normalMatrix * vec4(position, 1.0)));
-	}
+	pass_data.normal = normalize(vec3(normalMatrix * vec4(normal, 1.0)));
 	
 	pass_data.uv = uvCoords;
 

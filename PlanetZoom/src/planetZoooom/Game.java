@@ -59,16 +59,16 @@ public class Game implements IGame
 	// CONTROLS
 	private boolean wireframe = false;
 	private boolean freezeUpdate = false;
-	private float flatShading = 0.0f;
-	
+
 	private static final int HUD_MODE_OFF = 0;
 	private static final int HUD_MODE_INFO = 1;
 	private static final int HUD_MODE_NOISE = 2;
 	private static final int HUD_MODE_ATMOSPHERE = 3;
 	
-	private static final float[] HUD_BG_YELLOW = new float[] {1, 211.0f/255.0f, 42.0f/255.0f, 0.5f};
-	private static final float[] HUD_BG_WHITE = new float[] {1, 1, 1, 0.5f};
-	private static final float[] HUD_BG_PURPLE = new float[] {238.0f/255.0f, 170.0f/255.0f, 1f, 0.5f};
+	private static final float[] HUD_BG_YELLOW = new float[] {0.8f, 0.62f, 0.00f, 0.9f};
+	private static final float[] HUD_BG_WHITE = new float[] {0.6f, 0.6f, 0.6f, 0.9f};
+	private static final float[] HUD_BG_GREY = new float[] {0.6f, 0.6f, 0.6f, 0.9f};
+	private static final float[] HUD_BG_PURPLE = new float[] {0.73f, 0.47f, 0.8f, 0.9f};
 	
 	private int hudMode;
 	
@@ -135,9 +135,9 @@ public class Game implements IGame
 	{
 		planet = new Planet(6500.0f, new Vector3f(0f, 0f, 0f));
 		hud = new HeadsUpDisplay(0, 0, "arial_nm.png", HUD_BG_WHITE);
-		sun = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 100000.0f);
+		sun = new BillBoard(new Vector3f(-25000.0f, 0.0f, 0.0f), 30000.0f, 30000.0f);
 		sun.setTexture(sunTexture);
-		sunGlow = new BillBoard(new Vector3f(-100000.0f, 0.0f, 0.0f), 1.0f);
+		sunGlow = new BillBoard(new Vector3f(-24900.0f, 0.0f, 0.0f), 40000.0f, 30000.0f);
 		sunGlow.setTexture(sunGlowTexture);
 	}
 
@@ -188,15 +188,15 @@ public class Game implements IGame
 			sunShader.loadUniformVec3f(Info.camera.getLocalUpVector(), "cameraUp");
 			sunShader.loadUniformVec3f(Info.camera.getLocalRightVector(), "cameraRight");	
 			sun.render(GL_TRIANGLES);
-		}
-
-		glUseProgram(sunGlowShader.getId());
-		{
-			sunGlowShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
-			sunGlowShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
-			sunGlowShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
 			sunGlow.render(GL_TRIANGLES);
 		}
+//
+//		glUseProgram(sunShader.getId());
+//		{
+//			sunShader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
+//			sunShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
+//			sunShader.loadUniformVec3f(sunGlow.getPosition(), "billboardCenter");
+//		}
 	}
 	
 	private void drawAtmosphere()
@@ -229,27 +229,30 @@ public class Game implements IGame
 		shader.loadUniformMat4f(Info.projectionMatrix, "projectionMatrix", false);
 		shader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 		shader.loadUniformMat4f(normalMatrix, "normalMatrix", true);
-		shader.loadUniformVec3f(sun.getPosition(), "lightPosition");
+		shader.loadUniformVec3f(new Vector3f(-100000.0f, 0.0f, 0.0f), "lightPosition");
 		shader.loadUniformVec3f(Info.camera.getPosition(), "cameraPosition");
 		shader.loadUniform1f(planet.getRadius(), "radius");
-		shader.loadUniform1f(flatShading, "flatShading");
 		shader.loadUniform1f(planet.getMountainHeight(), "mountainHeight");
 	}
 	
 	private void drawPlanet()
 	{
 		Matrix4f.mul(Info.camera.getViewMatrix(), planet.getSphere().getModelMatrix(), modelViewMatrix);
-		Matrix4f.invert(modelViewMatrix, normalMatrix);		
+		Matrix4f.invert(modelViewMatrix, normalMatrix);
 		
 		switch(planet.getShaderMode())
 		{
 		case Planet.STYLE_EARTH:	loadPlanetShaderUniforms(earthShader);
+									planet.setHasWater(true);
 									break;
 		case Planet.STYLE_MARS:		loadPlanetShaderUniforms(marsShader);
+									planet.setHasWater(false);
 									break;
 		case Planet.STYLE_DUNE: 	loadPlanetShaderUniforms(dessertShader);
+									planet.setHasWater(false);
 									break;
 		case Planet.STYLE_UNICOLOR: loadPlanetShaderUniforms(uniColorPlanetShader);
+									planet.setHasWater(true);
 									break;
 		default: 					throw new IllegalArgumentException();
 		}
@@ -264,7 +267,7 @@ public class Game implements IGame
 			wireFrameShader.loadUniformMat4f(modelViewMatrix, "modelViewMatrix", false);
 			wireFrameShader.loadUniform1f(0.5f, "greytone");
 			planet.getSphere().render(GL_LINES);
-			wireFrameShader.loadUniform1f(1.0f, "greytone");
+			wireFrameShader.loadUniform1f(0.8f, "greytone");
 			planet.getSphere().render(GL_POINTS);
 			glDepthFunc(GL_LESS);
 		}
@@ -301,7 +304,10 @@ public class Game implements IGame
 		
 			case HUD_MODE_INFO:
 			{
-				hud.setBackgroundColor(HUD_BG_WHITE);
+				if(freezeUpdate)
+					hud.setBackgroundColor(HUD_BG_GREY);
+				else
+					hud.setBackgroundColor(HUD_BG_WHITE);
 				hud.update(getInfoHUDText());
 				return;
 			}
@@ -390,6 +396,7 @@ public class Game implements IGame
 	private void reset()
 	{
 		planet.setNoiseSeed(0);
+		planet.resetPlanet();
 		Info.camera = new FreeCamera(new Vector3f(0.0f,0.0f,20000.0f));
 		planet.setShaderMode(0);
 		wireframe = false;

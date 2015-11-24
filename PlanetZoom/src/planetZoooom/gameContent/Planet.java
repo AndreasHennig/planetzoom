@@ -8,14 +8,15 @@ import planetZoooom.interfaces.IGameObjectListener;
 import planetZoooom.utils.CustomNoise;
 import planetZoooom.utils.Info;
 
-public class Planet implements IGameObjectListener
+public class Planet //implements IGameObjectListener
 {
 	private final static float MIN_AMPLITUDE = 1;
 	private final static float MIN_LAMBDA_BASE_FACTOR = 0.1f;
 	private final static int MIN_OCTAVES = 1;
+	private final static int MAX_OCTAVES = 10;
 	private final static float MIN_MOUNTAIN_HEIGHT = 0.0214f;
 	private final static int MIN_TRIANGLES = 10000;
-	final static float CAM_COLLISION_OFFSET = 30;
+	final static float CAM_COLLISION_OFFSET = 200;
 
 	private DynamicSphere sphere;
 	private Vector3f position;
@@ -28,28 +29,32 @@ public class Planet implements IGameObjectListener
 	private float mountainHeight;	
 	private final float slowDownRadius;
 	private int shaderMode = 0;
+	private boolean hasWater;
 	
 	public static final int STYLE_EARTH = 0;
 	public static final int STYLE_MARS = 1;
 	public static final int STYLE_DUNE = 2;
 	public static final int STYLE_UNICOLOR = 3;
 	
-	
 	public Planet(float radius, Vector3f position)
 	{
 		this.position = position;
-		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES);
+		this.sphere = new DynamicSphere(radius, MIN_TRIANGLES, this);
 		this.atmosphere = new Atmosphere(this);
 
-		sphere.addListener(this);
+		//sphere.addListener(this);
 
+		resetPlanet();
+		
+		slowDownRadius = getRadius() * 1.15f;
+	}
+
+	public void resetPlanet() {
 		lambdaBaseFactor = 0.75f;
 		octaves = 3;
 		amplitude = 1.77f;
 		noiseSeed = 0;
 		mountainHeight = MIN_MOUNTAIN_HEIGHT;
-		
-		slowDownRadius = getRadius() * 1.15f;
 	}
 
 	public void update()
@@ -63,6 +68,16 @@ public class Planet implements IGameObjectListener
 		adjustCamSpeed(camSphereDistance);
 		
 		handleCollision(planetToCam);
+	}
+	
+	public void setHasWater(boolean water)
+	{
+		hasWater = water;
+	}
+	
+	public boolean getHasWater()
+	{
+		return hasWater;
 	}
 
 	public float getAmplitude()
@@ -87,6 +102,8 @@ public class Planet implements IGameObjectListener
 	{
 		if (octaves < MIN_OCTAVES)
 			this.octaves = MIN_OCTAVES;
+		else if(octaves > MAX_OCTAVES)
+			octaves = MAX_OCTAVES;
 		else
 			this.octaves = octaves;
 	}
@@ -132,7 +149,6 @@ public class Planet implements IGameObjectListener
 			this.mountainHeight = mountainHeight;
 	}
 
-	
 	private void adjustCamSpeed(float camSphereDistance) {
 		ICameraControl camControl = Info.camera.getCameraControl();
 		
@@ -209,22 +225,22 @@ public class Planet implements IGameObjectListener
 		return lambdaBaseFactor * planetRadius;
 	}
 
-	@Override
-	public void vertexCreated(Vector3f v)
-	{
-		float planetRadius = this.getRadius();
-
-		final float lambda = lambdaBaseFactor * planetRadius;
-
-		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
-
-		if (noise < 0)
-			noise = 0;
-
-		// 0.14 % = 8 km von 6000 km
-		v.scale(1 + noise * mountainHeight);
-	}
-	
+//	@Override
+//	public void vertexCreated(Vector3f v)
+//	{
+//		float planetRadius = this.getRadius();
+//
+//		final float lambda = lambdaBaseFactor * planetRadius;
+//
+//		float noise = (float) CustomNoise.perlinNoise(v.x + noiseSeed, v.y + noiseSeed, v.z + noiseSeed, octaves, lambda, amplitude);
+//
+//		if (noise < 0)
+//			noise = 0;
+//
+//		// 0.14 % = 8 km von 6000 km
+//		v.scale(1 + noise * mountainHeight);
+//	}
+			
 	public void setShaderMode(int mode){
 		this.shaderMode = mode;
 		atmosphere.update(mode);

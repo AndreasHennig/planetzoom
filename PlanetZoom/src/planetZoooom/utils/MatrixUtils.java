@@ -8,8 +8,8 @@ public class MatrixUtils
 	{
 		Matrix4f result = new Matrix4f();
 		float fov = fovParam;
-		float zFar = 500000.0f;
-		float zNear = 0.01f;
+		float zFar = 90000.0f;
+		float zNear = 1f;
 		float aspectRatio = (float) width/height;		
 		float frustumLength = zFar - zNear;
 		float yScale = (float)(1.0f/Math.tan(Math.toRadians(fov/2.0f)));

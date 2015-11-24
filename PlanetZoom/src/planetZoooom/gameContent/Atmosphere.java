@@ -16,13 +16,11 @@ public class Atmosphere
 	private static final int ATMOSPHERE_SPHERE_SUBDIVISIONS = 6; 
 	private static final float ATMOSPHERE_PLANET_DISTANCE = 0.150f;
 	
-	private static final int SAMPLE_RAYS = 2;						// Number of sample rays to use in integral equation
+	private static final int SAMPLE_RAYS = 3;						// Number of sample rays to use in integral equation
 	
 	private static final float MIE_PHASE_ASYMETRY_FACTOR = -0.990f;	// The Mie phase asymmetry factor
-	//private static final float EXPOSURE = 2.0f;
 	private static final float RAYLEIGH_SCALE_DEPTH = 0.15f;
-	private static final float MIE_SCALE_DEPTH = 0.15f;
-	private static final float MIE_SCATTERING = 0.0001f;
+	private static final float MIE_SCATTERING = 0.0001f; 
 			
 	private float rayleighScattering;
 	private float waveLengthRed;
@@ -30,7 +28,6 @@ public class Atmosphere
 	private float waveLengthBlue;
 	private float sunBrightness;
 
-	private float planetRadius;
 	
 	private float[] wavelengths = new float[3];
 	
@@ -38,7 +35,6 @@ public class Atmosphere
 	public Atmosphere(Planet planet)
 	{
 		sphere = new StaticSphere(ATMOSPHERE_SPHERE_SUBDIVISIONS, planet.getRadius() * (1 + ATMOSPHERE_PLANET_DISTANCE));
-		this.planetRadius = planet.getRadius();
 		position = planet.getPosition();
 		modelMatrix = new Matrix4f().translate(position);
 		
@@ -71,64 +67,8 @@ public class Atmosphere
 			default: 					throw new IllegalArgumentException();
 		}
 	}
-	/**
-	 * if rayleigh is true rayleigh scattering is calculated 
-	 * otherwise mie scattering is calculated
-	 * returns the "optical depth" that is the average atmospheric density across the ray from point Pa to point Pb multiplied by the length of the ray
-	 */
-	private void outScattering(boolean rayleigh, Vector3f pa, Vector3f pb, int samples)
-	{		
-		/*
-		 * 
-		 * The scattering equations have nested integrals that are impossible to solve analytically; 
-		 * fortunately, it's easy to numerically compute the value of an integral with techniques such as the trapezoid rule. 
-		 * Approximating an integral in this manner boils down to a weighted sum calculated in a loop. Imagine a line segment on a graph: 
-		 * break up the segment into n sample segments and evaluate the integrand at the center point of each sample segment. 
-		 * Multiply each result by the length of the sample segment and add them all up. 
-		 * Taking more samples makes the result more accurate, but it also makes the integral more expensive to calculate.
-		 */
-		
-		Vector3f ray = new Vector3f();
-		Vector3f segment = new Vector3f();
-		Vector3f samplePoint = new Vector3f();
-		Vector3f.sub(pb, pa, ray);
-		ray.scale(1.0f / samples);
-		float offset = (1.0f / samples) / 2.0f;
-		float segmentLength = segment.scale(1.0f / samples).length();
-		double sum = 0;
-		float height = 0;
-		//calculate out-scattering integral
-		
-		for(int i = 0; i < samples; i++)
-		{
-			segment.x = ray.x;
-			segment.y = ray.y;
-			segment.z = ray.z;
-			segment.scale(offset + i * (1.0f / samples));
-		
-			samplePoint.x  = pa.x + segment.x;
-			samplePoint.y  = pa.y + segment.y;
-			samplePoint.z  = pa.z + segment.z;
-			
-			height = samplePoint.length() - planetRadius;
-			//set height parameter so 0 equals sea level and 1 is the top of the atmosphere
-			sum += calculateAtmosphericDenisity(height, rayleigh) * segmentLength; 
-		}
-	}
-	
-	private void createLUT()
-	{
-		
-	}
-	private double calculateAtmosphericDenisity(float height, boolean rayleigh)
-	{
-		if(rayleigh)
-			return Math.exp(height / RAYLEIGH_SCALE_DEPTH);
-		else
-			return Math.exp(height / MIE_SCALE_DEPTH);
-	}
 
-	
+
 	public void loadSpecificUniforms(ShaderProgram atmosphereShader)
 	{
 		atmosphereShader.loadUniformVec3f(new Vector3f(wavelengths[0],wavelengths[1], wavelengths[2]), "inverseWavelength");
