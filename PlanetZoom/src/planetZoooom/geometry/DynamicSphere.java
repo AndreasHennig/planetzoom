@@ -18,7 +18,7 @@ public class DynamicSphere
 	private static final int FIRST_CHECK = 3;
 	private static final double VIEW_FRUSTUM_OFFSET = 1.5;
 	private static final float VIEW_FRUSTUM_CHECK_OFFSET = 0.01f;
-	private static final int ANGLE_TOLERANCE = 40;	
+	private static final float ANGLE_TOLERANCE = (float) Math.cos((90 + 40) * Math.PI / 180);	// NEW Angle tolerance, belongs to isFacingTowardsCamera() --> OLD: private static final int ANGLE_TOLERANCE = 40;	
 	//To be inherited by superclass
 	private float[] positions;
 	private float[] normals;
@@ -383,6 +383,8 @@ public class DynamicSphere
 		return isInViewFrustum(positions);
 	}
 
+	//OLD isFacingTowardsCamera
+	/*
 	private boolean isFacingTowardsCamera(int[] triangleIndices) 
 	{
 		float[] a = getPositions(triangleIndices);
@@ -395,6 +397,22 @@ public class DynamicSphere
 			angle = 360 - angle;
 		
 		return angle < 90 + ANGLE_TOLERANCE;
+	}*/
+	
+	//NEW isFacingTowardsCamera (Prof. Dr. Lenz edition)
+	private boolean isFacingTowardsCamera(int[] triangleIndices) 
+	{
+		float[] a = getPositions(triangleIndices);
+		setVec(v1, a[0], a[1], a[2]);
+
+		Vector3f.sub(Info.camera.getPosition(), v1, n1);
+
+		float dot = Vector3f.dot(v1, n1);
+		if (dot >= 0) {
+			return true;
+		}
+		dot /= v1.length() * n1.length();
+		return dot > ANGLE_TOLERANCE;
 	}
 	
 	public float getRadius()
