@@ -19,6 +19,8 @@ Actual features of the final version:
 ## How to run the application
 The application is created in eclipse. In this repo you find the complete eclipse project with all necessary libraries. So you can just clone the repo and import it into you workspace.
 
+HINT: If you have problems starting the application (e.g. under OSX) try the following parameter in Run Configurations -> VM arguments: -XstartOnFirstThread
+
 ## Acknowledgment
 Special thanks goes to Prof. Dr. Tobias Lenz for his support, patience and for pointing us into the right direction.
 
